@@ -8,5 +8,5 @@
 
   - __Product Owner__: Corey Wolff
   - __Scrum Master__: Lain Jiang
-  - __Development Team Members__: Joyce Liu, James Yokobosky
+  - __Development Team Members__: Joyce Liu, James Yokobosky, Leo Thorp
 
