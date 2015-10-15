@@ -1,10 +1,8 @@
 var express = require('express');
 var router = express.Router();
+var handlers = require('../Utilities/requestHandlers')
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  log('getting /', 'new log succeeded!');
-  res.render('index', { title: 'Express' });
-});
+router.post('/*', handlers.postSkeleton);
 
 module.exports = router;
