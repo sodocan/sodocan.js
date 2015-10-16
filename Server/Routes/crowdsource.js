@@ -4,28 +4,37 @@ var handlers = require('../Utilities/requestHandlers');
 
 /* GET home page. */
 router.get('/api',function(req, res){
-var apiPath = parse(req.url).pathname;
+var apiPath = req.url;
 
-parseApiPath(apiPath, function(data) {
-  //do some stuff here
-  res.end(data);
-});
+parseApiPath(apiPath, testCallback);
 
 
 });
 
 var parseApiPath = function(path, callback) {
   var pathArray = path.split('/');
+  var pathArrayPointer = 0;
+  var next = function() {
+    pathArrayPointer++;
+    return pathArray[pathArrayPointer];
+  }
+
+
+
   var searchObject = {};
+  if (next() !== 'api') {
+    send404();
+    return;
+  }
   searchObject.projectName = next();
   if (!searchObject.projectName) {
     send404();
     return;
   }
-  var next = next();
-  if (next === 'ref') {
+  var nextPath = next();
+  if (nextPath === 'ref') {
     searchObject.methodName = next();
-    next = next();
+    nextPath = next();
   }
 
   mongoose.find(searchObject, function(error, references) {
@@ -37,16 +46,16 @@ var parseApiPath = function(path, callback) {
       var contexts = {};
       var context = 'all';
       do {
-        if (next === 'all' || next.slice(0,7) === 'entryID' || !isNaN(+next) || !next) {
+        if (nextPath === 'all' || nextPath.slice(0,7) === 'entryID' || !isNaN(+nextPath) || !nextPath) {
           contexts[context] = contexts[context] || [];
-          if (next) { // not necessary, since will just push undefined to array
-            contexts[context].push(next);
+          if (nextPath) { // not necessary, since will just push undefined to array
+            contexts[context].push(nextPath);
           }
         } else {
-          context = next;
+          context = nextPath;
         }
-        next = next();
-      } while (next);
+        nextPath = next();
+      } while (nextPath);
 
       var newReferences = references.map(function(reference) {
         var entriesObj = reference.contexts;
@@ -75,7 +84,14 @@ var parseApiPath = function(path, callback) {
   });
 };
 
+// This is temporary
+var send404 = function() {
+  log('Got a 404!');
+};
 
+var testCallback= function(ref){
+  log('the references' , ref);
+};
 
 //[
 //get all top voted entries for all functions / classes / everythign
