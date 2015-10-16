@@ -53,6 +53,35 @@ var findCommentBlocks = function(string) {
   return string.match(blockRegex);
 };
 
+/* 
+  stuff
+*/
+
+var findFunctionNames = function(string) {
+  var functionPatternA = /(?:[{,]|var)[\n\r]?\s*([a-zA-Z0-9_]+)\s*[=:]\s*function\(/g;
+  var functionPatternB = /function\s*([a-zA-Z0-9_]+)\(/g;
+
+  var matchListA = functionPatternA.exec(string);
+  var matchListB = functionPatternB.exec(string);
+  var functionNames = [];
+
+  while (matchListA) {
+    functionNames.push(matchListA[1]);
+    matchListA = functionPatternA.exec(string);
+  }
+
+  while (matchListB) {
+    functionNames.push(matchListB[1]);
+    matchListB = functionPatternB.exec(string);
+  }
+
+  return functionNames.sort();
+};
+
+// {foo: bar, faz: function()}
+// var func = function(a)
+// function func(a)
+
 var parseCommentBlock = function(commentBlock) {
   //@functionName:
   // @params: '...stuff...' 
@@ -152,6 +181,7 @@ module.exports = {
   splitEntries: splitEntries,
   processEntry: processEntry,
   convertToJS: convertToJS,
+  findFunctionNames: findFunctionNames
 };
 
 //for command line use

@@ -4,11 +4,12 @@ var fs = require('fs');
 
 var findCommentBlocks = docParser.findCommentBlocks;
 var parseCommentBlock = docParser.parseCommentBlock;
-var splitEntires = docParser.splitEntries;
+var splitEntries = docParser.splitEntries;
 var processEntry = docParser.processEntry;
 var properties = docParser.properties;
 var convertToJS = docParser.convertToJS;
 var parserMain = docParser.parserMain;
+var findFunctionNames = docParser.findFunctionNames;
 
 var fixtures = fs.readFileSync('./spec/fixtures.js').toString();
 
@@ -87,7 +88,7 @@ describe("documentation parser", function() {
     expect(parsedJS).to.deep.equal({name: 'foo', type: 'String'});
   });
 
-  it("should determine approprite action based on entry type(obj, str, array)", function() {
+  it("should determine appropriate action based on entry type(obj, str, array)", function() {
     test = 'params: {name: "foo", type: "Number"}';
     var entryObj = processEntry(test);
     expect(entryObj.propertyName).to.equal('params');
@@ -105,6 +106,17 @@ describe("documentation parser", function() {
     expect(result.length).to.equal(2);
     expect(result[0].params[0].name).to.equal('stuff');
     expect(result[1].returns[1].type).to.equal('num');
-    console.log(result);
+    // console.log(result);
+  });
+
+  it("should parse the names of functions even without comments", function() {
+    var results = findFunctionNames(fixtures);
+    console.log('result of function names: ', results);
+    expect(results.length).to.equal(7);
+    expect(results[0]).to.equal('baz');
+    expect(results[1]).to.equal('chopsticks');
+    expect(results[2]).to.equal('foo');
+    expect(results[3]).to.equal('goldfish');
+    expect(results[4]).to.equal('guppy');
   });
 });
