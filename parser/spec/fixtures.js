@@ -5,12 +5,12 @@
 @description: 'xtra cheddar'
 */
 
-var goldfish = function(stuff) {
+var goldfish = function(stuff, things) {
 
 };
 
-function guppy(eggs) {
-  
+function guppy(eggs, pie, green) {
+
 } 
 /* @doc
 @params: {name: 'stuff', type: 'Boolean'}
@@ -36,7 +36,7 @@ function spicyTuna() {
 }
 
 var stuff = {
-  foo: function() {}
+  foo: function(obj, trapezoid) {}
 };
 
-var otherStuff = {bar: 1, baz: function(){}};
+var otherStuff = {bar: 1, baz: function(grapefruit){}};

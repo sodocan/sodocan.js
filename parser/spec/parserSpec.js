@@ -8,8 +8,9 @@ var splitEntries = docParser.splitEntries;
 var processEntry = docParser.processEntry;
 var properties = docParser.properties;
 var convertToJS = docParser.convertToJS;
-var parserMain = docParser.parserMain;
-var findFunctionNames = docParser.findFunctionNames;
+var parseComments = docParser.parseComments;
+var findFunctionInfo = docParser.findFunctionInfo;
+var parseMain = docParser.parseMain;
 
 var fixtures = fs.readFileSync('./spec/fixtures.js').toString();
 
@@ -101,7 +102,7 @@ describe("documentation parser", function() {
   });
 
   it("should parse a file to get documentation info", function() {
-    var result = parserMain(fixtures);
+    var result = parseComments(fixtures);
     expect(Array.isArray(result)).to.equal(true);
     expect(result.length).to.equal(2);
     expect(result[0].params[0].name).to.equal('stuff');
@@ -110,13 +111,24 @@ describe("documentation parser", function() {
   });
 
   it("should parse the names of functions even without comments", function() {
-    var results = findFunctionNames(fixtures);
-    console.log('result of function names: ', results);
+    var results = findFunctionInfo(fixtures);
+    // console.log('result of function names: ', results);
     expect(results.length).to.equal(7);
-    expect(results[0]).to.equal('baz');
-    expect(results[1]).to.equal('chopsticks');
-    expect(results[2]).to.equal('foo');
-    expect(results[3]).to.equal('goldfish');
-    expect(results[4]).to.equal('guppy');
+    expect(results[0].functionName).to.equal('baz');
+    expect(results[1].functionName).to.equal('chopsticks');
+    expect(results[2].functionName).to.equal('foo');
+    expect(results[3].functionName).to.equal('goldfish');
+    expect(results[4].functionName).to.equal('guppy');
+  });
+
+  it("should parse info based on both functions and comments", function() {
+    var results = parseMain(fixtures);
+    console.log('result of function names: ', JSON.stringify(results));
+    expect(results.length).to.equal(7);
+    // expect(results[0].functionName).to.equal('baz');
+    // expect(results[1].functionName).to.equal('chopsticks');
+    // expect(results[2].functionName).to.equal('foo');
+    // expect(results[3].functionName).to.equal('goldfish');
+    // expect(results[4].functionName).to.equal('guppy');
   });
 });

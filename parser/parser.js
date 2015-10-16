@@ -30,7 +30,15 @@ var fileOperations = function(paths) {
   }
 };
 
-var parserMain = function(string) {
+// right now does not distinguish between API and helper functions
+var parseMain = function(string) {
+  // assuming function names are supplied
+  var functionInfo = findFunctionInfo(string);
+  var commentInfo = parseComments(string);
+  return combineInfo(functionInfo, commentInfo);
+};
+
+var parseComments = function(string) {
   var results = [];  
   var blocks = findCommentBlocks(string);
   blocks.forEach(function(block) {
@@ -57,25 +65,44 @@ var findCommentBlocks = function(string) {
   stuff
 */
 
-var findFunctionNames = function(string) {
-  var functionPatternA = /(?:[{,]|var)[\n\r]?\s*([a-zA-Z0-9_]+)\s*[=:]\s*function\(/g;
-  var functionPatternB = /function\s*([a-zA-Z0-9_]+)\(/g;
+var findFunctionInfo = function(string) {
+  var functionPatternA = /(?:[{,]|var)[\n\r]?\s*([a-zA-Z0-9_]+)\s*[=:]\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  var functionPatternB = /function\s*([a-zA-Z0-9_]+)\s*\(([a-zA-Z0-9_,\s]*)\)/g;
+  //var paramsPattern = /function\s*[a-zA-Z0-9_]*\s*(\([a-zA-Z0-9_,\s]*\))/g;
 
   var matchListA = functionPatternA.exec(string);
   var matchListB = functionPatternB.exec(string);
-  var functionNames = [];
+  var functionInfo = [];
 
+  // right now paramsList will return an array even if there's no params
+  // may refactor later, may not
   while (matchListA) {
-    functionNames.push(matchListA[1]);
+    var paramsList = matchListA[2].split(',').map(function(param){
+      return {'name': param.trim()};
+    });
+    var obj = {
+      functionName: matchListA[1],
+      params: paramsList
+    };
+    functionInfo.push(obj);
     matchListA = functionPatternA.exec(string);
   }
 
   while (matchListB) {
-    functionNames.push(matchListB[1]);
+    var paramsList = matchListB[2].split(',').map(function(param){
+      return {'name': param.trim()};
+    });
+    var obj = {
+      functionName: matchListB[1],
+      params: paramsList
+    };
+    functionInfo.push(obj);
     matchListB = functionPatternB.exec(string);
   }
 
-  return functionNames.sort();
+  return functionInfo.sort(function(a, b) {
+    return b.functionName < a.functionName;
+  });
 };
 
 // {foo: bar, faz: function()}
@@ -174,14 +201,31 @@ var splitEntries = function(string) {
   return string.split(entryDividingRegex);
 };
 
+var combineInfo = function(functionArr, commentArray) {
+  var combinedArr = [];
+  var storage = {};
+
+  for (var i = 0; i < functionArr.length; i++) {
+    storage[functionArr[i].functionName] = functionArr[i];
+  }
+  for (var j = 0; j < commentArray.length; j++) {
+    storage[commentArray[j].functionName] = commentArray[j];
+  }
+  for (var name in storage) {
+    combinedArr.push(storage[name]);
+  }
+  return combinedArr;
+};
+
 module.exports = {
-  parserMain: parserMain,
+  parseComments: parseComments,
   findCommentBlocks: findCommentBlocks,
   parseCommentBlock: parseCommentBlock,
   splitEntries: splitEntries,
   processEntry: processEntry,
   convertToJS: convertToJS,
-  findFunctionNames: findFunctionNames
+  findFunctionInfo: findFunctionInfo,
+  parseMain: parseMain
 };
 
 //for command line use
