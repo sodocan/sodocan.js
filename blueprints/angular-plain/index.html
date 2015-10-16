@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html x-ng-app="sodocan" x-ng-controller="sodocanCtrl">
+  <head>
+    <title x-ng-bind="pageTitle"></title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- build step not yet included -->
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+    <!-- build step not yet included -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.js"></script>
+    <script type="text/javascript" src="angular-shared/sodocan.js"></script>
+    <script type="text/javascript" src="angular-plain/header.js"></script>
+    <script type="text/javascript" src="angular-plain/content.js"></script>
+
+  </head>
+  <body>
+
+    <div class="header" x-sodocan-header></div>
+
+    <div class="sidebar" x-sodocan-sidebar></div>
+
+    <div class="content" x-sodocan-content></div>
+
+    <div class="footer" x-sodocan-footer></div>
+
+  </body>
+</html>
