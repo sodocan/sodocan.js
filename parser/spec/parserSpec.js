@@ -1,5 +1,6 @@
 var expect = require('chai').expect;
 var docParser = require('../parser.js');
+var parsedToHTML = require('../parsedToHTML.js');
 var fs = require('fs');
 
 var findCommentBlocks = docParser.findCommentBlocks;
@@ -13,6 +14,7 @@ var findFunctionInfo = docParser.findFunctionInfo;
 var parseMain = docParser.parseMain;
 
 var fixtures = fs.readFileSync('./spec/fixtures.js').toString();
+var parsedJSON = fs.readFileSync('./spec/parsedJSON.json').toString();
 
 describe("documentation parser", function() {
   var test;
@@ -123,12 +125,13 @@ describe("documentation parser", function() {
 
   it("should parse info based on both functions and comments", function() {
     var results = parseMain(fixtures);
-    console.log('result of function names: ', JSON.stringify(results));
     expect(results.length).to.equal(7);
-    // expect(results[0].functionName).to.equal('baz');
-    // expect(results[1].functionName).to.equal('chopsticks');
-    // expect(results[2].functionName).to.equal('foo');
-    // expect(results[3].functionName).to.equal('goldfish');
-    // expect(results[4].functionName).to.equal('guppy');
+    expect(results[3].functionName).to.equal('goldfish');
+    expect(results[3].functionName).to.equal('goldfish');
+  });
+
+  it("should turn parsedInfo to HTML", function() {
+    var results = parsedToHTML(parsedJSON);
+    console.log(results);
   });
 });

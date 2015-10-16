@@ -1,0 +1,48 @@
+    <div class="entry">
+      <h1>{{{ functionName }}}</h1>
+      {{#if params}}
+        <div>
+          <h2>Parameters</h2>
+          <ul>
+            {{#each params}}
+              {{#if this.name}}
+              <li>{{{ this.name }}}</li>  
+              {{/if}}
+              {{#if this.type}}
+              <li>{{{ this.type }}}</li>
+              {{/if}}
+            {{/each}}
+          </ul>
+        </div>
+      {{/if}}
+      {{#if returns}}
+        <div>
+          <h2>Returns</h2>
+          <ul>
+            {{#each returns}}
+              <li>{{{ this.type }}}</li>
+            {{/each}}
+          </ul>
+        </div>
+      {{/if}}
+      <div>
+        {{#if group}}    
+          <h2>Group By: {{{ group }}}</h2>
+        {{/if}}
+        {{#if classContext}}  
+          <h2>Class Context: {{{ classContext }}}</h2>
+        {{/if}}
+      </div>
+      <div>
+        <h2>Crowd Entries: </h2>
+        {{#if crowdEntries.description}}  
+          <p>Description: {{{ crowdEntries.description }}}</p>
+        {{/if}}
+        {{#if crowdEntries.example}}  
+          <p>Example: {{{ crowdEntries.example }}}</p>
+        {{/if}}
+        {{#if crowdEntries.tips}}  
+          <p>Tips: {{{ crowdEntries.tips }}}</p>
+        {{/if}}
+      </div>
+    </div>

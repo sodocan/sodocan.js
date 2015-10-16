@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 var fs = require('fs');
+var parsedToHTML = require('./parsedToHTML.js');
 
 //consider including more specific types of description: params description, returns description
 //maybe we don't need 'name' for the 'returns' array
@@ -22,7 +23,8 @@ var fileOperations = function(paths) {
   for (var i = 0; i < paths.length; i++) {
     fileNumbers.push(i + 1);
     fs.readFile(paths[i], function(err, data) {
-      var JSONdata = JSON.stringify(parserMain(data.toString()));
+      var JSONdata = JSON.stringify(parseMain(data.toString()));
+      console.log('JSONdata in fileOperations:', JSONdata);
       fs.appendFile(outputPath, JSONdata, function(err, data) {
         console.log('successfully parsed file ' + fileNumbers.shift() + ' of ' + paths.length);
       });
@@ -52,6 +54,14 @@ var parseComments = function(string) {
   }); 
   return results;
 };
+
+// var buildCrowdEntries = function(blockObj) {
+//   blockObj.crowdEntries = {
+//     descriptions: [blockObj.description],
+//     examples: [blockObj.example],
+//     tips: [blockObj.tips]
+//   };
+// };
 
 var findCommentBlocks = function(string) {
   //search the string for a substring beginning with /* and ending with */
