@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "parser.js",
+  "preferGlobal" : true,
+  "bin" : {
+    "parse": "parser.js"
+  },
   "dependencies": {
   },
   "devDependencies": {

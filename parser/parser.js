@@ -1,19 +1,36 @@
+#! /usr/bin/env node
 var fs = require('fs');
 
 //consider including more specific types of description: params description, returns description
 //maybe we don't need 'name' for the 'returns' array
-exports.properties = properties = {
+
+var properties = {
   'functionName': '',
   'params': [],
   'returns': [],
   'group': '',
   'description': '',
   'example': '',
-  'tips': ''
+  'tips': '',
+  'classContext': ''
 };
 
-exports.parserMain = parserMain = function(string) {
-  // fs.readFile(filePath, function(err, data) {
+var fileOperations = function(paths) {
+  //last path in array is the output file; earlier ones are js files to parse
+  var outputPath = paths.pop();
+  var fileNumbers = [];
+  for (var i = 0; i < paths.length; i++) {
+    fileNumbers.push(i + 1);
+    fs.readFile(paths[i], function(err, data) {
+      var JSONdata = JSON.stringify(parserMain(data.toString()));
+      fs.appendFile(outputPath, JSONdata, function(err, data) {
+        console.log('successfully parsed file ' + fileNumbers.shift() + ' of ' + paths.length);
+      });
+    });
+  }
+};
+
+var parserMain = function(string) {
   var results = [];  
   var blocks = findCommentBlocks(string);
   blocks.forEach(function(block) {
@@ -28,7 +45,7 @@ exports.parserMain = parserMain = function(string) {
   return results;
 };
 
-exports.findCommentBlocks = findCommentBlocks = function(string) {
+var findCommentBlocks = function(string) {
   //search the string for a substring beginning with /* and ending with */
   // right now assumes @doc is the first thing in the block after 0 or more white spaces
   // but not other chars
@@ -36,7 +53,36 @@ exports.findCommentBlocks = findCommentBlocks = function(string) {
   return string.match(blockRegex);
 };
 
-exports.parseCommentBlock = parseCommentBlock = function(commentBlock) {
+/* 
+  stuff
+*/
+
+var findFunctionNames = function(string) {
+  var functionPatternA = /(?:[{,]|var)[\n\r]?\s*([a-zA-Z0-9_]+)\s*[=:]\s*function\(/g;
+  var functionPatternB = /function\s*([a-zA-Z0-9_]+)\(/g;
+
+  var matchListA = functionPatternA.exec(string);
+  var matchListB = functionPatternB.exec(string);
+  var functionNames = [];
+
+  while (matchListA) {
+    functionNames.push(matchListA[1]);
+    matchListA = functionPatternA.exec(string);
+  }
+
+  while (matchListB) {
+    functionNames.push(matchListB[1]);
+    matchListB = functionPatternB.exec(string);
+  }
+
+  return functionNames.sort();
+};
+
+// {foo: bar, faz: function()}
+// var func = function(a)
+// function func(a)
+
+var parseCommentBlock = function(commentBlock) {
   //@functionName:
   // @params: '...stuff...' 
   //                   @description: '....'
@@ -46,7 +92,6 @@ exports.parseCommentBlock = parseCommentBlock = function(commentBlock) {
   commentBlock = commentBlock.trim();
   commentBlock = commentBlock.substring(1);
   // check if matches pattern: [\n\r]\s*@; if so, there are multiple entries
-  //if there are multiple entries
   var entries;
   if (commentBlock.match(/[\n\r]\s*@/)) {
     entries = splitEntries(commentBlock);
@@ -60,7 +105,7 @@ var propertyIsValid = function(propName) {
   return (propName in properties);
 };
 
-exports.processEntry = processEntry = function(entry) {
+var processEntry = function(entry) {
   //grab property name (in between @ and :)
   //grab contents after colon
 
@@ -95,19 +140,28 @@ exports.processEntry = processEntry = function(entry) {
   return entryObj;
 };
 
-exports.convertToJS = convertToJS = function(string) {
+var convertToJS = function(string) {
   var fixedJSON = string.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2": ');
   fixedJSON = fixedJSON.replace(/:\s*(['])([^']+)(['])/g, ':"$2"');
   return JSON.parse(fixedJSON); 
 };
 
-// first char is neither [ or {
+//[^']*
+// : 'stuff_*&&^%%*(@())!##@""'
+// : 'she said: "oh hi"'
+// : "she said: 'oh hi'"
+// : 'stuff', name: 'stuff'
+// @functionName: 'stuff'
+// @description: 'convoluted: "yes"'
+// JSON.parse('"stuff: \'stuff\'"'); "stuff: 'stuff'"
+
+// first char is neither [ or {, so parse the plain string
   // check if first char is ' 
     // find double quotes (unescaped) 
       // escape them and replace them with single quotes  replace " with \'
     // replace head and tail with double quotes 
 
-exports.parseString = parseString = function(string) {
+var parseString = function(string) {
   if (string[0] === "'") {
     string = string.replace(/"/g, "\'");
     string = '"' + string.substring(1, string.length - 1) + '"';
@@ -115,13 +169,24 @@ exports.parseString = parseString = function(string) {
   return JSON.parse(string);
 };
 
-exports.splitEntries = splitEntries = function(string) {
+var splitEntries = function(string) {
   var entryDividingRegex = /[\r\n]\s*@/g;
   return string.split(entryDividingRegex);
 };
 
-//todo: make less tightly coupled (don't use side effects to set properties obj, do it in
-// main )
+module.exports = {
+  parserMain: parserMain,
+  findCommentBlocks: findCommentBlocks,
+  parseCommentBlock: parseCommentBlock,
+  splitEntries: splitEntries,
+  processEntry: processEntry,
+  convertToJS: convertToJS,
+  findFunctionNames: findFunctionNames
+};
+
+//for command line use
+var userArgs = process.argv.slice(2);
+if (userArgs) fileOperations(userArgs);
 
 // @params: 'abc', @name: 'name'
 // @params: [{ name: 'sdfsd' type: 'Boolean' }, { name: 'sdfsd' type: 'Boolean' }]
