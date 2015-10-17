@@ -1,5 +1,14 @@
 #!/usr/bin/env node
 
+
+// I added this. This is not part of the express generator
+global.log = function() {
+  console.log('*********LOG*********');
+  for (var i = 0; i < arguments.length; i++) {
+    console.log(arguments[i]);
+  }
+  console.log('*********************');
+};
 /**
  * Module dependencies.
  */
@@ -90,11 +99,4 @@ function onListening() {
 }
 
 
-// I added this. This is not part of the express generator
-global.log = function() {
-  console.log('*********LOG*********');
-  for (var i = 0; i < arguments.length; i++) {
-    console.log(arguments[i]);
-  }
-  console.log('*********************');
-}
+
