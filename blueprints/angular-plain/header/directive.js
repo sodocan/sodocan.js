@@ -3,7 +3,7 @@ angular.module('sodocan')
   return {
     restrict: 'A',
     replace: 'true',
-    templateUrl: 'angular-plain/header.html'
+    templateUrl: 'angular-plain/header/template.html'
   };
 })
 .controller('sodocanHeaderCtrl', ['$scope', 'sodocanData', function($scope,sodocanData) {
