@@ -12,7 +12,7 @@ var convertToJS = docParser.convertToJS;
 var parseComments = docParser.parseComments;
 var findFunctionInfo = docParser.findFunctionInfo;
 var parseMain = docParser.parseMain;
-
+var buildExplanations = docParser.buildExplanations;
 var fixtures = fs.readFileSync('./spec/fixtures.js').toString();
 var parsedJSON = fs.readFileSync('./spec/parsedJSON.json').toString();
 
@@ -50,14 +50,14 @@ describe("documentation parser", function() {
   });
 
   it("should parse a comment block into separate entries; whether there is a single one or more", function() {
-    var test ='/* @doc \n @functionName: "hey"\n   @description: "man"  */';
+    var test ='/* @doc \n @functionName: "hey"\n   @descriptions: "man"  */';
     var entries = parseCommentBlock(test);
     expect(entries.length).to.equal(2);
-    expect(entries).to.deep.equal(['functionName: "hey"', 'description: "man"']);
-    test ='/* @doc \n @description: "man"  */';
+    expect(entries).to.deep.equal(['functionName: "hey"', 'descriptions: "man"']);
+    test ='/* @doc \n @descriptions: "man"  */';
     entries = parseCommentBlock(test);
     expect(entries.length).to.equal(1);
-    expect(entries).to.deep.equal(['description: "man"']);
+    expect(entries).to.deep.equal(['descriptions: "man"']);
   });
 
   it("should locate appropriate keyword in properties object and process its entry", function() {
@@ -75,9 +75,9 @@ describe("documentation parser", function() {
   });
 
   it("should also parse string content with nested quotes", function() {
-    test = "description: 'this is great: \"?\"'";
+    test = "descriptions: 'this is great: \"?\"'";
     var entryObj = processEntry(test);
-    expect(entryObj.propertyName).to.equal('description');
+    expect(entryObj.propertyName).to.equal('descriptions');
     expect(entryObj.content).to.equal("this is great: '?'");
   });
 
@@ -130,8 +130,20 @@ describe("documentation parser", function() {
     expect(results[3].functionName).to.equal('goldfish');
   });
 
-  it("should turn parsedInfo to HTML", function() {
-    var results = parsedToHTML(parsedJSON);
-    console.log(results);
-  });
+  // it("should correctly build the explanations object on each blockObj", function() {
+  //   test = {functionName: "tester", 
+  //   descriptions: "this is my function", 
+  //   examples: "use this",
+  //   tips: "be careful"};
+  //   buildExplanations(test);
+  //   expect(test.description).to.equal(undefined);
+  //   expect(typeof test.explanations).to.equal('object');
+  //   console.log(test.explanations);
+  //   console.log(test);
+  // });
+
+  // it("should turn parsedInfo to HTML", function() {
+  //   var results = parsedToHTML(parsedJSON);
+  //   // console.log(results);
+  // });
 });

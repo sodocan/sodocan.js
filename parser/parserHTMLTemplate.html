@@ -1,15 +1,15 @@
     <div class="entry">
-      <h1 style="color:blue">{{{ functionName }}}</h1>
+      <h1 style="color:blue">{{ functionName }}</h1>
       {{#if params}}
         <div>
           <h2>Parameters</h2>
           <ul>
             {{#each params}}
               {{#if this.name}}
-              <li>{{{ this.name }}}</li>  
+              <li>{{ this.name }}</li>  
               {{/if}}
               {{#if this.type}}
-              <li>{{{ this.type }}}</li>
+              <li>{{ this.type }}</li>
               {{/if}}
             {{/each}}
           </ul>
@@ -20,29 +20,31 @@
           <h2>Returns</h2>
           <ul>
             {{#each returns}}
-              <li>{{{ this.type }}}</li>
+              <li>{{ this.type }}</li>
             {{/each}}
           </ul>
         </div>
       {{/if}}
       <div>
         {{#if group}}    
-          <h2>Group By: {{{ group }}}</h2>
+          <h2>Group By: {{ group }}</h2>
         {{/if}}
         {{#if classContext}}  
-          <h2>Class Context: {{{ classContext }}}</h2>
+          <h2>Class Context: {{ classContext }}</h2>
         {{/if}}
       </div>
       <div>
         <h2>Explanations: </h2>
-        {{#if explanations.description}}  
-          <p>Description: {{{ explanations.description }}}</p>
+        {{#if explanations.descriptions}}  
+        <ul>
+          <li>Description: {{ explanations.descriptions }}</li>
         {{/if}}
-        {{#if explanations.example}}  
-          <p>Example: {{{ explanations.example }}}</p>
+        {{#if explanations.examples}}  
+          <li>Example: {{ explanations.examples }}</li>
         {{/if}}
         {{#if explanations.tips}}  
-          <p>Tips: {{{ explanations.tips }}}</p>
+          <li>Tips: {{ explanations.tips }}</li>
+        </ul>
         {{/if}}
       </div>
     </div>

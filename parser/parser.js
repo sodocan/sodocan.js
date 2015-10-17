@@ -10,8 +10,8 @@ var properties = {
   'params': [],
   'returns': [],
   'group': '',
-  'description': '',
-  'example': '',
+  'descriptions': '',
+  'examples': '',
   'tips': '',
   'classContext': ''
 };
@@ -19,18 +19,40 @@ var properties = {
 var fileOperations = function(paths) {
   //last path in array is the output file; earlier ones are js files to parse
   var outputPath = paths.pop();
-  var fileNumbers = [];
-  for (var i = 0; i < paths.length; i++) {
-    fileNumbers.push(i + 1);
-    fs.readFile(paths[i], function(err, data) {
-      var JSONdata = JSON.stringify(parseMain(data.toString()));
-      console.log('JSONdata in fileOperations:', JSONdata);
-      fs.appendFile(outputPath, JSONdata, function(err, data) {
-        console.log('successfully parsed file ' + fileNumbers.shift() + ' of ' + paths.length);
-      });
-    });
+  var outputArray = [];
+  var numberOfFiles = paths.length;
+
+  for (var i = 0; i < numberOfFiles; i++) {
+    outputArray = outputArray.concat(parseMain(fs.readFileSync(paths[i]).toString()));
   }
+
+  fs.writeFile(outputPath, JSON.stringify(outputArray), function(err, data) {
+    if (err) {
+      console.log(err + '(will be triggered by mocha tests)');
+    }
+    else {
+      console.log('Successfully parsed all files');
+    }
+  });
+
+  // fs.writeFile(outputPath, '', function(err, data) {
+  //   for (var i = 0; i < paths.length; i++) {
+  //     fileNumbers.push(i + 1);
+  //     fs.readFile(paths[i], function(err, data) {
+  //       var JSONdata = JSON.stringify(parseMain(data.toString()));
+  //       console.log('JSONdata in fileOperations:', JSONdata);
+  //       fs.appendFile(outputPath, JSONdata, function(err, data) {
+  //         console.log('successfully parsed file ' + fileNumbers.shift() + ' of ' + paths.length);
+  //       });
+  //     });
+  //   }
+  // });
 };
+
+// do a while loop/for loop until all files are processed
+// outputArray = []
+// outputArray.concat(fs.readFileSync(currentPath));
+
 
 // right now does not distinguish between API and helper functions
 var parseMain = function(string) {
@@ -50,18 +72,23 @@ var parseComments = function(string) {
       var entryObj = processEntry(entry);
       blockObj[entryObj.propertyName] = entryObj.content;
     });
+    //add nested explanations object
+    buildExplanations(blockObj);
     results.push(blockObj);
   }); 
   return results;
 };
 
-// var buildCrowdEntries = function(blockObj) {
-//   blockObj.crowdEntries = {
-//     descriptions: [blockObj.description],
-//     examples: [blockObj.example],
-//     tips: [blockObj.tips]
-//   };
-// };
+var buildExplanations = function(blockObj) {
+  blockObj.explanations = {
+    descriptions: blockObj.descriptions,
+    examples: blockObj.examples,
+    tips: blockObj.tips
+  };
+  delete blockObj.descriptions;
+  delete blockObj.examples;
+  delete blockObj.tips;
+};
 
 var findCommentBlocks = function(string) {
   //search the string for a substring beginning with /* and ending with */
@@ -235,11 +262,13 @@ module.exports = {
   processEntry: processEntry,
   convertToJS: convertToJS,
   findFunctionInfo: findFunctionInfo,
-  parseMain: parseMain
+  parseMain: parseMain,
+  buildExplanations: buildExplanations
 };
 
 //for command line use
 var userArgs = process.argv.slice(2);
+console.log(userArgs);
 if (userArgs) fileOperations(userArgs);
 
 // @params: 'abc', @name: 'name'

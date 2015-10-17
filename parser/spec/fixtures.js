@@ -2,7 +2,8 @@
 @params: {name: "stuff", type: "Boolean"}
 @returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
 @functionName: 'goldfish'
-@description: 'xtra cheddar'
+@descriptions: 'xtra cheddar'
+@tips: 'don't eat too much
 */
 
 var goldfish = function(stuff, things) {
@@ -16,14 +17,14 @@ function guppy(eggs, pie, green) {
 @params: {name: 'stuff', type: 'Boolean'}
 @returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
 @functionName: 'rice'
-@description: 'squishy'
+@descriptions: 'squishy'
 */
 
 /*
 @params: {name: 'stuff', type: 'Boolean'}
 @returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
 @functionName: 'rice'
-@description: 'squishy'
+@descriptions: 'squishy'
 */
 
 var rice = function(stuff) {
