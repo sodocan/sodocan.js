@@ -1,5 +1,5 @@
     <div class="entry">
-      <h1>{{{ functionName }}}</h1>
+      <h1 style="color:blue">{{{ functionName }}}</h1>
       {{#if params}}
         <div>
           <h2>Parameters</h2>
@@ -34,15 +34,15 @@
         {{/if}}
       </div>
       <div>
-        <h2>Crowd Entries: </h2>
-        {{#if crowdEntries.description}}  
-          <p>Description: {{{ crowdEntries.description }}}</p>
+        <h2>Explanations: </h2>
+        {{#if explanations.description}}  
+          <p>Description: {{{ explanations.description }}}</p>
         {{/if}}
-        {{#if crowdEntries.example}}  
-          <p>Example: {{{ crowdEntries.example }}}</p>
+        {{#if explanations.example}}  
+          <p>Example: {{{ explanations.example }}}</p>
         {{/if}}
-        {{#if crowdEntries.tips}}  
-          <p>Tips: {{{ crowdEntries.tips }}}</p>
+        {{#if explanations.tips}}  
+          <p>Tips: {{{ explanations.tips }}}</p>
         {{/if}}
       </div>
     </div>
