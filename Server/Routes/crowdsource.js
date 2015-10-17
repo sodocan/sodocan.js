@@ -1,97 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var handlers = require('../Utilities/requestHandlers');
+var methodsDB = require('../Databases/Models/methods.js');
+
+log(handlers);
 
 /* GET home page. */
-router.get('/api',function(req, res){
-var apiPath = req.url;
+router.get('/*', handlers.apiGet);
 
-parseApiPath(apiPath, testCallback);
-
-
-});
-
-var parseApiPath = function(path, callback) {
-  var pathArray = path.split('/');
-  var pathArrayPointer = 0;
-  var next = function() {
-    pathArrayPointer++;
-    return pathArray[pathArrayPointer];
-  }
-
-
-
-  var searchObject = {};
-  if (next() !== 'api') {
-    send404();
-    return;
-  }
-  searchObject.projectName = next();
-  if (!searchObject.projectName) {
-    send404();
-    return;
-  }
-  var nextPath = next();
-  if (nextPath === 'ref') {
-    searchObject.methodName = next();
-    nextPath = next();
-  }
-
-  mongoose.find(searchObject, function(error, references) {
-    if (error || !references.length) {
-      send404();
-    } else {
-
-
-      var contexts = {};
-      var context = 'all';
-      do {
-        if (nextPath === 'all' || nextPath.slice(0,7) === 'entryID' || !isNaN(+nextPath) || !nextPath) {
-          contexts[context] = contexts[context] || [];
-          if (nextPath) { // not necessary, since will just push undefined to array
-            contexts[context].push(nextPath);
-          }
-        } else {
-          context = nextPath;
-        }
-        nextPath = next();
-      } while (nextPath);
-
-      var newReferences = references.map(function(reference) {
-        var entriesObj = reference.contexts;
-        for (var context in entriesObj) {
-          depthSpecs = contexts[context] || contexts.all;
-          if (depthSpecs) {
-            var entryDepth = depthSpecs[0] || 1;
-            var addDepth = depthSpecs[1] || 0;
-            if (entryDepth.slice(0,7) === 'entryID') {
-              // pull out only that one with the entryID
-            } else {
-              // sort array andt then slice on the first entryDepth entries
-            }
-
-            // then for each kept entry, do the same if statement above for addDepth
-          } else {
-            // delete that entire context category from object
-          }
-        }
-        return reference;
-      });
-
-      callback(newReferences);
-
-    }
-  });
-};
-
-// This is temporary
-var send404 = function() {
-  log('Got a 404!');
-};
-
-var testCallback= function(ref){
-  log('the references' , ref);
-};
 
 //[
 //get all top voted entries for all functions / classes / everythign

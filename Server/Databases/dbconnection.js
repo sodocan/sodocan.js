@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-var dbURI = process.env.MONGOLAB_URI || config.localdb;
+var dbURI = process.env.MONGOLAB_URI || 'mongodb://localhost/sodocandb';
 mongoose.connect(dbURI);
 var db = mongoose.connection;
 
@@ -17,4 +17,4 @@ db.on('disconnected', function() {
   console.log('Mongoose connection disconnected.');
 });
 
-module.exports = db;
+module.exports = mongoose;

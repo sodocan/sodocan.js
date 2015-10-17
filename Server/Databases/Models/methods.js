@@ -5,11 +5,11 @@ var MethodSchema = new db.Schema({
   methodName: {type: String, required: true},
   group: {type: String},
   reference: {type: Array, default: []},
-  crowdEntries: Mixed,
+  crowdEntries: db.Schema.Types.Mixed,
 });
 
 
-var model =  mongoose.model('methods', MethodSchema);
+var methodsModel =  db.model('methods', MethodSchema);
 
 var testObjs = [
   {
@@ -148,6 +148,19 @@ var testObjs = [
   }
 ];
 
+var insertObjs = function(objs){
+  for(var i = 0; i < objs.length; i++){
+    methodsModel.findOneAndUpdate({
+      project: objs[i].project,
+      methodName: objs[i].methodName
+    }, objs[i], {upsert: true},
+    function(){
+    });
+  }
+};
+
+insertObjs(testObjs);
+
 /*
 Test cases:
 1. api/sodocan
@@ -158,7 +171,7 @@ Test cases:
 6. api/sodocan/all/all
 7. api/sodocan/tips/descriptions
 8. api/sodocan/all/tips/0
-9. api/sodocan/ref/makePretty/descriptions/entryID-128/all
+9. api/sodocan/ref/makeItPretty/descriptions/entryID-128/all
 */
 
-module.exports = model;
+module.exports = methodsModel;

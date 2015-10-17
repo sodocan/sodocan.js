@@ -13,8 +13,8 @@ var createRouter = require('./Routes/create');
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+//app.set('views', path.join(__dirname, 'views'));
+//app.set('view engine', 'jade');
 
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -24,8 +24,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'StaticPages')));
 
 app.use('/create', createRouter);
-app.use('/users', users);
-app.use('/:projectName', crowdsourceRouter);
+app.use('/users', usersRouter);
+app.use('/api', crowdsourceRouter);
 //NOTE: figure out best practices for above route
 
 app.use(function(req, res, next) {
@@ -41,10 +41,11 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
+    // res.render('error', {
+    //   message: err.message,
+    //   error: err
+    // });
+    res.end();
   });
 }
 
@@ -52,10 +53,11 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+  // res.render('error', {
+  //   message: err.message,
+  //   error: {}
+  // });
+  res.end();
 });
 
 
