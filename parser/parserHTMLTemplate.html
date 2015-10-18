@@ -1,5 +1,10 @@
     <div class="entry">
       <h1 style="color:blue">{{ functionName }}</h1>
+      {{#if project}}
+        <div>
+          <h2>Project: {{ project }}</h2>
+        </div>
+      {{/if}}
       {{#if params}}
         <div>
           <h2>Parameters</h2>

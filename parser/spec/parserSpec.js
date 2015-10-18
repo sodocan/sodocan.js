@@ -13,6 +13,7 @@ var parseComments = docParser.parseComments;
 var findFunctionInfo = docParser.findFunctionInfo;
 var parseMain = docParser.parseMain;
 var buildExplanations = docParser.buildExplanations;
+var parseHeader = docParser.parseHeader;
 var fixtures = fs.readFileSync('./spec/fixtures.js').toString();
 var parsedJSON = fs.readFileSync('./spec/parsedJSON.json').toString();
 
@@ -106,7 +107,7 @@ describe("documentation parser", function() {
   it("should parse a file to get documentation info", function() {
     var result = parseComments(fixtures);
     expect(Array.isArray(result)).to.equal(true);
-    expect(result.length).to.equal(2);
+    expect(result.length).to.equal(3);
     expect(result[0].params[0].name).to.equal('stuff');
     expect(result[1].returns[1].type).to.equal('num');
     // console.log(result);
@@ -125,25 +126,32 @@ describe("documentation parser", function() {
 
   it("should parse info based on both functions and comments", function() {
     var results = parseMain(fixtures);
-    expect(results.length).to.equal(7);
-    expect(results[3].functionName).to.equal('goldfish');
-    expect(results[3].functionName).to.equal('goldfish');
+    expect(results.body.length).to.equal(7);
+    expect(results.body[3].functionName).to.equal('goldfish');
+    expect(results.body[3].functionName).to.equal('goldfish');
   });
 
-  // it("should correctly build the explanations object on each blockObj", function() {
-  //   test = {functionName: "tester", 
-  //   descriptions: "this is my function", 
-  //   examples: "use this",
-  //   tips: "be careful"};
-  //   buildExplanations(test);
-  //   expect(test.description).to.equal(undefined);
-  //   expect(typeof test.explanations).to.equal('object');
-  //   console.log(test.explanations);
-  //   console.log(test);
-  // });
+  it("should correctly build the explanations object on each blockObj", function() {
+    test = {functionName: "tester", 
+    descriptions: "this is my function", 
+    examples: "use this",
+    tips: "be careful"};
+    buildExplanations(test);
+    expect(test.description).to.equal(undefined);
+    expect(typeof test.explanations).to.equal('object');
+    console.log(test.explanations);
+    console.log(test); 
+  });
 
-  // it("should turn parsedInfo to HTML", function() {
-  //   var results = parsedToHTML(parsedJSON);
-  //   // console.log(results);
-  // });
+  it("should parse a header correctly", function() {
+    test = "/* @header   \n@project : AirBNB for cowboys " + 
+    "  \n@author : Leo Thorp, Lain Jiang  \n@version: 0.0.1 */";
+    console.log('about to parse header');
+    console.log('PARSE HEADER RESULT: ', parseHeader(test));
+  });
+
+  it("should turn parsedInfo to HTML", function() {
+    var results = parsedToHTML(parsedJSON);
+    // console.log(results);
+  });
 });
