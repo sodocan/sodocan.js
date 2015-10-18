@@ -30,6 +30,7 @@ var fileOperations = function(paths) {
 
   // right now, header has to be in the first file that's specified in CLI
   // TODO: default to the file that has header, only one project allowed per command 
+  // TODO: output is an obj rather than an array
   // file1: noHeader file2: header, file3: noHeader
   for (var i = 0; i < numberOfFiles; i++) {
     var parsedFileContents = parseMain(fs.readFileSync(paths[i]).toString());
@@ -176,16 +177,12 @@ var findFunctionInfo = function(string) {
     });
     var obj = {
       functionName: matchListA[1],
-<<<<<<< HEAD
       params: paramsList,
       explanations: {
         descriptions: '',
         examples: '',
         tips: ''
       }
-=======
-      params: paramsList
->>>>>>> 8a745cd4c20736723039790c84155a17098439e6
     };
     functionInfo.push(obj);
     matchListA = functionPatternA.exec(string);
