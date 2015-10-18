@@ -1,164 +1,28 @@
 var db = require('../dbconnection.js');
+var testObjs = require('./dummyData').methodsData;
 
 var MethodSchema = new db.Schema({
-  project: {type: String, required: true},
-  methodName: {type: String, required: true},
+  project: {type: String, required: true, index: true},
+  functionName: {type: String, required: true},
   group: {type: String},
-  reference: {type: Array, default: []},
+  reference: db.Schema.Types.Mixed,
   crowdEntries: db.Schema.Types.Mixed,
 });
 
-
+MethodSchema.index({project: 1, functionName: 1});
 var methodsModel =  db.model('methods', MethodSchema);
 
-var testObjs = [
-  {
-    project: 'sodocan',
-    methodName: 'makeSkele',
-    reference:
-      [
-        {
-          params: '(collection, iteratee, callback)', //'(collection,iterattee,callback)'
-          output: 'String'
-        }
-      ],
-    crowdEntries: {
-      descriptions: [
-        {
-          text:'efa',
-          votes: 10,
-          entryID: 123,
-          additions: [
-            {
-              text: 'asdfsds',
-              votes: 3,
-              additionID: 12
-            }
-          ]
-        },
-         {
-          text:'asdfds',
-          votes: 12,
-          entryID: 124,
-          additions: [
-            {
-              text: 'asdf',
-              votes: 3,
-              additionID: 11
-            }
-          ]
-        }
-      ],
-      examples: [
-        {
-          text:'asdfds',
-          votes: 12,
-          entryID: 125,
-          additions: [
-            {
-              text: 'asdf',
-              votes: 3,
-              additionID: 10
-            }
-          ]
-        }
-      ],
-      tips: [
-        {
-          text:'asgsrdgdrgsdgdfds',
-          votes: 12,
-          entryID: 104,
-          additions: [
-            {
-              text: 'rere',
-              votes: 3,
-              additionID: 129
-            }
-          ]
-        }
-      ]
-    }
-  },
-  {
-    project: 'sodocan',
-    methodName: 'makeItPretty',
-    reference:
-      [
-        {
-          params: '(ugly)', //'(collection,iterattee,callback)'
-          output: 'Object'
-        }
-      ],
-    crowdEntries: {
-      descriptions: [
-        {
-          text:'efa',
-          votes: 14,
-          entryID: 1223,
-          additions: [
-            {
-              text: 'asdf',
-              votes: 3,
-              additionID: 13
-            }
-          ]
-        },
-         {
-          text:'bvb',
-          votes: 12,
-          entryID: 128,
-          additions: [
-            {
-              text: 'asdf',
-              votes: 3,
-              additionID: 14
-            }
-          ]
-        }
-      ],
-      examples: [
-        {
-          text:'asdfds',
-          votes: 12,
-          entryID: 115,
-          additions: [
-            {
-              text: 'asdf',
-              votes: 3,
-              additionID: 11
-            }
-          ]
-        }
-      ],
-      tips: [
-        {
-          text:'asgsrdgdrgsdgdfds',
-          votes: 12,
-          entryID: 154,
-          additions: [
-            {
-              text: 'rere',
-              votes: 3,
-              additionID: 125
-            }
-          ]
-        }
-      ]
-    }
-  }
-];
 
-var insertObjs = function(objs){
+var insertObjs = function(objs){ //inserts dummy data
   for(var i = 0; i < objs.length; i++){
     methodsModel.findOneAndUpdate({
       project: objs[i].project,
-      methodName: objs[i].methodName
+      functionName: objs[i].functionName
     }, objs[i], {upsert: true},
     function(){
     });
   }
 };
-
 insertObjs(testObjs);
 
 /*

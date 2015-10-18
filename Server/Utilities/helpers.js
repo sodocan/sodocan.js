@@ -10,17 +10,17 @@ var parseApiPath = exports.parseApiPath = function(path, callback, res) {
 
   var searchObject = {}; //will be sent through mongoose
   // if (next() !== 'api') {
-  //   send404();
+  //   send404(res);
   //   return;
   // }
   searchObject.project = next();
   if (!searchObject.project) { //if you didn't give us a project name (just /api)
-    send404();
+    send404(res);
     return;
   }
   var nextPath = next();
   if (nextPath === 'ref') { //if the very next section says ref, we then pull out the method name
-    searchObject.methodName = next();//this Means that you are looking for a specif method
+    searchObject.functionName = next();//this Means that you are looking for a specif method
     nextPath = next();  //as opposed all methods of a context, or in general (all methods)
   }
 
@@ -31,7 +31,7 @@ var parseApiPath = exports.parseApiPath = function(path, callback, res) {
       }
       else{
         console.error('found no references');
-        send404();
+        send404(res);
       }
     } else {
 
@@ -129,9 +129,10 @@ var parseApiPath = exports.parseApiPath = function(path, callback, res) {
 
 
 // This is temporary
-var send404 = exports.send404 = function(lineNum) {
+var send404 = exports.send404 = function(res) {
   log('Got a 404!');
   console.error(new Error('404').stack);
+  res.status(404).end();
 };
 
 var testCallback = exports.testCallback = function(ref, res){
