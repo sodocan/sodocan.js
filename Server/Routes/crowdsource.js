@@ -3,8 +3,6 @@ var router = express.Router();
 var handlers = require('../Utilities/requestHandlers');
 var methodsDB = require('../Databases/Models/methods.js');
 
-log(handlers);
-
 /* GET home page. */
 router.get('/*', handlers.apiGet);
 
