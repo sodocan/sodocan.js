@@ -1,42 +1,59 @@
+/* @header
+@project: 'underscore'
+@author: 'superman'
+@version: '~0.0.3'
+*/
+
+
 /* @doc
 @params: {name: "stuff", type: "Boolean"}
 @returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
 @functionName: 'goldfish'
-@description: 'xtra cheddar'
+@descriptions: 'xtra cheddar'
+@tips: 'don't eat too much
+@group: 'happy saturday'
 */
 
-var goldfish = function(stuff) {
+var goldfish = function(stuff, things) {
 
 };
 
-function guppy(eggs) {
-  
+function guppy(eggs, pie, green) {
+
 } 
 /* @doc
 @params: {name: 'stuff', type: 'Boolean'}
 @returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
 @functionName: 'rice'
-@description: 'squishy'
+@descriptions: 'squishy'
+@group: 'happy saturday'
 */
 
 /*
 @params: {name: 'stuff', type: 'Boolean'}
 @returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
 @functionName: 'rice'
-@description: 'squishy'
+@descriptions: 'squishy'
 */
 
 var rice = function(stuff) {
   function chopsticks() {}
 };
 
+/* @doc
+@params: {name: 'stuff', type: 'Boolean'}
+@returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
+@functionName: 'spicyTuna'
+@descriptions: 'top quality fish'
+@group: 'happy saturday'
+*/
 
 function spicyTuna() {
   return something;
 }
 
 var stuff = {
-  foo: function() {}
+  foo: function(obj, trapezoid) {}
 };
 
-var otherStuff = {bar: 1, baz: function(){}};
+var otherStuff = {bar: 1, baz: function(grapefruit){}};

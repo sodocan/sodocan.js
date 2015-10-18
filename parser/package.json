@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "parser.js",
-  "preferGlobal" : true,
-  "bin" : {
+  "preferGlobal": true,
+  "bin": {
     "parse": "parser.js"
   },
   "dependencies": {
+    "handlebars": "^4.0.3"
   },
   "devDependencies": {
     "chai": "^3.3.0",

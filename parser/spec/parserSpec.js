@@ -1,5 +1,6 @@
 var expect = require('chai').expect;
 var docParser = require('../parser.js');
+var parsedToHTML = require('../parsedToHTML.js');
 var fs = require('fs');
 
 var findCommentBlocks = docParser.findCommentBlocks;
@@ -8,10 +9,13 @@ var splitEntries = docParser.splitEntries;
 var processEntry = docParser.processEntry;
 var properties = docParser.properties;
 var convertToJS = docParser.convertToJS;
-var parserMain = docParser.parserMain;
-var findFunctionNames = docParser.findFunctionNames;
-
+var parseComments = docParser.parseComments;
+var findFunctionInfo = docParser.findFunctionInfo;
+var parseMain = docParser.parseMain;
+var buildExplanations = docParser.buildExplanations;
+var parseHeader = docParser.parseHeader;
 var fixtures = fs.readFileSync('./spec/fixtures.js').toString();
+var parsedJSON = fs.readFileSync('./spec/parsedJSON.json').toString();
 
 describe("documentation parser", function() {
   var test;
@@ -47,14 +51,14 @@ describe("documentation parser", function() {
   });
 
   it("should parse a comment block into separate entries; whether there is a single one or more", function() {
-    var test ='/* @doc \n @functionName: "hey"\n   @description: "man"  */';
+    var test ='/* @doc \n @functionName: "hey"\n   @descriptions: "man"  */';
     var entries = parseCommentBlock(test);
     expect(entries.length).to.equal(2);
-    expect(entries).to.deep.equal(['functionName: "hey"', 'description: "man"']);
-    test ='/* @doc \n @description: "man"  */';
+    expect(entries).to.deep.equal(['functionName: "hey"', 'descriptions: "man"']);
+    test ='/* @doc \n @descriptions: "man"  */';
     entries = parseCommentBlock(test);
     expect(entries.length).to.equal(1);
-    expect(entries).to.deep.equal(['description: "man"']);
+    expect(entries).to.deep.equal(['descriptions: "man"']);
   });
 
   it("should locate appropriate keyword in properties object and process its entry", function() {
@@ -72,9 +76,9 @@ describe("documentation parser", function() {
   });
 
   it("should also parse string content with nested quotes", function() {
-    test = "description: 'this is great: \"?\"'";
+    test = "descriptions: 'this is great: \"?\"'";
     var entryObj = processEntry(test);
-    expect(entryObj.propertyName).to.equal('description');
+    expect(entryObj.propertyName).to.equal('descriptions');
     expect(entryObj.content).to.equal("this is great: '?'");
   });
 
@@ -101,22 +105,54 @@ describe("documentation parser", function() {
   });
 
   it("should parse a file to get documentation info", function() {
-    var result = parserMain(fixtures);
+    var result = parseComments(fixtures);
     expect(Array.isArray(result)).to.equal(true);
-    expect(result.length).to.equal(2);
+    expect(result.length).to.equal(3);
     expect(result[0].params[0].name).to.equal('stuff');
     expect(result[1].returns[1].type).to.equal('num');
     // console.log(result);
   });
 
   it("should parse the names of functions even without comments", function() {
-    var results = findFunctionNames(fixtures);
-    console.log('result of function names: ', results);
+    var results = findFunctionInfo(fixtures);
+    // console.log('result of function names: ', results);
     expect(results.length).to.equal(7);
-    expect(results[0]).to.equal('baz');
-    expect(results[1]).to.equal('chopsticks');
-    expect(results[2]).to.equal('foo');
-    expect(results[3]).to.equal('goldfish');
-    expect(results[4]).to.equal('guppy');
+    expect(results[0].functionName).to.equal('baz');
+    expect(results[1].functionName).to.equal('chopsticks');
+    expect(results[2].functionName).to.equal('foo');
+    expect(results[3].functionName).to.equal('goldfish');
+    expect(results[4].functionName).to.equal('guppy');
+  });
+
+  it("should parse info based on both functions and comments", function() {
+    var results = parseMain(fixtures);
+<<<<<<< HEAD
+    expect(results.body.length).to.equal(7);
+    expect(results.body[3].functionName).to.equal('goldfish');
+    expect(results.body[3].functionName).to.equal('goldfish');
+  });
+
+  it("should correctly build the explanations object on each blockObj", function() {
+    test = {functionName: "tester", 
+    descriptions: "this is my function", 
+    examples: "use this",
+    tips: "be careful"};
+    buildExplanations(test);
+    expect(test.description).to.equal(undefined);
+    expect(typeof test.explanations).to.equal('object');
+    console.log(test.explanations);
+    console.log(test); 
+  });
+
+  it("should parse a header correctly", function() {
+    test = "/* @header   \n@project : AirBNB for cowboys " + 
+    "  \n@author : Leo Thorp, Lain Jiang  \n@version: 0.0.1 */";
+    console.log('about to parse header');
+    console.log('PARSE HEADER RESULT: ', parseHeader(test));
+  });
+
+  it("should turn parsedInfo to HTML", function() {
+    var results = parsedToHTML(parsedJSON);
+    // console.log(results);
   });
 });
