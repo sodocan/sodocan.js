@@ -19,6 +19,7 @@ var properties = {
   'version': ''
 };
 
+// TODO: call parsedToHTML to output simple HTML page
 var fileOperations = function(paths) {
   var defaultProjectName = paths[0].match(/\/?([^\/]+)\./)[1];
   //last path in array is the output file; earlier ones are js files to parse
@@ -30,7 +31,6 @@ var fileOperations = function(paths) {
       version: '',
       author: ''
     },
-
     body: []
   };
   var numberOfFiles = paths.length;
@@ -75,19 +75,6 @@ var fileOperations = function(paths) {
       console.log('Successfully parsed all files');
     }
   });
-
-  // fs.writeFile(outputPath, '', function(err, data) {
-  //   for (var i = 0; i < paths.length; i++) {
-  //     fileNumbers.push(i + 1);
-  //     fs.readFile(paths[i], function(err, data) {
-  //       var JSONdata = JSON.stringify(parseMain(data.toString()));
-  //       console.log('JSONdata in fileOperations:', JSONdata);
-  //       fs.appendFile(outputPath, JSONdata, function(err, data) {
-  //         console.log('successfully parsed file ' + fileNumbers.shift() + ' of ' + paths.length);
-  //       });
-  //     });
-  //   }
-  // });
 };
 
 // right now does not distinguish between API and helper functions
@@ -192,9 +179,11 @@ var findFunctionInfo = function(string) {
     var paramsList = matchListA[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
+    paramsList = paramsList[0].name === '' ? [] : paramsList;
     var obj = {
       functionName: matchListA[1],
       params: paramsList,
+      returns: [],
       explanations: {
         descriptions: '',
         examples: '',
@@ -209,9 +198,16 @@ var findFunctionInfo = function(string) {
     var paramsList = matchListB[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
+    paramsList = paramsList[0].name === '' ? [] : paramsList;
     var obj = {
       functionName: matchListB[1],
-      params: paramsList
+      params: paramsList,
+      returns: [],
+      explanations: {
+        descriptions: '',
+        examples: '',
+        tips: ''
+      }
     };
     functionInfo.push(obj);
     matchListB = functionPatternB.exec(string);
@@ -369,7 +365,7 @@ module.exports = {
 //for command line use
 var userArgs = process.argv.slice(2);
 console.log(userArgs);
-if (userArgs) fileOperations(userArgs);
+if (userArgs[0] !== 'spec') fileOperations(userArgs);
 
 // @params: 'abc', @name: 'name'
 // @params: [{ name: 'sdfsd' type: 'Boolean' }, { name: 'sdfsd' type: 'Boolean' }]
