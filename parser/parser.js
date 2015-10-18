@@ -176,12 +176,16 @@ var findFunctionInfo = function(string) {
     });
     var obj = {
       functionName: matchListA[1],
+<<<<<<< HEAD
       params: paramsList,
       explanations: {
         descriptions: '',
         examples: '',
         tips: ''
       }
+=======
+      params: paramsList
+>>>>>>> 8a745cd4c20736723039790c84155a17098439e6
     };
     functionInfo.push(obj);
     matchListA = functionPatternA.exec(string);
