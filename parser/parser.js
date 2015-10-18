@@ -23,34 +23,51 @@ var fileOperations = function(paths) {
   var defaultProjectName = paths[0].match(/\/?([^\/]+)\./)[1];
   //last path in array is the output file; earlier ones are js files to parse
   var outputPath = paths.pop();
-  var outputArray = [];
+  //var outputArray = [];
+  var outputObj = {
+    header: {
+      project: '',
+      version: '',
+      author: ''
+    },
+
+    body: []
+  };
   var numberOfFiles = paths.length;
-  var hasProjectName = false;
+  //var hasProjectName = false;
 
-
+  for (var i = 0; i < numberOfFiles; i++) {
+    var parsedFileContents = parseMain(fs.readFileSync(paths[i]).toString());
+    if (parsedFileContents.header.project !== '') {
+      outputObj.header = parsedFileContents.header;
+    }
+    outputObj.body = outputObj.body.concat(parsedFileContents.body);
+  }
+  if (outputObj.header.projectName === '') {
+    outputObj.header.projectName = defaultProjectName;
+  }
   // right now, header has to be in the first file that's specified in CLI
   // TODO: default to the file that has header, only one project allowed per command 
   // TODO: output is an obj rather than an array
   // file1: noHeader file2: header, file3: noHeader
-  for (var i = 0; i < numberOfFiles; i++) {
-    var parsedFileContents = parseMain(fs.readFileSync(paths[i]).toString());
-    if (outputArray.length && !parsedFileContents.header.project && !parsedFileContents.header.author && !parsedFileContents.header.version) {
-      outputArray[0].body.concat(parsedFileContents.body);
-    }
-    else {
-      outputArray.push(parsedFileContents);
-      if (parsedFileContents.header.project !== '') {
-        hasProjectName = true;
-      }
-    }
-  }
-  if (!hasProjectName) {
-    outputArray[0].header.project = defaultProjectName;
-  }
+  // for (var i = 0; i < numberOfFiles; i++) {
+  //   var parsedFileContents = parseMain(fs.readFileSync(paths[i]).toString());
+  //   if (outputArray.length && !parsedFileContents.header.project && !parsedFileContents.header.author && !parsedFileContents.header.version) {
+  //     outputArray[0].body.concat(parsedFileContents.body);
+  //   }
+  //   else {
+  //     outputArray.push(parsedFileContents);
+  //     if (parsedFileContents.header.project !== '') {
+  //       hasProjectName = true;
+  //     }
+  //   }
+  // }
+  // if (!hasProjectName) {
+  //   outputArray[0].header.project = defaultProjectName;
+  // }
 
-  //file1: noHeader file2: header, file3: noHeader
 
-  fs.writeFile(outputPath, JSON.stringify(outputArray), function(err, data) {
+  fs.writeFile(outputPath, JSON.stringify(outputObj), function(err, data) {
     if (err) {
       console.log(err + '(will be triggered by mocha tests)');
     }
@@ -100,7 +117,7 @@ var parseHeader = function(string) {
       headerObj[entryObj.propertyName] = entryObj.content;
     });
   }
-  return [headerObj];
+  return headerObj;
 };
 
 var parseComments = function(string) {

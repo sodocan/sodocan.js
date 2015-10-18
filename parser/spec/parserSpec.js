@@ -126,7 +126,6 @@ describe("documentation parser", function() {
 
   it("should parse info based on both functions and comments", function() {
     var results = parseMain(fixtures);
-<<<<<<< HEAD
     expect(results.body.length).to.equal(7);
     expect(results.body[3].functionName).to.equal('goldfish');
     expect(results.body[3].functionName).to.equal('goldfish');
