@@ -14,30 +14,40 @@ exports.postSkeleton = function(req, res) {
   log('skeleton', skeleton);
   var skull = skeleton.header; // :D
   var methodsArray = skeleton.body;
+  var completedMethodEntry = runAfterAsync(res, methodsArray.length, mongoUpdateSuccess, mongoUpdateFailure);
   for(var i = 0; i < methodsArray.length; i++){
     var method = methodsArray[i];
     //check and see if this method exists already (match proj and method)
       //if it doesn't, convert it to proper mongoForm, then insert
 
-    var searchObj = {
-      project: method.project,
-      functionName: method.functionName
-    };
-    log('findOne about to be run');
-    methodsDB.findOne(searchObj, function(error, foundMethod) {
-      log('findOne got run');
-      if (error) {
-        log('mongo findOne error');
-        console.error(error);
-        res.stats(404).end();
+    findAndUpdateMethod(method, completedMethodEntry, skull);
 
-      } else if (foundMethod) {
-        // then iterate over entries to see if any of them differ
-        // from existing ones and add them
-        var crowdEntries = method.crowdEntries;
-        for (var context in crowdEntries) { //should be changed to explanations
-          var newEntryText = crowdEntries[context]; // this is a string
-          var existingEntries = foundMethod.crowdEntries[context]; // array
+    //else, check and see if content matches any existing method content
+      //if it doesn't match, insert
+  }
+};
+
+var findAndUpdateMethod = function(method, completedMethodEntry, skull){
+  var searchObj = {
+    project: skull.project,
+    functionName: method.functionName
+  };
+  log('findOne about to be run with ', method);
+  methodsDB.findOne(searchObj, function(error, foundMethod) {
+    log('findOne got run');
+    if (error) {
+      log('mongo findOne error');
+      console.error(error);
+      completedMethodEntry(error);
+    } else if (foundMethod) {
+      // then iterate over entries to see if any of them differ
+      // from existing ones and add them
+      log('foundMethod got run. Method: ', method);
+      var explanations = method.explanations;
+      for (var context in explanations) { //should be changed to explanations
+        var newEntryText = explanations[context]; // this is a string
+        if (newEntryText) { //only do work if there is text
+          var existingEntries = foundMethod.explanations[context]; // array
           var match = false;
           for (var j = 0; j < existingEntries.length; j++) {
             existingEntry = existingEntries[j]; // object
@@ -51,51 +61,48 @@ exports.postSkeleton = function(req, res) {
               text: newEntryText,
               upvotes: 0,
               additions: [],
-              entryID: hashCode(newEntryText)
+              entryID: Math.abs(hashCode(newEntryText))
             };
             existingEntries.push(newEntry);
           }
         }
-        /*
-        findOne(obj, func(err,found){
-          modify found
-          update(found)
-        })
-        */
-        methodsDB.update({
-          project: foundMethod.project,
-          functionName: foundMethod.functionName
-        },
-        {
-          crowdEntries: foundMethod.crowdEntries
-        }, function(err){
-          if(err){
-            console.error(err);
-
-          } else {
-            res.sendStatus(202);
-          }
-        });
-        // upsert modified foundMethod to database
-          // res.statusCode(202).end() inside callback of database upsert
-
-      } else {
-        // convertToDBForm and then insert
-          // res.statusCode(202).end() inside callback of database upsert
-
-        (new methodsDB(convertToDBForm(skull.project, method))).save(function(err){
-          if(err){
-            console.error(err);
-          } else {
-            res.sendStatus(202);
-          }
-        });
       }
-    });
+      /*
+      findOne(obj, func(err,found){
+        modify found
+        update(found)
+      })
+      */
+      methodsDB.update({
+        project: foundMethod.project,
+        functionName: foundMethod.functionName
+      },
+      {
+        explanations: foundMethod.explanations
+      }, function(err){
+        if(err){
+          completedMethodEntry(err);
 
-    //else, check and see if content matches any existing method content
-      //if it doesn't match, insert
-  }
+        } else {
+          completedMethodEntry();
+        }
+      });
+      // upsert modified foundMethod to database
+        // res.statusCode(202).end() inside callback of database upsert
+
+    } else {
+      // convertToDBForm and then insert
+        // res.statusCode(202).end() inside callback of database upsert
+      log('found nothing;!', 'method: ', method);
+      (new methodsDB(convertToDBForm(skull.project, method))).save(function(err){
+        if(err){
+          completedMethodEntry(err);
+        } else {
+          completedMethodEntry();
+        }
+      });
+    }
+  });
 };
 
 var convertToDBForm = function(projectName, skeleObj){
@@ -107,7 +114,7 @@ var convertToDBForm = function(projectName, skeleObj){
         text: skeleObj.explanations[context],
         upvotes: 0,
         additions: [],
-        entryID: hashCode(skeleObj.explanations[context])
+        entryID: Math.abs(hashCode(skeleObj.explanations[context]))
       });
     }
   }
@@ -139,11 +146,35 @@ var hashCode = function(string) {
   return hash;
 };
 
+var runAfterAsync = function(res, numOfCallbacks, success, error){
+  var finished = 0;
+  var failed = false;
+  return function(err){
+    if(!failed && !err){
+     finished++;
+      if(finished === numOfCallbacks){
+        success(res);
+      }
+    }
+    if(err && !failed){
+      failed = true;
+      error(res, err);
+    }
+  };
+};
+
+var mongoUpdateSuccess = function(res){
+  res.sendStatus(202);
+};
+
+var mongoUpdateFailure = function(res){
+  res.sendStatus(404);
+};
 
 // [{
 //   projectName: sfjsl,
 //   functionName: sdflsj,
-//   crowdEntries: {
+//   explanations: {
 //     descriptions: 'sfsflksfj',
 //   }
 // }]
@@ -151,7 +182,7 @@ var hashCode = function(string) {
 // [{
 //   projectName: sfjsl,
 //   functionName: sdflsj,
-//   crowdEntries: {
+//   explanations: {
 //     descriptions: [{
 //       text:'werlejrle',
 //       votes: 0,
