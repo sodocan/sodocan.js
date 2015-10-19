@@ -13,7 +13,7 @@
       }
     },
     {
-      functionName: 'method1',
+      functionName: 'method2',
       group: 'testGroup',
       params: [],
       returns: [],
@@ -40,7 +40,7 @@
       }
     },
     {
-      functionName: 'method1',
+      functionName: 'method2',
       group: 'testGroup',
       params: [],
       returns: [],
@@ -48,6 +48,24 @@
         descriptions: '',
         examples: 'examplesblahblah2_modified',
         tips: 'tipsblahblah2'
+      }
+    }
+  ]
+}
+
+{
+  header: {project: 'testProj'},
+  body: [
+    {
+      functionName: 'method3',
+      group: 'testGroup',
+      params: [],
+      returns: [],
+      explanations: {
+        descriptions: '',
+        examples: '',
+        tips: ''
+      }
     }
   ]
 }
@@ -58,4 +76,6 @@
 
 {header:{project:'testProj'},body:[{functionName:'method1',group:'testGroup',params:[],returns:[],explanations:{descriptions:'descriptionblahblah',examples:'examplesblahblah',tips:'tipsblahblah'}},{functionName:'method1',group:'testGroup',params:[],returns:[],explanations:{descriptions:'descriptionblahblah2',examples:'examplesblahblah2',tips:'tipsblahblah2'}}]}
 
-{"header":{"project":"testProj"},"body":[{"functionName":"method1","group":"testGroup","params":[],"returns":[],"explanations":{"descriptions":"descriptionblahblah","examples":"examplesblahblah","tips":"tipsblahblah"}},{"functionName":"method1","group":"testGroup","params":[],"returns":[],"explanations":{"descriptions":"descriptionblahblah2","examples":"examplesblahblah2","tips":"tipsblahblah2"}}]}
+{"header":{"project":"testProj"},"body":[{"functionName":"method1","group":"testGroup","params":[],"returns":[],"explanations":{"descriptions":"descriptionblahblah","examples":"examplesblahblah","tips":"tipsblahblah"}},{"functionName":"method2","group":"testGroup","params":[],"returns":[],"explanations":{"descriptions":"descriptionblahblah2","examples":"examplesblahblah2","tips":"tipsblahblah2"}}]}
+{"header":{"project":"testProj"},"body":[{"functionName":"method1","group":"testGroup","params":[],"returns":[],"explanations":{"descriptions":"descriptionblahblah","examples":"examplesblahblah","tips":"tipsblahblah"}},{"functionName":"method2","group":"testGroup","params":[],"returns":[],"explanations":{"descriptions":"","examples":"examplesblahblah2_modified","tips":"tipsblahblah2"}}]}
+{"header":{"project":"testProj"},"body":[{"functionName":"method3","group":"testGroup","params":[],"returns":[],"explanations":{"descriptions":"","examples":"","tips":""}}]}

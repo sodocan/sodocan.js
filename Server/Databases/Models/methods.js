@@ -6,7 +6,7 @@ var MethodSchema = new db.Schema({
   functionName: {type: String, required: true},
   group: {type: String},
   reference: db.Schema.Types.Mixed,
-  crowdEntries: db.Schema.Types.Mixed,
+  explanations: db.Schema.Types.Mixed,
 });
 
 MethodSchema.index({project: 1, functionName: 1});

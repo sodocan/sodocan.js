@@ -9,7 +9,7 @@ exports.methodsData = [
           output: 'String'
         }
       ],
-    crowdEntries: {
+    explanations: {
       descriptions: [
         {
           text:'efa',
@@ -76,7 +76,7 @@ exports.methodsData = [
           output: 'Object'
         }
       ],
-    crowdEntries: {
+    explanations: {
       descriptions: [
         {
           text:'efa',

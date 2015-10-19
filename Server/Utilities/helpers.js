@@ -24,7 +24,7 @@ var parseApiPath = exports.parseApiPath = function(path, callback, res) {
     nextPath = next();  //as opposed all methods of a context, or in general (all methods)
   }
 
-  methodsDB.find(searchObject, function(error, references) { //the mongo search
+  methodsDB.find(searchObject).sort({functionName: 1}).exec(function(error, references) { //the mongo search
     if (error || !references.length) {
       if(error){
         console.error(error);
