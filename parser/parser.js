@@ -105,7 +105,11 @@ var sendParsedToServer = function(string) {
   var options = {
     host:'localhost',
     port: '3000',
-    path: '/create/',
+    json: true,
+    headers: {
+        "content-type": "application/json",
+    },
+    path: '/create',
     method: 'POST'
   };
   var request = http.request(options, function(res) {
