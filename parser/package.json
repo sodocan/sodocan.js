@@ -8,9 +8,7 @@
     "parse": "parser.js"
   },
   "dependencies": {
-    "handlebars": "^4.0.3",
-    "https": "^1.0.0",
-    "url": "^0.11.0"
+    "handlebars": "^4.0.3"
   },
   "devDependencies": {
     "chai": "^3.3.0",

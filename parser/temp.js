@@ -24,7 +24,6 @@ var ajaxCall = function() {
       console.log(data);
     });
   });
-
   request.end();
 };
 ajaxCall();

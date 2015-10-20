@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 var fs = require('fs');
 var https = require('https');
+var http = require('http');
 var parsedToHTML = require('./parsedToHTML.js');
 
 //consider including more specific types of description: params description, returns description
@@ -95,14 +96,19 @@ var fileOperations = function(paths) {
       console.log('Successfully generated HTML file.');
     }
   });
+
+  sendParsedToServer(JSON.stringify(outputObj));
 };
 
+//https://httpbin.org/post
 var sendParsedToServer = function(string) {
   var options = {
-    url: 'http://localhost:3000/create',
+    host:'localhost',
+    port: '3000',
+    path: '/create/',
     method: 'POST'
   };
-  var request = https.request(options, function(res) {
+  var request = http.request(options, function(res) {
     console.log("statusCode: ", res.statusCode);
     console.log("headers: ", res.headers);
   });
@@ -112,7 +118,6 @@ var sendParsedToServer = function(string) {
   });
   request.write(string);
   request.end();
- 
 };
 
 // right now does not distinguish between API and helper functions
@@ -221,7 +226,7 @@ var findFunctionInfo = function(string) {
   var functionInfoA = parseFunctionPatternA(string, functionPatternA);
   var functionInfoB = parseFunctionPatternB(string, functionPatternB);
   var functionInfoC = parseFunctionPatternC(string, functionPatternC);
-  var functionInfo = functionInfoA.concat(functionInfoB).concat(functionInfoBC);
+  var functionInfo = functionInfoA.concat(functionInfoB).concat(functionInfoC);
   //var paramsPattern = /function\s*[a-zA-Z0-9_]*\s*(\([a-zA-Z0-9_,\s]*\))/g;
 
   // right now paramsList will return an array even if there's no params
