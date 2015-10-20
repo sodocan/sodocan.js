@@ -29,12 +29,13 @@ exports.postSkeleton = function(req, res) {
 };
 
 exports.upvote = function(req, res) {
-  var apiPath = req.url;
-
+  log('upvote handler got run');
+  helpers.upvote(req.body, res);
 };
 
 exports.addEntry = function(req, res) {
-
+  log('addEntry handler got run');
+  helpers.addEntry(req.body, res);
 };
 
 var findAndUpdateMethod = function(method, completedMethodEntry, skull){

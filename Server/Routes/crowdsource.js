@@ -6,9 +6,9 @@ var methodsDB = require('../Databases/Models/methods.js');
 log('crowdsource.js got run');
 
 /* GET home page. */
-router.get('/get/*', handlers.getApi);
-router.post('/upvote/*', handlers.upvote);
-router.post('/addEntry/*', handlers.addEntry);
+router.get('/*', handlers.getApi);
+router.post('/upvote', handlers.upvote); //localhost:3000/upvote
+router.post('/addEntry', handlers.addEntry);
 
 //[
 //get all top voted entries for all functions / classes / everythign

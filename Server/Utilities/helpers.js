@@ -3,7 +3,6 @@ var methodsDB = require('../Databases/Models/methods.js');
 var getReferences = exports.getReferences = function(path, callback, res) {
 
   var parsedPath = parseApiPath(path);
-  log(parsedPath);
   if (!parsedPath) {
     send404(res);
     return;
@@ -24,13 +23,12 @@ var getReferences = exports.getReferences = function(path, callback, res) {
       var contexts = parsedPath.contexts;
 
       var newReferences = references.map(function(reference) {
-        var entriesObj = reference.crowdEntries;
+        var entriesObj = reference.explanations;
         for (var context in entriesObj) {
           //go through each contexts (not just the ones mentioned)
           //if a specific context is mentioned, use it's depth
           //otherwise use the one specified in all
           depthSpecs = contexts[context] || contexts.all;
-          log(depthSpecs);
           if (depthSpecs) {
             //default depth is 1, default addtion is 0
             var entryDepth = depthSpecs[0] || '1';
@@ -56,7 +54,7 @@ var getReferences = exports.getReferences = function(path, callback, res) {
               contextArray = entriesObj[context];
             } else { // else entryDepth is a number
               //so we get the n (depth) amount of entries
-              contextArray = entriesObj[context] = entriesObj[context].slice(0,+entryDepth);
+              contextArray = entriesObj[context] = entriesObj[context].slice(0, +entryDepth);
             }
             //checking to see if we want a specific addition
             //very similar to what we did for entries
@@ -100,11 +98,15 @@ var parseApiPath = function(path) {
     return pathArray[pathArrayPointer];
   };
 
-  var searchObject = {}; //will be sent through mongoose
+  if (next() !== 'api') {
+    log('must use api word in url');
+    return;
+  }
 
-  next(); // this will be either 'get', 'upvote', or 'addEntry'
+  var searchObject = {}; //will be sent through mongoose
   searchObject.project = next();
   if (!searchObject.project) { //if you didn't give us a project name (just /api)
+    log('no project name provided');
     return;
   }
 
@@ -152,140 +154,221 @@ var testCallback = exports.testCallback = function(ref, res){
   res.send(ref);
 };
 
-var upvote = exports.upvote = function(path, callback, res) {
-  var parsedPath = parseApiPath(path);
-  var searchObject = parsedPath.searchObject;
+var upvote = exports.upvote = function(upvoteInfo, res) {
+  /*
+  {
+    project:
+    functionName:
+    context:
+    entryID:
+    [additionID:]
+    [username/ip:]
+  }
+  */
+  var searchObject = {
+    project: upvoteInfo.project,
+    functionName: upvoteInfo.functionName
+  };
+
   if (!searchObject.project || !searchObject.functionName) {
     send404(res);
     return;
   }
 
-  methodsDB.find(searchObject).exec(function(error, references) { //the mongo search
-    if (error || !references.length) {
+  methodsDB.findOne(searchObject).exec(function(error, reference) { //the mongo search
+    if (error || !reference) {
       if(error){
-        send404(res);
         console.error(error);
+        send404(res);
         return;
-      }
-      else{
+      } else {
         console.error('found no references');
         send404(res);
         return;
       }
     } else {
 
-      var contexts = parsedPath.contexts;
+      var context = upvoteInfo.context;
+      var entryID = upvoteInfo.entryID;
 
-      for (var context in contexts) {
-        var entryID = contexts[context][0];
-        if (entryID.slice(0,7) !== 'entryID') {
-          send404(res);
-          return;
-        }
+      var addition = false;
 
-        var addition = false;
+      var additionID = upvoteInfo.additionID;
+      if (additionID) {
+        addition = true;
+      }
 
-        var additionID = contexts[context][1];
-        if (additionID && additionID.slice(0,10) === 'additionID') {
-          additionID = +(additionID.slice(11));
-          addition = true;
-        } // will add in logic later to account for addition upvotes
+      var entryFound = false;
+      var contextArray = reference.explanations[context];
+      if (!contextArray) {
+        console.error('context not found');
+        return;
+      }
+      for (var i = 0; i < contextArray.length; i++) {
+        if (contextArray[i].entryID === entryID) {
+          entryFound = true;
+          if(!additionID){
+            contextArray[i].upvotes++;
 
-        entryID = +(entryID.slice(8));
-        var contextArray = references.explanations[context];
-        for (var i = 0; i < contextArray.length; i++) {
-          if (contextArray[i].entryID === entryID) {
-            contextArray[i].upvote++;
-            if (i > 0 && contextArray[i].upvote > contextArray[i-1].upvote) {
+            while (i > 0 && contextArray[i].upvotes > contextArray[i-1].upvotes) {
               var temp = contextArray[i];
               contextArray[i] = contextArray[i-1];
               contextArray[i-1] = temp;
+              i--;
             }
-            methodsDB.update(searchObject, {explanations: references.explanations}, function(error, response) {
-              if (error) {
-                console.error(error);
-                send404(res);
-                return;
-              } else {
-                res.sendStatus(202);
+          } else {
+            var additionFound = false;
+            var additions = contextArray[i].additions;
+            for (var j = 0; j < additions.length; j++) {
+              if (additions[j].additionID === additionID) {
+                additionFound = true;
+                additions[j].upvotes++;
+                while (j > 0 && additions[j].upvotes > additions[j-1].upvotes) {
+                  var temp = additions[j];
+                  additions[j] = additions[j-1];
+                  additions[j-1] = temp;
+                  j--;
+                }
+                break;
               }
-            })
+            }
+            if (!additionFound) {
+              log('additionID not found');
+              send404(res);
+              return;
+            }
           }
+          break;
         }
       }
+      if (!entryFound) {
+        log('entryID not found');
+        send404(res);
+        return;
+      }
 
-
-
-
-
-      var newReferences = references.map(function(reference) {
-        var entriesObj = reference.crowdEntries;
-        for (var context in entriesObj) {
-          //go through each contexts (not just the ones mentioned)
-          //if a specific context is mentioned, use it's depth
-          //otherwise use the one specified in all
-          depthSpecs = contexts[context] || contexts.all;
-          log(depthSpecs);
-          if (depthSpecs) {
-            //default depth is 1, default addtion is 0
-            var entryDepth = depthSpecs[0] || '1';
-            var addDepth = depthSpecs[1] || '0';
-            var contextArray;
-            //the prefix entryID means we are looking for a specific ID
-            if (entryDepth.slice(0,7) === 'entryID') {
-              id = +entryDepth.slice(8);
-              var found = false;
-              for (var i = 0; i < entriesObj[context].length; i++) {
-                if (entriesObj[context][i].entryID === id) {
-                  //search the all entries for that method until you find the specific one
-                  contextArray = entriesObj[context] = [entriesObj[context][i]];
-                  found = true;
-                  break;
-                }
-              }
-              if (!found) {
-                contextArray = entriesObj[context] = [];
-              }
-
-            } else if (entryDepth === 'all') {
-              contextArray = entriesObj[context];
-            } else { // else entryDepth is a number
-              //so we get the n (depth) amount of entries
-              contextArray = entriesObj[context] = entriesObj[context].slice(0,+entryDepth);
-            }
-            //checking to see if we want a specific addition
-            //very similar to what we did for entries
-            for (var i = 0; i < contextArray.length; i++) {
-              if (addDepth.slice(0,10) === 'additionID') {
-                id = +addDepth.slice(11);
-                var additionsArray = contextArray[i].additions;
-                var foundAdd = false;
-                for (var j = 0; i < additionsArray.length; j++) {
-                  if (additionsArray[j].additionID === id) {
-                    contextArray[i].additions = [additionsArray[j]];
-                    foundAdd = true;
-                    break;
-                  }
-                }
-                if (!foundAdd) {
-                  contextArray[i].additions = [];
-                }
-
-              } else if(addDepth !== 'all'){
-                contextArray[i].additions = contextArray[i].additions.slice(0, +addDepth);
-              }
-            }
-          } else {//if there was no depth, that means we don't want it. delete.
-            delete entriesObj[context];
-          }
+      methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
+        if (error) {
+          console.error(error);
+          send404(res);
+          return;
+        } else {
+          res.sendStatus(202);
         }
-        return reference;
       });
-
-      callback(newReferences, res);
     }
   });
+};
 
-}
+var addEntry = exports.addEntry = function(addEntryInfo, res) {
+  /*
+  {
+    project:
+    functionName:
+    context:
+    text:
+    [entryID:]
+    [username/ip:]
+  }
+  */
+  var searchObject = {
+    project: addEntryInfo.project,
+    functionName: addEntryInfo.functionName
+  };
 
+  if (!searchObject.project || !searchObject.functionName) {
+    send404(res);
+    return;
+  }
+
+  methodsDB.findOne(searchObject).exec(function(error, reference) { //the mongo search
+    if (error || !reference) {
+      if(error){
+        console.error(error);
+        send404(res);
+        return;
+      } else {
+        console.error('found no references');
+        send404(res);
+        return;
+      }
+    } else {
+
+      var context = addEntryInfo.context;
+      var contextArray = reference.explanations[context];
+      if (!contextArray) {
+        console.error('context not found');
+        return;
+      }
+      var id = hashCode(addEntryInfo.text);
+
+      var entryID = addEntryInfo.entryID;
+      if (entryID) {
+        var entryFound = false;
+        for (var i = 0; i < contextArray.length; i++) {
+          if (contextArray[i].entryID === entryID) {
+            entryFound = true;
+            for (var j = 0; j < contextArray[i].additions.length; j++) {
+              if (contextArray[i].additions[j].additionID === id) {
+                console.error('duplicate entry');
+                send404(res);
+                return;
+              }
+            }
+            var addition = {
+              text: addEntryInfo.text,
+              upvotes: 0,
+              additionID: id
+            };
+            contextArray[i].additions.push(addition);
+            break;
+          }
+        }
+        if (!entryFound) {
+          console.error('entryID not found');
+          send404(res);
+          return;
+        }
+      } else {
+        for (var i = 0; i < contextArray.length; i++) {
+          if (contextArray[i].entryID === id) {
+            console.error('duplicate entry');
+            send404(res);
+            return;
+          }
+        }
+        var entry = {
+          text: addEntryInfo.text,
+          upvotes: 0,
+          entryID: id,
+          additions: []
+        };
+        contextArray.push(entry);
+      }
+
+      methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
+        if (error) {
+          console.error(error);
+          send404(res);
+          return;
+        } else {
+          res.sendStatus(202);
+        }
+      });
+    }
+  });
+};
+
+var hashCode = function(string) {
+  var hash = 0, i, chr, len;
+  if (string.length === 0){
+   return hash;
+  }
+  for (i = 0, len = string.length; i < len; i++) {
+    chr   = string.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
 
