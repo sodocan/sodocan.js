@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 var fs = require('fs');
+var https = require('https');
 var parsedToHTML = require('./parsedToHTML.js');
 
 //consider including more specific types of description: params description, returns description
@@ -16,10 +17,10 @@ var properties = {
   'classContext': '', 
   'project': '',
   'author': '',
-  'version': ''
+  'version': '',
+  'contains': ''
 };
 
-// TODO: call parsedToHTML to output simple HTML page
 var fileOperations = function(paths) {
   var defaultProjectName = paths[0].match(/\/?([^\/]+)\./)[1];
   //last path in array is the output file; earlier ones are js files to parse
@@ -96,6 +97,24 @@ var fileOperations = function(paths) {
   });
 };
 
+var sendParsedToServer = function(string) {
+  var options = {
+    url: 'http://localhost:3000/create',
+    method: 'POST'
+  };
+  var request = https.request(options, function(res) {
+    console.log("statusCode: ", res.statusCode);
+    console.log("headers: ", res.headers);
+  });
+
+  request.on('error', function(err) {
+    console.log('POST request error: ', err);
+  });
+  request.write(string);
+  request.end();
+ 
+};
+
 // right now does not distinguish between API and helper functions
 var parseMain = function(string) {
   // assuming function names are supplied
@@ -104,7 +123,6 @@ var parseMain = function(string) {
   var commentInfo = parseComments(string);
   return {header: header, body: combineInfo(functionInfo, commentInfo)};
 };
-
 
 //TODO: fix (only trimming off number of characters of @doc, not @header.  add isHeader flag
 //parameter to parseCommentBlock and processEntry)
