@@ -1,0 +1,55 @@
+    <div class="entry">
+      <h2 style="color:blue">{{ functionName }}</h2>
+      {{#if params}}
+        <div>
+          <h3>Parameters</h3>
+          <table border='1'>
+            <tr>
+              <th style='width:125px'>Name</th>
+              <th style='width:125px'>Type</th>
+            </tr>
+            {{#each params}}
+              <tr>
+                <td>{{this.name}}</td>
+                <td>{{this.type}}</td>
+              </tr>    
+            {{/each}}
+          </table>
+        </div>
+      {{/if}}
+      {{#if returns}}
+        <div>
+          <h3>Returns</h3>
+          <table border='1'>
+            <tr>
+              <th style='width:125px'>Type</th>
+            </tr>
+            {{#each returns}}
+              <tr>
+                <td>{{this.type}}</td>
+              </tr>    
+            {{/each}}
+          </table>
+        </div>
+      {{/if}}
+      <div>
+        {{#if group}}    
+          <h3>Group By: {{ group }}</h3>
+        {{/if}}
+        {{#if classContext}}  
+          <h3>Class Context: {{ classContext }}</h3>
+        {{/if}}
+      </div>
+      <div>
+        {{#if explanations.descriptions}}  
+          <h3>Description: {{ explanations.descriptions }}</h3>
+        {{/if}}
+        {{#if explanations.examples}}  
+          <h3>Example: {{ explanations.examples }}</h3>
+        {{/if}}
+        {{#if explanations.tips}}  
+          <h3>Tips: {{ explanations.tips }}</h3>
+        </ul>
+        {{/if}}
+      </div>
+    </div>

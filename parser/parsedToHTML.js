@@ -2,14 +2,21 @@ var Handlebars = require('handlebars');
 var fs = require('fs');
 
 var parsedToHTML = function(jsonString) {
-  var elements = JSON.parse(jsonString);
-  var source = fs.readFileSync('./parserHTMLTemplate.html').toString();
-  var template = Handlebars.compile(source);
-  var middleHTMLString = '';
-  console.log('length of elements array: ', elements.length);
-  for (var i = 0; i < elements.length; i++) {
-    middleHTMLString += '\n';
-    middleHTMLString += template(elements[i]);
+  var jsonData = JSON.parse(jsonString);
+
+  // compile header HTML
+  var headerSource = fs.readFileSync(__dirname + '/headerHTMLTemplate.html').toString();
+  var headerTemplate = Handlebars.compile(headerSource);
+  var headerHTMLString = headerTemplate(jsonData.header);
+
+  // compile body HTML
+  var bodySource = fs.readFileSync(__dirname + '/bodyHTMLTemplate.html').toString();
+  var bodyTemplate = Handlebars.compile(bodySource);
+  var bodyHTMLString = '';
+  console.log('length of body array: ', jsonData.body.length);
+  for (var i = 0; i < jsonData.body.length; i++) {
+    bodyHTMLString += '\n';
+    bodyHTMLString += bodyTemplate(jsonData.body[i]);
   }
 
   var startHTMLString = '<!DOCTYPE html>' +
@@ -20,12 +27,8 @@ var parsedToHTML = function(jsonString) {
       '\n  </head>' +
     '\n  <body>';
   var endHTMLString = '\n  </body>\n</html>';
-  var total = startHTMLString + '\n' + middleHTMLString + '\n' + endHTMLString;
-  fs.writeFile('./spec/htmlResult.html', total, function(err) {
-    console.log('written to file.');
-  }); 
+  var total = startHTMLString + '\n' + headerHTMLString + '\n' + bodyHTMLString + '\n' + endHTMLString;
   return total;
-
 };
 
 module.exports = parsedToHTML;

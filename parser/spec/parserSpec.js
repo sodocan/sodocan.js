@@ -31,13 +31,14 @@ describe("documentation parser", function() {
   it("should be able to find a comment block denotated by /* and */", function() {
     test = '/* @doc */ \n function(arr){/* @doc stuff */}';
     var result = findCommentBlocks(test);
-    expect(result).to.deep.equal(['/* @doc */', '/* @doc stuff */']);
+    expect(result[0].blockString).to.equal('/* @doc */');
+    expect(result[1].blockString).to.equal('/* @doc stuff */');  
   });
 
   it("should ignore blocks that do not contain '@doc'", function() {
     test = '/* */   /* @doc */';
     var result = findCommentBlocks(test);
-    expect(result).to.deep.equal(['/* @doc */']);
+    expect(result[0].blockString).to.equal('/* @doc */');
     expect(result.length).to.equal(1);
   });
 
@@ -116,20 +117,19 @@ describe("documentation parser", function() {
   it("should parse the names of functions even without comments", function() {
     var results = findFunctionInfo(fixtures);
     // console.log('result of function names: ', results);
-    expect(results.length).to.equal(7);
-    expect(results[0].functionName).to.equal('baz');
-    expect(results[1].functionName).to.equal('chopsticks');
-    expect(results[2].functionName).to.equal('foo');
-    expect(results[3].functionName).to.equal('goldfish');
-    expect(results[4].functionName).to.equal('guppy');
+    expect(results.length).to.equal(8);
+    expect(results[0].functionName).to.equal('goldfish');
+    expect(results[1].functionName).to.equal('guppy');
+    expect(results[2].functionName).to.equal('rice');
+    expect(results[3].functionName).to.equal('chopsticks');
+    expect(results[4].functionName).to.equal('spicyTuna');
   });
 
   it("should parse info based on both functions and comments", function() {
     var results = parseMain(fixtures);
-<<<<<<< HEAD
-    expect(results.body.length).to.equal(7);
-    expect(results.body[3].functionName).to.equal('goldfish');
-    expect(results.body[3].functionName).to.equal('goldfish');
+    expect(results.body.length).to.equal(8);
+    expect(results.body[0].functionName).to.equal('goldfish');
+    expect(results.body[0].explanations.descriptions).to.equal('xtra cheddar');
   });
 
   it("should correctly build the explanations object on each blockObj", function() {
