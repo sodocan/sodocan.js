@@ -6,35 +6,56 @@ angular.module( 'sodocan', [
   'sodocan.router' */
 ])
 
-.config(function(){
+.config(function($locationProvider){
+  //should prob contain most of what's in sodocanCtrl
+  $locationProvider.html5Mode(true);
 })
 
-// use Q? pull in external?
-.factory('sodocanData', ['$http', function($http) {
-  var url = 'api/';
+.factory('sodocanAPI', ['$http', 'projectName', function($http,projectName) {
 
+  var projectURL = '/api/get/'+projectName+'/';
+  // api/get/{{projectName}}/ref/{{method}}
   var obj = {};
-  obj.ready = false;
+  obj.projectName = projectName;
   obj.getReference = function(ref,cb) {
-    $http.get(url+ref).success(cb);
+    return $http.get(projectURL+ref);
   };
 
-  obj.getAll = function(cb) {
-    $http.get(url).success(function(data) {
+  obj.refreshTop = function() {
+    return $http.get(projectURL).success(function(data) {
       obj.docs = data;
-      cb(true);
     });
-  }
+  };
 
   return obj;
 }])
 
-.controller('sodocanCtrl', ['$scope','sodocanData', function ($scope,sodocanData) {
-  sodocanData.getAll(function(ready) {
-    //maybe do something?
-  });
-}])
+.controller('sodocanCtrl',
+            ['$location','$scope','sodocanAPI', 'sodocanInit',
+              function ($location,$scope,sodocanAPI,sodocanInit) {
+  // possibly best moved to config
+  // TODO: sodocan router
+  sodocanAPI.docs = sodocanInit;
+  $scope.projectName = sodocanAPI.projectName;
+  $scope.pageTitle = sodocanAPI.projectName;
+}]);
 
-.controller('sodocanHeaderCtrl', function($scope) {
-  $scope.display='Testing';
+angular.element(document).ready(function() {
+    var $initInjector = angular.injector(['ng']);
+    var $http = $initInjector.get('$http');
+
+    var project = window.location.pathname.split('/')[1];
+
+    $http.get('/api/get/'+project).then(
+      function(resp) {
+        var ret = {};
+        var projName;
+        resp.data.map(function(method) {
+          ret[method.functionName] = method;
+          projName = method.project;
+        });
+        angular.module('sodocan').constant('projectName',projName);
+        angular.module('sodocan').constant('sodocanInit',ret);
+        angular.bootstrap(document,['sodocan']);
+      });
 });

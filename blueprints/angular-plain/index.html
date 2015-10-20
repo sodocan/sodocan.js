@@ -1,8 +1,12 @@
 <!DOCTYPE html>
-<html x-ng-app="sodocan" x-ng-controller="sodocanCtrl">
+<html x-ng-controller="sodocanCtrl">
   <head>
     <title x-ng-bind="pageTitle"></title>
-    
+    <script type="text/javascript">
+      var project = window.location.pathname.split('/')[1];
+      document.write('<base href="/'+project+'/">');
+    </script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- build step not yet included -->
@@ -10,9 +14,11 @@
 
     <!-- build step not yet included -->
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.js"></script>
-    <script type="text/javascript" src="angular-common/sodocan.js"></script>
-    <script type="text/javascript" src="angular-plain/header/directive.js"></script>
-    <script type="text/javascript" src="angular-plain/content/directive.js"></script>
+    <script type="text/javascript" src="../angular-common/sodocan.js"></script>
+    <script type="text/javascript" src="../angular-plain/header/headerCode.js"></script>
+    <script type="text/javascript" src="../angular-plain/content/contentCode.js"></script>
+    <script type="text/javascript" src="../angular-plain/footer/footerCode.js"></script>
+    <script type="text/javascript" src="../angular-plain/sidebar/sidebarCode.js"></script>
 
   </head>
   <body>
