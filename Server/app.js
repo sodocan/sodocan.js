@@ -6,9 +6,10 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-var crowdsourceRouter = require('./Routes/crowdsource');
+//var crowdsourceRouter = require('./Routes/crowdsource');
 var usersRouter = require('./Routes/users');
-var createRouter = require('./Routes/create');
+//var createRouter = require('./Routes/create');
+var handlers = require('./Utilities/requestHandlers');
 
 var app = express();
 
@@ -23,9 +24,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'StaticPages')));
 
-app.use('/create', createRouter);
-app.use('/users', usersRouter);
-app.use('/api', crowdsourceRouter);
+app.use('/users', usersRouter); // might change later to not use router
+
+app.get('/api/*', handlers.getApi);
+app.post('/create', handlers.postSkeleton);
+app.post('/upvote', handlers.upvote);
+app.post('/addEntry', handlers.addEntry);
 //NOTE: figure out best practices for above route
 
 app.use(function(req, res, next) {
