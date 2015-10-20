@@ -1,10 +1,11 @@
 var helpers = require('./helpers');
 var methodsDB = require('../Databases/Models/methods');
 
-exports.apiGet = function(req, res){
+exports.getApi = function(req, res){
+  log('getApi got run');
   log("helpers", helpers);
   var apiPath = req.url;
-  helpers.parseApiPath(apiPath, helpers.testCallback, res);
+  helpers.getReferences(apiPath, helpers.testCallback, res);
 };
 
 //[{header: {}, body:[]},.. ] - body form
@@ -25,6 +26,15 @@ exports.postSkeleton = function(req, res) {
     //else, check and see if content matches any existing method content
       //if it doesn't match, insert
   }
+};
+
+exports.upvote = function(req, res) {
+  var apiPath = req.url;
+
+};
+
+exports.addEntry = function(req, res) {
+
 };
 
 var findAndUpdateMethod = function(method, completedMethodEntry, skull){
@@ -170,6 +180,18 @@ var mongoUpdateSuccess = function(res){
 var mongoUpdateFailure = function(res){
   res.sendStatus(404);
 };
+
+exports.newEntry = function(req, res) {
+
+}
+
+/*
+  {
+  upvote: function
+  addition:
+
+  }
+*/
 
 // [{
 //   projectName: sfjsl,

@@ -3,9 +3,12 @@ var router = express.Router();
 var handlers = require('../Utilities/requestHandlers');
 var methodsDB = require('../Databases/Models/methods.js');
 
-/* GET home page. */
-router.get('/*', handlers.apiGet);
+log('crowdsource.js got run');
 
+/* GET home page. */
+router.get('/get/*', handlers.getApi);
+router.post('/upvote/*', handlers.upvote);
+router.post('/addEntry/*', handlers.addEntry);
 
 //[
 //get all top voted entries for all functions / classes / everythign
