@@ -23,6 +23,7 @@ var properties = {
 var fileOperations = function(paths) {
   var defaultProjectName = paths[0].match(/\/?([^\/]+)\./)[1];
   //last path in array is the output file; earlier ones are js files to parse
+  //outputPath is a directory
   var outputPath = paths.pop();
   //var outputArray = [];
   var outputObj = {
@@ -34,7 +35,10 @@ var fileOperations = function(paths) {
     body: []
   };
   var numberOfFiles = paths.length;
-  //var hasProjectName = false;
+  var classStore = {};
+  var classList = [];
+  var groupStore = {};
+  var groupList = [];
 
   for (var i = 0; i < numberOfFiles; i++) {
     var parsedFileContents = parseMain(fs.readFileSync(paths[i]).toString());
@@ -46,33 +50,48 @@ var fileOperations = function(paths) {
   if (outputObj.header.projectName === '') {
     outputObj.header.projectName = defaultProjectName;
   }
-  // right now, header has to be in the first file that's specified in CLI
-  // TODO: default to the file that has header, only one project allowed per command 
-  // TODO: output is an obj rather than an array
-  // file1: noHeader file2: header, file3: noHeader
-  // for (var i = 0; i < numberOfFiles; i++) {
-  //   var parsedFileContents = parseMain(fs.readFileSync(paths[i]).toString());
-  //   if (outputArray.length && !parsedFileContents.header.project && !parsedFileContents.header.author && !parsedFileContents.header.version) {
-  //     outputArray[0].body.concat(parsedFileContents.body);
-  //   }
-  //   else {
-  //     outputArray.push(parsedFileContents);
-  //     if (parsedFileContents.header.project !== '') {
-  //       hasProjectName = true;
-  //     }
-  //   }
-  // }
-  // if (!hasProjectName) {
-  //   outputArray[0].header.project = defaultProjectName;
-  // }
 
+  //add index property to each entry
+  //create a list of all classes and groups
+  for (var i = 0; i < outputObj.body.length; i++) {
+    outputObj.body[i].index = i;
+    var group = outputObj.body[i].group;
+    var classContext = outputObj.body[i].classContext;
+    if (group && !groupStore[group]) {
+      groupList.push(group);
+      groupStore[group] = group;
+    }
+    if (classContext && !classStore[classContext]) {
+      classList.push(classContext);
+      classStore[classContext] = classContext;
+    }
+  }
 
-  fs.writeFile(outputPath, JSON.stringify(outputObj), function(err, data) {
+  outputObj.header.classList = classList;
+  outputObj.header.groupList = groupList;
+
+  // to write JSON and HTML files
+  //create the specified directory if is does not exist
+  if (!fs.existsSync(outputPath)){
+    fs.mkdirSync(outputPath);
+  }
+
+  fs.writeFile(outputPath + '/parsedJSON.json', JSON.stringify(outputObj), function(err, data) {
     if (err) {
       console.log(err + '(will be triggered by mocha tests)');
     }
     else {
-      console.log('Successfully parsed all files');
+      console.log('Successfully parsed into JSON file.');
+    }
+  });
+
+  // to write HTML file
+  fs.writeFile(outputPath + '/parsedHTML.html', parsedToHTML(JSON.stringify(outputObj)), function(err, data) {
+    if (err) {
+      console.log(err + '(will be triggered by mocha tests)');
+    }
+    else {
+      console.log('Successfully generated HTML file.');
     }
   });
 };
@@ -113,13 +132,14 @@ var parseComments = function(string) {
   if (blocks) {
     blocks.forEach(function(block) {
       var blockObj = {
-        'functionName': '',
-        'params': [],
-        'returns': [],
-        'group': '',
-        'classContext': ''
+        functionName: '',
+        params: [],
+        returns: [],
+        group: '',
+        classContext: '',
+        index: block.indexOfBlock
       };
-      var entries = parseCommentBlock(block);
+      var entries = parseCommentBlock(block.blockString);
       entries.forEach(function(entry) {
         var entryObj = processEntry(entry);
         blockObj[entryObj.propertyName] = entryObj.content;
@@ -156,26 +176,86 @@ var findCommentBlocks = function(string) {
   //search the string for a substring beginning with /* and ending with */
   // right now assumes @doc is the first thing in the block after 0 or more white spaces
   // but not other chars
+  var blocks = [];
   var blockRegex = /\/\*{1}\s*@doc([\s\S]+?)?\*\//g;
-  return string.match(blockRegex);
+  var blockMatch = blockRegex.exec(string);
+  while (blockMatch) {
+    var blockData = {
+      blockString: blockMatch[0],
+      indexOfBlock: blockMatch.index
+    };
+    blocks.push(blockData);
+    blockMatch = blockRegex.exec(string);
+  }
+  return blocks;
 };
 
-/* 
-  stuff
-*/
-
 var findFunctionInfo = function(string) {
+  // checks for independent functions: var xyz = function() {}
   var functionPatternA = /(?:[{,]|var)[\n\r]?\s*([a-zA-Z0-9_]+)\s*[=:]\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  // checks for independent functions: function xyz() = {}
   var functionPatternB = /function\s*([a-zA-Z0-9_]+)\s*\(([a-zA-Z0-9_,\s]*)\)/g;
-  //var paramsPattern = /function\s*[a-zA-Z0-9_]*\s*(\([a-zA-Z0-9_,\s]*\))/g;
+  // checks for class methods: a.xyz = function() {}
+  var functionPatternC = /([a-zA-Z0-9_]+\.)+([a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  // TODO possibly patternD: checks for class methods: var d3 = {xyz: function(){}}
+  // and find the object name to be the context
 
-  var matchListA = functionPatternA.exec(string);
-  var matchListB = functionPatternB.exec(string);
-  var functionInfo = [];
+  var functionInfoA = parseFunctionPatternA(string, functionPatternA);
+  var functionInfoB = parseFunctionPatternB(string, functionPatternB);
+  var functionInfoC = parseFunctionPatternC(string, functionPatternC);
+  var functionInfo = functionInfoA.concat(functionInfoB).concat(functionInfoBC);
+  //var paramsPattern = /function\s*[a-zA-Z0-9_]*\s*(\([a-zA-Z0-9_,\s]*\))/g;
 
   // right now paramsList will return an array even if there's no params
   // may refactor later, may not
+  // while (matchListA) {
+  //   var paramsList = matchListA[2].split(',').map(function(param){
+  //     return {'name': param.trim()};
+  //   });
+  //   paramsList = paramsList[0].name === '' ? [] : paramsList;
+  //   var obj = {
+  //     functionName: matchListA[1],
+  //     params: paramsList,
+  //     returns: [],
+  //     explanations: {
+  //       descriptions: '',
+  //       examples: '',
+  //       tips: ''
+  //     }
+  //   };
+  //   functionInfo.push(obj);
+  //   matchListA = functionPatternA.exec(string);
+  // }
+
+  // while (matchListB) {
+  //   var paramsList = matchListB[2].split(',').map(function(param){
+  //     return {'name': param.trim()};
+  //   });
+  //   paramsList = paramsList[0].name === '' ? [] : paramsList;
+  //   var obj = {
+  //     functionName: matchListB[1],
+  //     params: paramsList,
+  //     returns: [],
+  //     explanations: {
+  //       descriptions: '',
+  //       examples: '',
+  //       tips: ''
+  //     }
+  //   };
+  //   functionInfo.push(obj);
+  //   matchListB = functionPatternB.exec(string);
+  // }
+
+  return functionInfo.sort(function(a, b) {
+    return a.index > b.index;
+  });
+};
+
+var parseFunctionPatternA = function(string, pattern) {
+  var matchListA = pattern.exec(string);
+  var results = [];  
   while (matchListA) {
+    console.log('A match index is: ', matchListA.index);
     var paramsList = matchListA[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
@@ -188,13 +268,21 @@ var findFunctionInfo = function(string) {
         descriptions: '',
         examples: '',
         tips: ''
-      }
+      },
+      classContext: '',
+      index: matchListA.index
     };
-    functionInfo.push(obj);
-    matchListA = functionPatternA.exec(string);
+    results.push(obj);
+    matchListA = pattern.exec(string);  
   }
+  return results;
+};
 
+var parseFunctionPatternB = function(string, pattern) {
+  var matchListB = pattern.exec(string);
+  var results = [];  
   while (matchListB) {
+    console.log('B match index is: ', matchListB.index);
     var paramsList = matchListB[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
@@ -207,15 +295,42 @@ var findFunctionInfo = function(string) {
         descriptions: '',
         examples: '',
         tips: ''
-      }
+      },
+      classContext: '',
+      index: matchListB.index
     };
-    functionInfo.push(obj);
-    matchListB = functionPatternB.exec(string);
+    results.push(obj);
+    matchListB = pattern.exec(string);
   }
+  return results;
+};
 
-  return functionInfo.sort(function(a, b) {
-    return b.functionName < a.functionName;
-  });
+var parseFunctionPatternC = function(string, pattern) {
+  var matchListC = pattern.exec(string);
+  var results = [];
+  while (matchListC) {
+    console.log('C match index is: ', matchListC.index);
+    var classContext = matchListC[1].trim(); 
+    var paramsList = matchListC[3].split(',').map(function(param) {
+      return {name: param.trim()};
+    });
+    paramsList = paramsList[0].name === '' ? [] : paramsList;
+    var obj = {
+      functionName: matchListC[2],
+      params: paramsList,
+      returns: [],
+      explanations: {
+        descriptions: '',
+        examples: '',
+        tips: ''
+      },
+      classContext: classContext,
+      index: matchListC.index
+    };
+    results.push(obj);
+    matchListC = pattern.exec(string);
+  }
+  return results;
 };
 
 // {foo: bar, faz: function()}
@@ -288,13 +403,6 @@ var processEntry = function(entry) {
   return entryObj;
 };
 
-// properties {
-// header: {
-//  project, 
-//  author, 
-//}
-//}
-
 var convertToJS = function(string) {
   var fixedJSON = string.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2": ');
   fixedJSON = fixedJSON.replace(/:\s*(['])([^']+)(['])/g, ':"$2"');
@@ -346,6 +454,12 @@ var combineInfo = function(functionArr, commentArray) {
   for (var name in storage) {
     combinedArr.push(storage[name]);
   }
+
+  //sort by regex match index
+  combinedArr.sort(function(a, b) {
+    return a.index > b.index;
+  });
+
   return combinedArr;
 };
 
@@ -375,10 +489,6 @@ if (userArgs[0] !== 'spec') fileOperations(userArgs);
   // check if it's an object or an array
     // if object, pushes into an empty array
 
-// extra(?): how to handle multiple files (organize result, etc)
-
-// error catching 
-  // for file source
 // find comment blocks : /** ... */
   //@doc signals that the documentation info for a function is to follow
   // loook for @keywords and call respective functions to further parse the keyword

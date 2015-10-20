@@ -11,7 +11,7 @@
 @functionName: 'goldfish'
 @descriptions: 'xtra cheddar'
 @tips: 'don't eat too much
-@group: 'happy saturday'
+@group: 'happySaturday'
 */
 
 var goldfish = function(stuff, things) {
@@ -26,7 +26,7 @@ function guppy(eggs, pie, green) {
 @returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
 @functionName: 'rice'
 @descriptions: 'squishy'
-@group: 'happy saturday'
+@group: 'happySaturday'
 */
 
 /*
@@ -45,7 +45,7 @@ var rice = function(stuff) {
 @returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
 @functionName: 'spicyTuna'
 @descriptions: 'top quality fish'
-@group: 'happy saturday'
+@group: 'happySaturday'
 */
 
 function spicyTuna() {
@@ -57,3 +57,6 @@ var stuff = {
 };
 
 var otherStuff = {bar: 1, baz: function(grapefruit){}};
+
+var _ = {};
+_.each = function(){};
