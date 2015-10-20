@@ -1,5 +1,7 @@
 #! /usr/bin/env node
 var fs = require('fs');
+var https = require('https');
+var http = require('http');
 var parsedToHTML = require('./parsedToHTML.js');
 
 //consider including more specific types of description: params description, returns description
@@ -16,10 +18,10 @@ var properties = {
   'classContext': '', 
   'project': '',
   'author': '',
-  'version': ''
+  'version': '',
+  'contains': ''
 };
 
-// TODO: call parsedToHTML to output simple HTML page
 var fileOperations = function(paths) {
   var defaultProjectName = paths[0].match(/\/?([^\/]+)\./)[1];
   //last path in array is the output file; earlier ones are js files to parse
@@ -94,6 +96,28 @@ var fileOperations = function(paths) {
       console.log('Successfully generated HTML file.');
     }
   });
+
+  sendParsedToServer(JSON.stringify(outputObj));
+};
+
+//https://httpbin.org/post
+var sendParsedToServer = function(string) {
+  var options = {
+    host:'localhost',
+    port: '3000',
+    path: '/create/',
+    method: 'POST'
+  };
+  var request = http.request(options, function(res) {
+    console.log("statusCode: ", res.statusCode);
+    console.log("headers: ", res.headers);
+  });
+
+  request.on('error', function(err) {
+    console.log('POST request error: ', err);
+  });
+  request.write(string);
+  request.end();
 };
 
 // right now does not distinguish between API and helper functions
@@ -104,7 +128,6 @@ var parseMain = function(string) {
   var commentInfo = parseComments(string);
   return {header: header, body: combineInfo(functionInfo, commentInfo)};
 };
-
 
 //TODO: fix (only trimming off number of characters of @doc, not @header.  add isHeader flag
 //parameter to parseCommentBlock and processEntry)
@@ -203,7 +226,7 @@ var findFunctionInfo = function(string) {
   var functionInfoA = parseFunctionPatternA(string, functionPatternA);
   var functionInfoB = parseFunctionPatternB(string, functionPatternB);
   var functionInfoC = parseFunctionPatternC(string, functionPatternC);
-  var functionInfo = functionInfoA.concat(functionInfoB).concat(functionInfoBC);
+  var functionInfo = functionInfoA.concat(functionInfoB).concat(functionInfoC);
   //var paramsPattern = /function\s*[a-zA-Z0-9_]*\s*(\([a-zA-Z0-9_,\s]*\))/g;
 
   // right now paramsList will return an array even if there's no params
