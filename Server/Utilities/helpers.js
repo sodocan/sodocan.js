@@ -196,10 +196,14 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
       var additionID = upvoteInfo.additionID;
       if (additionID) {
         addition = true;
-      } // will add in logic later to account for addition upvotes
+      }
 
       var entryFound = false;
       var contextArray = reference.explanations[context];
+      if (!contextArray) {
+        console.error('context not found');
+        return;
+      }
       for (var i = 0; i < contextArray.length; i++) {
         if (contextArray[i].entryID === entryID) {
           entryFound = true;
@@ -256,4 +260,115 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
   });
 };
 
+var addEntry = exports.addEntry = function(addEntryInfo, res) {
+  /*
+  {
+    project:
+    functionName:
+    context:
+    text:
+    [entryID:]
+    [username/ip:]
+  }
+  */
+  var searchObject = {
+    project: addEntryInfo.project,
+    functionName: addEntryInfo.functionName
+  };
+
+  if (!searchObject.project || !searchObject.functionName) {
+    send404(res);
+    return;
+  }
+
+  methodsDB.findOne(searchObject).exec(function(error, reference) { //the mongo search
+    if (error || !reference) {
+      if(error){
+        console.error(error);
+        send404(res);
+        return;
+      } else {
+        console.error('found no references');
+        send404(res);
+        return;
+      }
+    } else {
+
+      var context = addEntryInfo.context;
+      var contextArray = reference.explanations[context];
+      if (!contextArray) {
+        console.error('context not found');
+        return;
+      }
+      var id = hashCode(addEntryInfo.text);
+
+      var entryID = addEntryInfo.entryID;
+      if (entryID) {
+        var entryFound = false;
+        for (var i = 0; i < contextArray.length; i++) {
+          if (contextArray[i].entryID === entryID) {
+            entryFound = true;
+            for (var j = 0; j < contextArray[i].additions.length; j++) {
+              if (contextArray[i].additions[j].additionID === id) {
+                console.error('duplicate entry');
+                send404(res);
+                return;
+              }
+            }
+            var addition = {
+              text: addEntryInfo.text,
+              upvotes: 0,
+              additionID: id
+            };
+            contextArray[i].additions.push(addition);
+            break;
+          }
+        }
+        if (!entryFound) {
+          console.error('entryID not found');
+          send404(res);
+          return;
+        }
+      } else {
+        for (var i = 0; i < contextArray.length; i++) {
+          if (contextArray[i].entryID === id) {
+            console.error('duplicate entry');
+            send404(res);
+            return;
+          }
+        }
+        var entry = {
+          text: addEntryInfo.text,
+          upvotes: 0,
+          entryID: id,
+          additions: []
+        };
+        contextArray.push(entry);
+      }
+
+      methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
+        if (error) {
+          console.error(error);
+          send404(res);
+          return;
+        } else {
+          res.sendStatus(202);
+        }
+      });
+    }
+  });
+};
+
+var hashCode = function(string) {
+  var hash = 0, i, chr, len;
+  if (string.length === 0){
+   return hash;
+  }
+  for (i = 0, len = string.length; i < len; i++) {
+    chr   = string.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
 

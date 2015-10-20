@@ -34,7 +34,8 @@ exports.upvote = function(req, res) {
 };
 
 exports.addEntry = function(req, res) {
-
+  log('addEntry handler got run');
+  helpers.addEntry(req.body, res);
 };
 
 var findAndUpdateMethod = function(method, completedMethodEntry, skull){
