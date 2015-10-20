@@ -100,7 +100,7 @@ var fileOperations = function(paths) {
   sendParsedToServer(JSON.stringify(outputObj));
 };
 
-//https://httpbin.org/post
+
 var sendParsedToServer = function(string) {
   var options = {
     host:'localhost',
