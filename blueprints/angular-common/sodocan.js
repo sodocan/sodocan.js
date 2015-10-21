@@ -8,12 +8,12 @@ angular.module( 'sodocan', [
 
 .config(function($locationProvider){
   //should prob contain most of what's in sodocanCtrl
-  $locationProvider.html5Mode(true);
+  $locationProvider.html5Mode(true).hashPrefix('!');
 })
 
 .factory('sodocanAPI', ['$http', 'projectName', function($http,projectName) {
 
-  var projectURL = '/api/get/'+projectName+'/';
+  var projectURL = '/api/'+projectName+'/';
   // api/get/{{projectName}}/ref/{{method}}
   var obj = {};
   obj.projectName = projectName;
@@ -30,14 +30,50 @@ angular.module( 'sodocan', [
   return obj;
 }])
 
+.factory('sodocanRouter', ['$location', '$http','$rootScope','sodocanAPI',
+                           function($location,$http,$rootScope,sodocanAPI) {
+  var contexts = {
+    'description':true,
+    'tips':true,
+    'examples':true
+  };
+  var obj = {};
+  obj.update = function() {
+    obj.route = {};
+    obj.route.numbers = [];
+    var path = $location.path().split('/').filter(function(val) {
+      return !(val==='');
+    });
+    // path[ 0 -> # or method
+    //       1 -> # or context
+    //       2 -> # for context or ID ]
+    var piece;
+    while (path.length>0) {
+      piece = path.shift();
+      if (contexts[piece]) {
+        obj.route.context = piece;
+      } else if (isFinite(piece) || piece==='all') {
+        obj.route.numbers.push(piece);
+      } else {
+        obj.route.ref = piece;
+      }
+    }
+  };
+  
+  obj.update();
+  return obj;
+}])
+
 .controller('sodocanCtrl',
-            ['$location','$scope','sodocanAPI', 'sodocanInit',
-              function ($location,$scope,sodocanAPI,sodocanInit) {
+            ['$location','$scope','sodocanAPI', 'sodocanInit','sodocanRouter',
+              function ($location,$scope,sodocanAPI,sodocanInit,sodocanRouter) {
   // possibly best moved to config
-  // TODO: sodocan router
-  sodocanAPI.docs = sodocanInit;
+  sodocanAPI.docs = sodocanInit.docs;
+  sodocanAPI.path = sodocanInit['sodocan-path'];
   $scope.projectName = sodocanAPI.projectName;
   $scope.pageTitle = sodocanAPI.projectName;
+  $scope.$on('$locationChangeStart', sodocanRouter.update);
+  $scope.sodocanRoute = function() { return sodocanRouter.route; };
 }]);
 
 angular.element(document).ready(function() {
@@ -46,13 +82,16 @@ angular.element(document).ready(function() {
 
     var project = window.location.pathname.split('/')[1];
 
-    $http.get('/api/get/'+project).then(
+    $http.get('/api/'+project).then(
       function(resp) {
-        var ret = {};
+        var ret = {docs:{}};
         var projName;
         resp.data.map(function(method) {
-          ret[method.functionName] = method;
+          ret.docs[method.functionName] = method;
           projName = method.project;
+        });
+        ret['sodocan-path'] = window.location.pathname.split('/').filter(function(val) {
+          return !(val==='');
         });
         angular.module('sodocan').constant('projectName',projName);
         angular.module('sodocan').constant('sodocanInit',ret);

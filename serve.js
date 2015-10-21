@@ -88,7 +88,7 @@ var exampleJSON = [
 ];
 
 function handleRequest(req,res) {
-  if (req.url.match(/^\/api\/get\/testProj/)) {
+  if (req.url.match(/^\/api\/testProj/)) {
     if (req.url.match(/testProj$/)) {
       var ret = JSON.stringify(exampleJSON);
     }

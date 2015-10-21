@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Example Page</title>
+
+    <style>
+#header {
+  width: 100%;
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+#sidebar {
+  width: 20%;
+  float: left;
+  font-size: 0.9em;
+}
+
+#sidebar ul {
+  margin-left: 10px;
+  padding-left: 20px;
+}
+
+#sidebar ul ul {
+  margin-left: 1em;
+  padding-left: 0;
+}
+
+#content {
+  width: 70%;
+  padding-right: 5%;
+  float: right;
+}
+
+#content h3 {
+  display: inline-block;
+  padding-right: 5em;
+}
+
+.subthing {
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+#footer {
+  clear: both;
+  font-size: 0.8em;
+  color: #888;
+  padding-top: 40px;
+  width: 100%;
+  text-align: center;
+}
+
+.editbox {
+  display: block;
+  width: 80%;
+  height: 5em;
+}
+
+.voteable {
+  background-color: #ccc;
+}
+
+a.upvote {
+  display: block;
+  width: 10px;
+  height: 10px;
+  background-color:#0f0;
+}
+
+a.downvote {
+  display: block;
+  width: 10px;
+  height: 10px;
+  background-color:#f00;
+}
+    </style>
+  </head>
+  <body>
+
+    <div id="header">
+      Logo or whatever
+    </div>
+
+    <div id="sidebar">
+      <ul id="funcList">
+      </ul>
+    </div>
+
+    <div id="content">
+
+    </div>
+
+    <div id="footer">
+      some kinda text
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="mvp.js"></script>
+  </body>
+</html>
+
