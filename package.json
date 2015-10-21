@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "index.js"
+    "start": "Server/index.js"
+  },
+  "scripts": {
+    "postinstall": "./node_modules/bower/bin/bower install",
+    "start": "node index.js"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
