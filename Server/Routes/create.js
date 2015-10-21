@@ -1,3 +1,5 @@
+// This file is no longer needed. Will delete
+
 var express = require('express');
 var router = express.Router();
 var handlers = require('../Utilities/requestHandlers');
