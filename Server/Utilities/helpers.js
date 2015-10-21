@@ -14,20 +14,37 @@ var send404 = exports.send404 = function(res, errorMessageOrObj) {
 
 var sendReferences = exports.sendReferences = function(ref, res){
   res.send(ref);
-};
+}; // pointless, just do res.send(ref) wherever this was called
 
 var mongoUpdateSuccess = exports.mongoUpdateSuccess = function(res){
   res.sendStatus(202);
-};
+}; // pointless, will get rid of this
 
 var mongoUpdateFailure = exports.mongoUpdateFailure = function(res, err){
   console.error(err);
   res.sendStatus(404);
-};
+}; // pointless, replace with send404
 
 
 /* Database Actions */
 
+// successC (required), notFoundC, and errorC are all callback functions
+// successC takes the found reference as a parameter
+// errorC takes the error as a parameter
+var mongoFindOne = function(res, searchObj, successC, notFoundC, errorC) {
+  notFoundC = notFoundC || function() {send404(res, 'reference not found');};
+  errorC = errorC || function(err) {send404(res, err);};
+
+  methodsDB.findOne(searchObj).exec(function(error, reference) {
+    if (error) {
+      errorC(error);
+    } else if (!reference) {
+      notFoundC();
+    } else {
+      successC(reference);
+    }
+  });
+};
 
 
 
@@ -399,9 +416,10 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
               }
             }
             var addition = {
+              additionID: id,
+              timestamp: new Date(),
               text: addEntryInfo.text,
               upvotes: 0,
-              additionID: id
             };
             contextArray[i].additions.push(addition);
             break;
@@ -421,9 +439,10 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
           }
         }
         var entry = {
+          entryID: id,
+          timestamp: new Date(),
           text: addEntryInfo.text,
           upvotes: 0,
-          entryID: id,
           additions: []
         };
         contextArray.push(entry);

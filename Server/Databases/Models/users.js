@@ -8,6 +8,17 @@ var UserSchema = new db.Schema({
   additions: {type: Array, default: []}
 });
 
+/* explanations: [
+  {
+    entryID, timestamp?, project, functionName, context, additions, upvotes
+  }
+]
+
+additions: [{
+  additionID, timestamp?, project, functionName, context, entryID, upvotes
+}]
+*/
+
 /*
 
 NOTE: ADD THIS BACK IN WHEN IMPLEMENTING USERS FOR REALZ
