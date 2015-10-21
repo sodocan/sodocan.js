@@ -13,7 +13,7 @@ angular.module( 'sodocan', [
 
 .factory('sodocanAPI', ['$http', 'projectName', function($http,projectName) {
 
-  var projectURL = '/api/'+projectName+'/';
+  var projectURL = 'http://localhost:3000/api/'+projectName+'/';
   // api/get/{{projectName}}/ref/{{method}}
   var obj = {};
   obj.projectName = projectName;
@@ -82,7 +82,7 @@ angular.element(document).ready(function() {
 
     var project = window.location.pathname.split('/')[1];
 
-    $http.get('/api/'+project).then(
+    $http.get('http://localhost:3000/api/'+project).then(
       function(resp) {
         var ret = {docs:{}};
         var projName;
