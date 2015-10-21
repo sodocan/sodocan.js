@@ -3,17 +3,35 @@
 
 // I added this. This is not part of the express generator
 global.log = function() {
-  console.log('*********LOG*********');
-  for (var i = 0; i < arguments.length; i++) {
+  var start;
+  if (arguments.length > 1 && typeof arguments[0] === 'string') {
+    var header = arguments[0];
+    var addToFront = false;
+    while (header.length < 25) {
+      if (addToFront) {
+        header = '*' + header;
+      } else {
+        header += '*';
+      }
+      addToFront = !addToFront;
+    }
+    console.log(header);
+    start = 1;
+  } else {
+    console.log('***********LOG***********');
+    start = 0;
+  }
+  for (var i = start; i < arguments.length; i++) {
     console.log(arguments[i]);
   }
-  console.log('*********************');
+  console.log('*************************');
 };
+
 /**
  * Module dependencies.
  */
 
-var app = require('./Server/app');
+var app = require('./app');
 var debug = require('debug')('testApp:server');
 var http = require('http');
 

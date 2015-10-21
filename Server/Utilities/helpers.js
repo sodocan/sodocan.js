@@ -1,22 +1,170 @@
 var methodsDB = require('../Databases/Models/methods.js');
 
+/* Server Response Actions */
+
+var send404 = exports.send404 = function(res, errorMessageOrObj) {
+  if (typeof errorMessageOrObj === 'string') {
+    log('Error', errorMessageOrObj);
+  } else {
+    console.error(errorMessageOrObj);
+  }
+  console.error(new Error('404').stack);
+  res.status(404).end();
+};
+
+var sendReferences = exports.sendReferences = function(ref, res){
+  res.send(ref);
+};
+
+var mongoUpdateSuccess = exports.mongoUpdateSuccess = function(res){
+  res.sendStatus(202);
+};
+
+var mongoUpdateFailure = exports.mongoUpdateFailure = function(res, err){
+  console.error(err);
+  res.sendStatus(404);
+};
+
+
+/* Database Actions */
+
+
+
+
+/* Other Helpers */
+
+var parseApiPath = function(path) {
+  var pathArray = path.split('/');
+  var pathArrayPointer = 0;
+  var next = function() { //next moves us down the array one
+    pathArrayPointer++;
+    return pathArray[pathArrayPointer];
+  };
+
+  if (next() !== 'api') {
+    log('must use api word in url');
+    return;
+  }
+
+  var searchObject = {}; //will be sent through mongoose
+  searchObject.project = next();
+  if (!searchObject.project) { //if you didn't give us a project name (just /api)
+    log('no project name provided');
+    return;
+  }
+
+  var nextPath = next();
+  if (nextPath === 'ref') { //if the very next section says ref, we then pull out the method name
+    searchObject.functionName = next();//this Means that you are looking for a specif method
+    nextPath = next();  //as opposed all methods of a context, or in general (all methods)
+  }
+
+  var contexts = {};
+  var context = 'all'; //setting default context
+  do {
+    if (!nextPath || nextPath === 'all' || nextPath.slice(0,7) === 'entryID' || !isNaN(+nextPath)) {
+      //the first time through, this will put an empty array into context
+      //ex (contexts[description] = [])
+      contexts[context] = contexts[context] || [];
+      if (nextPath) { // not necessary, since will just push undefined to array
+        //pushes the depth, addition, all, or entry ID into context
+        //{example:[1,all]}
+        contexts[context].push(nextPath);
+      }
+    } else {
+      //we've entered a new context, so switch the context for contexts object
+      context = nextPath;
+      contexts[context] = contexts[context] || [];
+    }
+    nextPath = next();
+  } while (nextPath);
+  return {
+    searchObject: searchObject,
+    contexts: contexts
+  };
+};
+
+var convertToDBForm = function(projectName, skeleObj){
+  var explanations = {};
+  for(var context in skeleObj.explanations){
+    explanations[context] = [];
+    if(skeleObj.explanations[context]){
+      explanations[context].push({
+        text: skeleObj.explanations[context],
+        upvotes: 0,
+        additions: [],
+        entryID: hashCode(skeleObj.explanations[context])
+      });
+    }
+  }
+
+  var dbForm = {
+    project: projectName,
+    functionName: skeleObj.functionName,
+    group: skeleObj.group,
+    reference: {
+      params: skeleObj.params,
+      returns: skeleObj.returns
+    },
+    explanations: explanations
+  };
+  return dbForm;
+};
+
+var runAfterAsync = exports.runAfterAsync = function(res, numOfCallbacks, success, error){
+  var finished = 0;
+  var failed = false;
+  return function(err){
+    if(!failed && !err){
+     finished++;
+      if(finished === numOfCallbacks){
+        success(res);
+      }
+    }
+    if(err && !failed){
+      failed = true;
+      error(res, err);
+    }
+  };
+};
+
+var hashCode = function(string) {
+  var hash = 0, i, chr, len;
+  if (string.length === 0){
+   return hash;
+  }
+  for (i = 0, len = string.length; i < len; i++) {
+    chr   = string.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
+
+
+
+
+
+
+
+
+
+/* Uncategorized so far */
 var getReferences = exports.getReferences = function(path, callback, res) {
 
   var parsedPath = parseApiPath(path);
   if (!parsedPath) {
-    send404(res);
+    send404(res, 'Path parsing failed');
     return;
   }
 
   methodsDB.find(parsedPath.searchObject).sort({functionName: 1}).exec(function(error, references) { //the mongo search
     if (error || !references.length) {
       if(error){
-        send404(res);
-        console.error(error);
+        send404(res, error);
       }
       else{
-        console.error('found no references');
-        send404(res);
+        send404(res, 'found no references');
       }
     } else {
 
@@ -90,69 +238,9 @@ var getReferences = exports.getReferences = function(path, callback, res) {
   });
 };
 
-var parseApiPath = function(path) {
-  var pathArray = path.split('/');
-  var pathArrayPointer = 0;
-  var next = function() { //next moves us down the array one
-    pathArrayPointer++;
-    return pathArray[pathArrayPointer];
-  };
-
-  if (next() !== 'api') {
-    log('must use api word in url');
-    return;
-  }
-
-  var searchObject = {}; //will be sent through mongoose
-  searchObject.project = next();
-  if (!searchObject.project) { //if you didn't give us a project name (just /api)
-    log('no project name provided');
-    return;
-  }
-
-  var nextPath = next();
-  if (nextPath === 'ref') { //if the very next section says ref, we then pull out the method name
-    searchObject.functionName = next();//this Means that you are looking for a specif method
-    nextPath = next();  //as opposed all methods of a context, or in general (all methods)
-  }
-
-  var contexts = {};
-  var context = 'all'; //setting default context
-  do {
-    if (!nextPath || nextPath === 'all' || nextPath.slice(0,7) === 'entryID' || !isNaN(+nextPath)) {
-      //the first time through, this will put an empty array into context
-      //ex (contexts[description] = [])
-      contexts[context] = contexts[context] || [];
-      if (nextPath) { // not necessary, since will just push undefined to array
-        //pushes the depth, addition, all, or entry ID into context
-        //{example:[1,all]}
-        contexts[context].push(nextPath);
-      }
-    } else {
-      //we've entered a new context, so switch the context for contexts object
-      context = nextPath;
-      contexts[context] = contexts[context] || [];
-    }
-    nextPath = next();
-  } while (nextPath);
-  return {
-    searchObject: searchObject,
-    contexts: contexts
-  };
-};
 
 
-// This is temporary
-var send404 = exports.send404 = function(res) {
-  log('Got a 404!');
-  console.error(new Error('404').stack);
-  res.status(404).end();
-};
 
-var testCallback = exports.testCallback = function(ref, res){
-  log('the references' , ref);
-  res.send(ref);
-};
 
 var upvote = exports.upvote = function(upvoteInfo, res) {
   /*
@@ -171,19 +259,17 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
   };
 
   if (!searchObject.project || !searchObject.functionName) {
-    send404(res);
+    send404(res, 'project or functionName not provided');
     return;
   }
 
   methodsDB.findOne(searchObject).exec(function(error, reference) { //the mongo search
     if (error || !reference) {
       if(error){
-        console.error(error);
-        send404(res);
+        send404(res, error);
         return;
       } else {
-        console.error('found no references');
-        send404(res);
+        send404(res, 'found no references');
         return;
       }
     } else {
@@ -233,8 +319,7 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
               }
             }
             if (!additionFound) {
-              log('additionID not found');
-              send404(res);
+              send404(res, 'additionID not found');
               return;
             }
           }
@@ -242,15 +327,13 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
         }
       }
       if (!entryFound) {
-        log('entryID not found');
-        send404(res);
+        send404(res, 'entryID not found');
         return;
       }
 
       methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
         if (error) {
-          console.error(error);
-          send404(res);
+          send404(res, error);
           return;
         } else {
           res.sendStatus(202);
@@ -359,16 +442,75 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
   });
 };
 
-var hashCode = function(string) {
-  var hash = 0, i, chr, len;
-  if (string.length === 0){
-   return hash;
-  }
-  for (i = 0, len = string.length; i < len; i++) {
-    chr   = string.charCodeAt(i);
-    hash  = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return Math.abs(hash);
+
+
+var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, completedMethodEntry, skull) {
+  var searchObj = {
+    project: skull.project,
+    functionName: method.functionName
+  };
+
+  methodsDB.findOne(searchObj, function(error, foundMethod) {
+    if (error) {
+      console.error(error);
+      completedMethodEntry(error);
+    } else if (foundMethod) {
+      // then iterate over entries to see if any of them differ
+      // from existing ones and add them
+      var explanations = method.explanations;
+      for (var context in explanations) { //should be changed to explanations
+        var newEntryText = explanations[context]; // this is a string
+        if (newEntryText) { //only do work if there is text
+          var existingEntries = foundMethod.explanations[context]; // array
+          var match = false;
+          for (var j = 0; j < existingEntries.length; j++) {
+            var existingEntry = existingEntries[j]; // object
+            if (newEntryText === existingEntry.text) {
+              match = true;
+              break;
+            }
+          }
+          if (!match) {
+            var newEntry = {
+              text: newEntryText,
+              upvotes: 0,
+              additions: [],
+              entryID: hashCode(newEntryText)
+            };
+            existingEntries.push(newEntry);
+          }
+        }
+      }
+
+      methodsDB.update({
+        project: foundMethod.project,
+        functionName: foundMethod.functionName
+      },
+      {
+        explanations: foundMethod.explanations
+      }, function(err){
+        if(err){
+          completedMethodEntry(err);
+
+        } else {
+          completedMethodEntry();
+        }
+      });
+      // upsert modified foundMethod to database
+        // res.statusCode(202).end() inside callback of database upsert
+
+    } else {
+      // convertToDBForm and then insert
+        // res.statusCode(202).end() inside callback of database upsert
+      (new methodsDB(convertToDBForm(skull.project, method))).save(function(err){
+        if(err){
+          completedMethodEntry(err);
+        } else {
+          completedMethodEntry();
+        }
+      });
+    }
+  });
 };
+
 
