@@ -3,6 +3,7 @@ var fs = require('fs');
 var https = require('https');
 var http = require('http');
 var parsedToHTML = require('./parsedToHTML.js');
+var networkRequest = require('./networkRequest.js');
 
 //consider including more specific types of description: params description, returns description
 //maybe we don't need 'name' for the 'returns' array
@@ -23,11 +24,7 @@ var properties = {
 };
 
 var fileOperations = function(paths) {
-  var defaultProjectName = paths[0].match(/\/?([^\/]+)\./)[1];
-  //last path in array is the output file; earlier ones are js files to parse
-  //outputPath is a directory
-  var outputPath = paths.pop();
-  //var outputArray = [];
+
   var outputObj = {
     header: {
       project: '',
@@ -36,25 +33,63 @@ var fileOperations = function(paths) {
     },
     body: []
   };
-  var numberOfFiles = paths.length;
+  var outputPath = paths.pop();
+  //if the user is parsing local files
+  if (!isNetworkRequest(paths[0])) {
+    var defaultProjectName = paths[0].match(/\/?([^\/]+)\./)[1];
+    //last path in array is the output file; earlier ones are js files to parse
+    //outputPath is a directory
+    //var outputArray = [];
+    var numberOfFiles = paths.length;
+    for (var i = 0; i < numberOfFiles; i++) {
+      var parsedFileContents = parseMain(fs.readFileSync(paths[i]).toString());
+      if (parsedFileContents.header.project !== '') {
+        outputObj.header = parsedFileContents.header;
+      }
+      outputObj.body = outputObj.body.concat(parsedFileContents.body);
+    }
+    if (outputObj.header.projectName === '') {
+      outputObj.header.projectName = defaultProjectName;
+    }
+
+    constructGroupClassAndIndex(outputObj);
+    // to write JSON and HTML files
+    //create the specified directory if is does not exist
+    writeIntoLocalFiles(outputObj, outputPath);
+    // make POST request to our server to send over the processed json file
+    sendParsedToServer(JSON.stringify(outputObj));
+  } else {
+    // for github API call - going to exist in some if block
+    // check if https:// or http://
+    // githugAPICallInfo is an array with [API call path, username, repo name]
+    var githubAPICallInfo = networkRequest.parseUrl(paths[0]);
+    if (githubAPICallInfo) {
+      networkRequest.githubAPICallForFile(githubAPICallInfo, function(data) {
+        var parsedFileContents = parseMain(data);
+        if (parsedFileContents.header.project === '') {
+          outputObj.header.project = githubAPICallInfo[2];
+        }
+        outputObj.body = parsedFileContents.body;
+        constructGroupClassAndIndex(outputObj);
+        writeIntoLocalFiles(outputObj, outputPath);
+        // make POST request to our server to send over the processed json file
+        sendParsedToServer(JSON.stringify(outputObj));
+      }); 
+    }
+  }
+};
+
+var isNetworkRequest = function(path) {
+  return (path.match('http://') || path.match('https://'));
+};
+
+var constructGroupClassAndIndex = function(outputObj) {
+  //add index property to each entry
+  //create a list of all classes and groups
   var classStore = {};
   var classList = [];
   var groupStore = {};
   var groupList = [];
-
-  for (var i = 0; i < numberOfFiles; i++) {
-    var parsedFileContents = parseMain(fs.readFileSync(paths[i]).toString());
-    if (parsedFileContents.header.project !== '') {
-      outputObj.header = parsedFileContents.header;
-    }
-    outputObj.body = outputObj.body.concat(parsedFileContents.body);
-  }
-  if (outputObj.header.projectName === '') {
-    outputObj.header.projectName = defaultProjectName;
-  }
-
-  //add index property to each entry
-  //create a list of all classes and groups
   for (var i = 0; i < outputObj.body.length; i++) {
     outputObj.body[i].index = i;
     var group = outputObj.body[i].group;
@@ -71,13 +106,15 @@ var fileOperations = function(paths) {
 
   outputObj.header.classList = classList;
   outputObj.header.groupList = groupList;
+};
 
+var writeIntoLocalFiles = function(outputObj, outputPath) {
   // to write JSON and HTML files
   //create the specified directory if is does not exist
   if (!fs.existsSync(outputPath)){
     fs.mkdirSync(outputPath);
   }
-
+  // to write JSON file
   fs.writeFile(outputPath + '/parsedJSON.json', JSON.stringify(outputObj), function(err, data) {
     if (err) {
       console.log(err + '(will be triggered by mocha tests)');
@@ -96,20 +133,16 @@ var fileOperations = function(paths) {
       console.log('Successfully generated HTML file.');
     }
   });
-
-  sendParsedToServer(JSON.stringify(outputObj));
 };
 
-//https://httpbin.org/post
 var sendParsedToServer = function(string) {
   var options = {
     host:'localhost',
     port: '3000',
-    json: true,
     headers: {
-        "content-type": "application/json",
+      "content-type": "application/json",
     },
-    path: '/create',
+    path: '/create/',
     method: 'POST'
   };
   var request = http.request(options, function(res) {
@@ -133,8 +166,6 @@ var parseMain = function(string) {
   return {header: header, body: combineInfo(functionInfo, commentInfo)};
 };
 
-//TODO: fix (only trimming off number of characters of @doc, not @header.  add isHeader flag
-//parameter to parseCommentBlock and processEntry)
 var parseHeader = function(string) {
   var header = findHeader(string);
   // console.log('header before processing: ', header);
@@ -223,7 +254,7 @@ var findFunctionInfo = function(string) {
   // checks for independent functions: function xyz() = {}
   var functionPatternB = /function\s*([a-zA-Z0-9_]+)\s*\(([a-zA-Z0-9_,\s]*)\)/g;
   // checks for class methods: a.xyz = function() {}
-  var functionPatternC = /([a-zA-Z0-9_]+\.)+([a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  var functionPatternC = /((?:[a-zA-Z0-9_]+\.)+)([a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
   // TODO possibly patternD: checks for class methods: var d3 = {xyz: function(){}}
   // and find the object name to be the context
 
@@ -231,47 +262,6 @@ var findFunctionInfo = function(string) {
   var functionInfoB = parseFunctionPatternB(string, functionPatternB);
   var functionInfoC = parseFunctionPatternC(string, functionPatternC);
   var functionInfo = functionInfoA.concat(functionInfoB).concat(functionInfoC);
-  //var paramsPattern = /function\s*[a-zA-Z0-9_]*\s*(\([a-zA-Z0-9_,\s]*\))/g;
-
-  // right now paramsList will return an array even if there's no params
-  // may refactor later, may not
-  // while (matchListA) {
-  //   var paramsList = matchListA[2].split(',').map(function(param){
-  //     return {'name': param.trim()};
-  //   });
-  //   paramsList = paramsList[0].name === '' ? [] : paramsList;
-  //   var obj = {
-  //     functionName: matchListA[1],
-  //     params: paramsList,
-  //     returns: [],
-  //     explanations: {
-  //       descriptions: '',
-  //       examples: '',
-  //       tips: ''
-  //     }
-  //   };
-  //   functionInfo.push(obj);
-  //   matchListA = functionPatternA.exec(string);
-  // }
-
-  // while (matchListB) {
-  //   var paramsList = matchListB[2].split(',').map(function(param){
-  //     return {'name': param.trim()};
-  //   });
-  //   paramsList = paramsList[0].name === '' ? [] : paramsList;
-  //   var obj = {
-  //     functionName: matchListB[1],
-  //     params: paramsList,
-  //     returns: [],
-  //     explanations: {
-  //       descriptions: '',
-  //       examples: '',
-  //       tips: ''
-  //     }
-  //   };
-  //   functionInfo.push(obj);
-  //   matchListB = functionPatternB.exec(string);
-  // }
 
   return functionInfo.sort(function(a, b) {
     return a.index > b.index;
@@ -343,7 +333,7 @@ var parseFunctionPatternC = function(string, pattern) {
     });
     paramsList = paramsList[0].name === '' ? [] : paramsList;
     var obj = {
-      functionName: matchListC[2],
+      functionName: classContext + matchListC[2],
       params: paramsList,
       returns: [],
       explanations: {
@@ -351,7 +341,7 @@ var parseFunctionPatternC = function(string, pattern) {
         examples: '',
         tips: ''
       },
-      classContext: classContext,
+      classContext: classContext.slice(0, classContext.length - 1),
       index: matchListC.index
     };
     results.push(obj);
@@ -508,36 +498,21 @@ var userArgs = process.argv.slice(2);
 console.log(userArgs);
 if (userArgs[0] !== 'spec') fileOperations(userArgs);
 
-// @params: 'abc', @name: 'name'
-// @params: [{ name: 'sdfsd' type: 'Boolean' }, { name: 'sdfsd' type: 'Boolean' }]
-  // check if it's an object or an array
-    // if object, pushes into an empty array
-// @returns: [{ name: 'sdfsd' type: 'Boolean' }, { name: 'sdfsd' type: 'Boolean' }]
-  // check if it's an object or an array
-    // if object, pushes into an empty array
+//TODO: grab functionName from next function after a comment block (no need for
+ //@functionName property anymore.)
+//TODO: add @class functionality
+//TODO: start blocks with ** to distinguish from normal comments
 
-// find comment blocks : /** ... */
-  //@doc signals that the documentation info for a function is to follow
-  // loook for @keywords and call respective functions to further parse the keyword
-    // @functionName: if not provided, look for function dec patter; 
-        // if no function dec pattern, throw new Error
-    // @methodContext = Vector  (extra: find a way to infer this from surroundings?)
-    //   Vector.calculateMagnitude
-  //check for one the two function patterns, either function Name(args) {} or var Name = function() {}
-  //Name is value of @functionName
-  
-  //return json array of objects
-  
-  // @functionName
-  // @params
-    // @name: name of param
-    // @type
-    // @default: default value of param (optional)
-  // @returns
-    // @name: name of return value
-    // @type
-  // @description
-  // @group: heading for a group of functions
-  
-  // extra: @special (user-defined keyword)
-  // extra: cross-referencing {@link BABYLON.Vector3|Vector3} i 
+// @functionName
+// @params
+  // @name: name of param
+  // @type
+  // @default: default value of param (optional)
+// @returns
+  // @name: name of return value
+  // @type
+// @description
+// @group: heading for a group of functions
+
+// extra: @special (user-defined keyword)
+// extra: cross-referencing {@link BABYLON.Vector3|Vector3} i 
