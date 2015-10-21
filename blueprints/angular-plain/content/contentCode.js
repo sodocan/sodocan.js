@@ -7,30 +7,10 @@ angular.module('sodocan')
   };
 })
 .controller('sodocanContentCtrl',
-            ['$location','$scope','sodocanAPI', function($location,$scope,sodocanAPI) {
-  
-  // TODO: abstract this out to sodocan topLevel
+            ['$scope','sodocanAPI','sodocanRouter',
+              function($scope,sodocanAPI,sodocanRouter) {
   var update = function(path) {
-    $scope.contentDisp = $location.path();
-    if (typeof path!=='array') {
-      path = $location.path().split('/').filter(function(val) {
-        return !(val==='');
-      });
-    }
-    if (path.length>0) {
-      if (isFinite(path[0])) {
-        // numbers to API
-        $scope.contentDisp = 'Number returns: '+path[0];
-      } else {
-        // start stacking ref call
-        $scope.contentDisp = 'Search for reference: '+path[0];
-      }
-    } else {
-      $scope.contentDisp = 'Default';
-    }
+    $scope.contentDisp = path;
   };
-  $scope.$on('$locationChangeStart', update);
-
-  // on first load
-  update(sodocanAPI.path);
+  $scope.$watch('sodocanRoute()',update);
 }]);

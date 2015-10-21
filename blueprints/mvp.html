@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Example Page</title>
+
+    <style>
+#header {
+  width: 100%;
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+#sidebar {
+  width: 20%;
+  float: left;
+  font-size: 0.9em;
+}
+
+#sidebar ul {
+  margin-left: 10px;
+  padding-left: 20px;
+}
+
+#sidebar ul ul {
+  margin-left: 1em;
+  padding-left: 0;
+}
+
+#content {
+  width: 75%;
+  padding-right: 5%;
+  float: right;
+}
+
+#content h3 {
+  display: inline-block;
+  padding-right: 5em;
+}
+
+.subthing {
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+#footer {
+  clear: both;
+  font-size: 0.8em;
+  color: #888;
+  padding-top: 40px;
+  width: 100%;
+  text-align: center;
+}
+
+.voteable {
+  background-color: #ccc;
+}
+
+a.upvote {
+  display: block;
+  width: 10px;
+  height: 10px;
+  background-color:#0f0;
+}
+
+a.downvote {
+  display: block;
+  width: 10px;
+  height: 10px;
+  background-color:#f00;
+}
+    </style>
+  </head>
+  <body>
+
+    <div id="header">
+      Logo or whatever
+    </div>
+
+    <div id="sidebar">
+      <ul>
+        <li><a href="#thing0">Thing0</a></li>
+        <li><a href="#thing1">Thing1</a></li>
+        <li><a href="#thing2">Thing2</a>
+          <ul>
+            <li><a href="#thing2:method0">Thing2.method0</a></li>
+            <li><a href="#thing2:method1">Thing2.method1</a></li>
+          </ul>
+        </li>
+        <li><a href="#thing3">Thing3</a></li>
+        <li><a href="#thing4">Thing4</a></li>
+        <li><a href="#thing5">Thing5</a></li>
+        <li><a href="#thing6">Thing6</a></li>
+        <li><a href="#thing7">Thing7</a></li>
+      </ul>
+    </div>
+
+    <div id="content">
+      <h3 id="thing0">Thing0</h3>
+      <span class="subthing">function(param,param1) -&gt; boolean</span>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam et elit
+      efficitur est aliquam tempus non non augue. Sed tincidunt consequat tellus
+      eu iaculis. Cras purus nunc, tincidunt fermentum fermentum eget, mattis in
+      eros. Praesent elementum, nibh ut dignissim venenatis, magna ligula
+      ullamcorper neque, tincidunt porta libero ligula vitae ligula. Fusce massa
+      ipsum, porta vitae urna vitae, vulputate venenatis elit. Mauris tincidunt
+      arcu turpis, rhoncus convallis turpis luctus sagittis. Integer vestibulum
+      venenatis mauris. Proin et erat non massa placerat faucibus. </p>
+      <p> Donec suscipit magna sit amet elit elementum scelerisque. Ut at dui ac diam
+      commodo porttitor et at sapien. Praesent convallis fringilla nibh, ut
+      iaculis metus aliquam eu. Praesent suscipit consectetur sem vitae rutrum.
+      Aliquam vel bibendum libero. Aliquam erat volutpat. Ut convallis luctus
+      orci id vehicula. Proin dictum pretium sapien et porta. Pellentesque id
+      mollis mauris. Pellentesque ultricies elit in libero porttitor feugiat ac
+      sed nulla. Curabitur id justo nisl. Phasellus massa odio, imperdiet quis
+      egestas sit amet, accumsan et nunc. Pellentesque ante tortor, tempus et leo
+      ac, sodales pellentesque leo. Cras sagittis purus eget quam finibus, a
+      consectetur nisl porta. Sed quis justo ornare, tincidunt nisi eget,
+      malesuada odio. </p>
+
+      <h3 id="thing1">Thing1</h3>
+      <span class="subthing">function(param,param1) -&gt; boolean</span>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam et elit
+      efficitur est aliquam tempus non non augue. Sed tincidunt consequat tellus
+      eu iaculis. Cras purus nunc, tincidunt fermentum fermentum eget, mattis in
+      eros. Praesent elementum, nibh ut dignissim venenatis, magna ligula
+      ullamcorper neque, tincidunt porta libero ligula vitae ligula. Fusce massa
+      ipsum, porta vitae urna vitae, vulputate venenatis elit. Mauris tincidunt
+      arcu turpis, rhoncus convallis turpis luctus sagittis. Integer vestibulum
+      venenatis mauris. Proin et erat non massa placerat faucibus. </p>
+      <p> Donec suscipit magna sit amet elit elementum scelerisque. Ut at dui ac diam
+      commodo porttitor et at sapien. Praesent convallis fringilla nibh, ut
+      iaculis metus aliquam eu. Praesent suscipit consectetur sem vitae rutrum.
+      Aliquam vel bibendum libero. Aliquam erat volutpat. Ut convallis luctus
+      orci id vehicula. Proin dictum pretium sapien et porta. Pellentesque id
+      mollis mauris. Pellentesque ultricies elit in libero porttitor feugiat ac
+      sed nulla. Curabitur id justo nisl. Phasellus massa odio, imperdiet quis
+      egestas sit amet, accumsan et nunc. Pellentesque ante tortor, tempus et leo
+      ac, sodales pellentesque leo. Cras sagittis purus eget quam finibus, a
+      consectetur nisl porta. Sed quis justo ornare, tincidunt nisi eget,
+      malesuada odio. </p>
+
+      <h3 id="thing2">Thing2</h3>
+      <span class="subthing">function(param,param1) -&gt; boolean</span>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam et elit
+      efficitur est aliquam tempus non non augue. Sed tincidunt consequat tellus
+      eu iaculis. Cras purus nunc, tincidunt fermentum fermentum eget, mattis in
+      eros. Praesent elementum, nibh ut dignissim venenatis, magna ligula
+      ullamcorper neque, tincidunt porta libero ligula vitae ligula. Fusce massa
+      ipsum, porta vitae urna vitae, vulputate venenatis elit. Mauris tincidunt
+      arcu turpis, rhoncus convallis turpis luctus sagittis. Integer vestibulum
+      venenatis mauris. Proin et erat non massa placerat faucibus. </p>
+      <p> Donec suscipit magna sit amet elit elementum scelerisque. Ut at dui ac diam
+      commodo porttitor et at sapien. Praesent convallis fringilla nibh, ut
+      iaculis metus aliquam eu. Praesent suscipit consectetur sem vitae rutrum.
+      Aliquam vel bibendum libero. Aliquam erat volutpat. Ut convallis luctus
+      orci id vehicula. Proin dictum pretium sapien et porta. Pellentesque id
+      mollis mauris. Pellentesque ultricies elit in libero porttitor feugiat ac
+      sed nulla. Curabitur id justo nisl. Phasellus massa odio, imperdiet quis
+      egestas sit amet, accumsan et nunc. Pellentesque ante tortor, tempus et leo
+      ac, sodales pellentesque leo. Cras sagittis purus eget quam finibus, a
+      consectetur nisl porta. Sed quis justo ornare, tincidunt nisi eget,
+      malesuada odio. </p>
+      <h4 id="thing2:method0">Thing2.method0</h4>
+      <p> Donec suscipit magna sit amet elit elementum scelerisque. Ut at dui ac diam
+      commodo porttitor et at sapien. Praesent convallis fringilla nibh, ut
+      iaculis metus aliquam eu. Praesent suscipit consectetur sem vitae rutrum.
+      Aliquam vel bibendum libero. Aliquam erat volutpat. Ut convallis luctus
+      orci id vehicula. Proin dictum pretium sapien et porta. Pellentesque id
+      mollis mauris. Pellentesque ultricies elit in libero porttitor feugiat ac
+      sed nulla. Curabitur id justo nisl. Phasellus massa odio, imperdiet quis
+      egestas sit amet, accumsan et nunc. Pellentesque ante tortor, tempus et leo
+      ac, sodales pellentesque leo. Cras sagittis purus eget quam finibus, a
+      consectetur nisl porta. Sed quis justo ornare, tincidunt nisi eget,
+      malesuada odio. </p>
+      <h4 id="thing2:method1">Thing2.method1</h4>
+      <p> Donec suscipit magna sit amet elit elementum scelerisque. Ut at dui ac diam
+      commodo porttitor et at sapien. Praesent convallis fringilla nibh, ut
+      iaculis metus aliquam eu. Praesent suscipit consectetur sem vitae rutrum.
+      Aliquam vel bibendum libero. Aliquam erat volutpat. Ut convallis luctus
+      orci id vehicula. Proin dictum pretium sapien et porta. Pellentesque id
+      mollis mauris. Pellentesque ultricies elit in libero porttitor feugiat ac
+      sed nulla. Curabitur id justo nisl. Phasellus massa odio, imperdiet quis
+      egestas sit amet, accumsan et nunc. Pellentesque ante tortor, tempus et leo
+      ac, sodales pellentesque leo. Cras sagittis purus eget quam finibus, a
+      consectetur nisl porta. Sed quis justo ornare, tincidunt nisi eget,
+      malesuada odio. </p>
+
+      <h3 id="thing3">Thing3</h3>
+      <span class="subthing">function(param,param1) -&gt; boolean</span>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam et elit
+      efficitur est aliquam tempus non non augue. Sed tincidunt consequat tellus
+      eu iaculis. Cras purus nunc, tincidunt fermentum fermentum eget, mattis in
+      eros. Praesent elementum, nibh ut dignissim venenatis, magna ligula
+      ullamcorper neque, tincidunt porta libero ligula vitae ligula. Fusce massa
+      ipsum, porta vitae urna vitae, vulputate venenatis elit. Mauris tincidunt
+      arcu turpis, rhoncus convallis turpis luctus sagittis. Integer vestibulum
+      venenatis mauris. Proin et erat non massa placerat faucibus. </p>
+      <p> Donec suscipit magna sit amet elit elementum scelerisque. Ut at dui ac diam
+      commodo porttitor et at sapien. Praesent convallis fringilla nibh, ut
+      iaculis metus aliquam eu. Praesent suscipit consectetur sem vitae rutrum.
+      Aliquam vel bibendum libero. Aliquam erat volutpat. Ut convallis luctus
+      orci id vehicula. Proin dictum pretium sapien et porta. Pellentesque id
+      mollis mauris. Pellentesque ultricies elit in libero porttitor feugiat ac
+      sed nulla. Curabitur id justo nisl. Phasellus massa odio, imperdiet quis
+      egestas sit amet, accumsan et nunc. Pellentesque ante tortor, tempus et leo
+      ac, sodales pellentesque leo. Cras sagittis purus eget quam finibus, a
+      consectetur nisl porta. Sed quis justo ornare, tincidunt nisi eget,
+      malesuada odio. </p>
+
+      <h3 id="thing4">Thing4</h3>
+      <span class="subthing">function(param,param1) -&gt; boolean</span>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam et elit
+      efficitur est aliquam tempus non non augue. Sed tincidunt consequat tellus
+      eu iaculis. Cras purus nunc, tincidunt fermentum fermentum eget, mattis in
+      eros. Praesent elementum, nibh ut dignissim venenatis, magna ligula
+      ullamcorper neque, tincidunt porta libero ligula vitae ligula. Fusce massa
+      ipsum, porta vitae urna vitae, vulputate venenatis elit. Mauris tincidunt
+      arcu turpis, rhoncus convallis turpis luctus sagittis. Integer vestibulum
+      venenatis mauris. Proin et erat non massa placerat faucibus. </p>
+      <p> Donec suscipit magna sit amet elit elementum scelerisque. Ut at dui ac diam
+      commodo porttitor et at sapien. Praesent convallis fringilla nibh, ut
+      iaculis metus aliquam eu. Praesent suscipit consectetur sem vitae rutrum.
+      Aliquam vel bibendum libero. Aliquam erat volutpat. Ut convallis luctus
+      orci id vehicula. Proin dictum pretium sapien et porta. Pellentesque id
+      mollis mauris. Pellentesque ultricies elit in libero porttitor feugiat ac
+      sed nulla. Curabitur id justo nisl. Phasellus massa odio, imperdiet quis
+      egestas sit amet, accumsan et nunc. Pellentesque ante tortor, tempus et leo
+      ac, sodales pellentesque leo. Cras sagittis purus eget quam finibus, a
+      consectetur nisl porta. Sed quis justo ornare, tincidunt nisi eget,
+      malesuada odio. </p>
+
+      <h3 id="thing5">Thing5</h3>
+      <span class="subthing">function(param,param1) -&gt; boolean</span>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam et elit
+      efficitur est aliquam tempus non non augue. Sed tincidunt consequat tellus
+      eu iaculis. Cras purus nunc, tincidunt fermentum fermentum eget, mattis in
+      eros. Praesent elementum, nibh ut dignissim venenatis, magna ligula
+      ullamcorper neque, tincidunt porta libero ligula vitae ligula. Fusce massa
+      ipsum, porta vitae urna vitae, vulputate venenatis elit. Mauris tincidunt
+      arcu turpis, rhoncus convallis turpis luctus sagittis. Integer vestibulum
+      venenatis mauris. Proin et erat non massa placerat faucibus. </p>
+      <p> Donec suscipit magna sit amet elit elementum scelerisque. Ut at dui ac diam
+      commodo porttitor et at sapien. Praesent convallis fringilla nibh, ut
+      iaculis metus aliquam eu. Praesent suscipit consectetur sem vitae rutrum.
+      Aliquam vel bibendum libero. Aliquam erat volutpat. Ut convallis luctus
+      orci id vehicula. Proin dictum pretium sapien et porta. Pellentesque id
+      mollis mauris. Pellentesque ultricies elit in libero porttitor feugiat ac
+      sed nulla. Curabitur id justo nisl. Phasellus massa odio, imperdiet quis
+      egestas sit amet, accumsan et nunc. Pellentesque ante tortor, tempus et leo
+      ac, sodales pellentesque leo. Cras sagittis purus eget quam finibus, a
+      consectetur nisl porta. Sed quis justo ornare, tincidunt nisi eget,
+      malesuada odio. </p>
+
+      <h3 id="thing6">Thing6</h3>
+      <span class="subthing">function(param,param1) -&gt; boolean</span>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam et elit
+      efficitur est aliquam tempus non non augue. Sed tincidunt consequat tellus
+      eu iaculis. Cras purus nunc, tincidunt fermentum fermentum eget, mattis in
+      eros. Praesent elementum, nibh ut dignissim venenatis, magna ligula
+      ullamcorper neque, tincidunt porta libero ligula vitae ligula. Fusce massa
+      ipsum, porta vitae urna vitae, vulputate venenatis elit. Mauris tincidunt
+      arcu turpis, rhoncus convallis turpis luctus sagittis. Integer vestibulum
+      venenatis mauris. Proin et erat non massa placerat faucibus. </p>
+      <p> Donec suscipit magna sit amet elit elementum scelerisque. Ut at dui ac diam
+      commodo porttitor et at sapien. Praesent convallis fringilla nibh, ut
+      iaculis metus aliquam eu. Praesent suscipit consectetur sem vitae rutrum.
+      Aliquam vel bibendum libero. Aliquam erat volutpat. Ut convallis luctus
+      orci id vehicula. Proin dictum pretium sapien et porta. Pellentesque id
+      mollis mauris. Pellentesque ultricies elit in libero porttitor feugiat ac
+      sed nulla. Curabitur id justo nisl. Phasellus massa odio, imperdiet quis
+      egestas sit amet, accumsan et nunc. Pellentesque ante tortor, tempus et leo
+      ac, sodales pellentesque leo. Cras sagittis purus eget quam finibus, a
+      consectetur nisl porta. Sed quis justo ornare, tincidunt nisi eget,
+      malesuada odio. </p>
+
+      <h3 id="thing7">Thing7</h3>
+      <span class="subthing">function(param,param1) -&gt; boolean</span>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam et elit
+      efficitur est aliquam tempus non non augue. Sed tincidunt consequat tellus
+      eu iaculis. Cras purus nunc, tincidunt fermentum fermentum eget, mattis in
+      eros. Praesent elementum, nibh ut dignissim venenatis, magna ligula
+      ullamcorper neque, tincidunt porta libero ligula vitae ligula. Fusce massa
+      ipsum, porta vitae urna vitae, vulputate venenatis elit. Mauris tincidunt
+      arcu turpis, rhoncus convallis turpis luctus sagittis. Integer vestibulum
+      venenatis mauris. Proin et erat non massa placerat faucibus. </p>
+      <p> Donec suscipit magna sit amet elit elementum scelerisque. Ut at dui ac diam
+      commodo porttitor et at sapien. Praesent convallis fringilla nibh, ut
+      iaculis metus aliquam eu. Praesent suscipit consectetur sem vitae rutrum.
+      Aliquam vel bibendum libero. Aliquam erat volutpat. Ut convallis luctus
+      orci id vehicula. Proin dictum pretium sapien et porta. Pellentesque id
+      mollis mauris. Pellentesque ultricies elit in libero porttitor feugiat ac
+      sed nulla. Curabitur id justo nisl. Phasellus massa odio, imperdiet quis
+      egestas sit amet, accumsan et nunc. Pellentesque ante tortor, tempus et leo
+      ac, sodales pellentesque leo. Cras sagittis purus eget quam finibus, a
+      consectetur nisl porta. Sed quis justo ornare, tincidunt nisi eget,
+      malesuada odio. </p>
+    </div>
+
+    <div id="footer">
+      some kinda text
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="mvp.js"></script>
+  </body>
+</html>
+
