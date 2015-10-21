@@ -1,7 +1,7 @@
 var http = require('http');
 var fs = require('fs');
 
-var PORT=3000;
+var PORT=4000;
 var DIR=__dirname+'/blueprints';
 var TEMPLATE = 'angular-plain';
 var headers = {'Access-Control-Allow-Origin':'*'};
