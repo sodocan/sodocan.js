@@ -14,6 +14,7 @@ var findFunctionInfo = docParser.findFunctionInfo;
 var parseMain = docParser.parseMain;
 var buildExplanations = docParser.buildExplanations;
 var parseHeader = docParser.parseHeader;
+var combineInfo = docParser.combineInfo;
 var fixtures = fs.readFileSync('./spec/fixtures.js').toString();
 var parsedJSON = fs.readFileSync('./spec/parsedJSON.json').toString();
 
@@ -128,6 +129,7 @@ describe("documentation parser", function() {
   it("should parse info based on both functions and comments", function() {
     var results = parseMain(fixtures);
     expect(results.body.length).to.equal(8);
+    //console.log('RESULTS.BODY: ', results.body);
     expect(results.body[0].functionName).to.equal('goldfish');
     expect(results.body[0].explanations.descriptions).to.equal('xtra cheddar');
   });
@@ -154,5 +156,28 @@ describe("documentation parser", function() {
   it("should turn parsedInfo to HTML", function() {
     var results = parsedToHTML(parsedJSON);
     // console.log(results);
+  });
+
+  it("should have same length as old combineInfo", function() {
+    var funcInfo = findFunctionInfo(fixtures);
+    var commentInfo = parseComments(fixtures);
+    expect(combineInfo(funcInfo, commentInfo).length).to.equal(8);
+  });
+
+  it("should grab the functionName from the JavaScript function following a comment block" +
+    "if none is provided in the comment", function() {
+    var funcInfo = findFunctionInfo(fixtures);
+    var commentInfo = parseComments(fixtures);
+    var combined = combineInfo(funcInfo, commentInfo);
+    expect(combined[0].functionName).to.equal('goldfish');
+  });
+
+  it("should grab the params from the JS following a comment without params", function() {
+    var funcInfo = findFunctionInfo(fixtures);
+    var commentInfo = parseComments(fixtures);
+    var combined = combineInfo(funcInfo, commentInfo);
+    console.log('COMBINED: ', combined);
+    expect(combined[2].params[0].name).to.equal('stuff');
+    expect(combined[2].params[1].name).to.equal('things');
   });
 });
