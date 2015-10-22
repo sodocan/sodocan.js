@@ -458,27 +458,93 @@ var splitEntries = function(string) {
   return string.split(entryDividingRegex);
 };
 
-var combineInfo = function(functionArr, commentArray) {
-  var combinedArr = [];
-  var storage = {};
+//each elem in commentArray has an index property
+//push all elements to a results array
+//sort by index
+//iterate over elems
+//if elem has no functionName
+  //grab function name (and param names) from following element
+  //delete following element
 
-  for (var i = 0; i < functionArr.length; i++) {
-    storage[functionArr[i].functionName] = functionArr[i];
-  }
-  for (var j = 0; j < commentArray.length; j++) {
-    storage[commentArray[j].functionName] = commentArray[j];
-  }
-  for (var name in storage) {
-    combinedArr.push(storage[name]);
-  }
+//add check for whether first one is comment or function
+//push into second results array after getting the data from the next 
+//element (more efficient than splice)
 
-  //sort by regex match index
-  combinedArr.sort(function(a, b) {
-    return a.index > b.index;
+//(possible: keep track of which are comments and which are functions to avoid
+  //potential for problems if there are consecutive comment blocks?)  
+var combineInfo = function(functionArray, commentArray) {
+  var combinedArray = functionArray.concat(commentArray);
+  //mark elements to indicate whether they are sourced from a comment,
+  //to be safe if user does something weird with ordering comments/functions
+  for (var i = 0; i < combinedArray.length; i++) {
+    combinedArray[i].fromComment = (i >= functionArray.length);
+    //if (combinedArray[i].index === 782) console.log('SPICY: ', combinedArray[i]);
+  }
+  var results = [];
+  //sort in order of appearance in the file
+  combinedArray.sort(function(a, b) {
+    return a.index - b.index;
   });
+  //console.log('COMBINED ARRAY before removing duplicates:',combinedArray);
+  //take functionName and params info from the following function if not provided in a comment
+  for (var i = 0; i < combinedArray.length; i++) {
 
-  return combinedArr;
+    //add to results and break if we're on the last element
+    if (i === combinedArray.length - 1) {
+      results.push(combinedArray[i]);
+      break;
+    } 
+
+    var current = combinedArray[i];
+    var next = combinedArray[i + 1];
+    //we're only interested in taking info from the next entry if we're on a comment
+    //and the next one is a JS entry
+    if (current.fromComment && !next.fromComment) { 
+      if (current.functionName === '') {
+        current.functionName = next.functionName;
+      }
+      //ensure that leaving out params in a comment will only grab the next one
+      //if the next one has the same functionName, or current functionName is blank
+      if (current.params[0] === undefined && 
+        (current.functionName === '' || current.functionName === next.functionName)) {
+        current.params = next.params;
+      }
+    }
+    delete current.fromComment;
+    results.push(current);
+
+    //skip next element, if it is the JS corresponding to the current comment 
+    if (next.functionName === current.functionName) {
+      i++;
+    }
+  }
+  return results;
 };
+
+
+
+//OLD VERSION  
+// var oldCombineInfo = function(functionArr, commentArray) {
+//   var combinedArr = [];
+//   var storage = {};
+
+//   for (var i = 0; i < functionArr.length; i++) {
+//     storage[functionArr[i].functionName] = functionArr[i];
+//   }
+//   for (var j = 0; j < commentArray.length; j++) {
+//     storage[commentArray[j].functionName] = commentArray[j];
+//   }
+//   for (var name in storage) {
+//     combinedArr.push(storage[name]);
+//   }
+
+//   //sort by regex match index
+//   combinedArr.sort(function(a, b) {
+//     return a.index > b.index;
+//   });
+
+//   return combinedArr;
+// };
 
 module.exports = {
   parseHeader: parseHeader,
@@ -490,7 +556,8 @@ module.exports = {
   convertToJS: convertToJS,
   findFunctionInfo: findFunctionInfo,
   parseMain: parseMain,
-  buildExplanations: buildExplanations
+  buildExplanations: buildExplanations,
+  combineInfo: combineInfo
 };
 
 //for command line use
@@ -498,8 +565,10 @@ var userArgs = process.argv.slice(2);
 console.log(userArgs);
 if (userArgs[0] !== 'spec') fileOperations(userArgs);
 
-//TODO: grab functionName from next function after a comment block (no need for
+//DONE: grab functionName from next function after a comment block (no need for
  //@functionName property anymore.)
+//TODO: double check that params are getting read from undersscore correctly
+//(_.each?)
 //TODO: add @class functionality
 //TODO: start blocks with ** to distinguish from normal comments
 

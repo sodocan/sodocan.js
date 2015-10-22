@@ -4,11 +4,10 @@
 @version: '~0.0.3'
 */
 
-
+//removed functionName from this
 /* @doc
 @params: {name: "stuff", type: "Boolean"}
 @returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
-@functionName: 'goldfish'
 @descriptions: 'xtra cheddar'
 @tips: 'don't eat too much
 @group: 'happySaturday'
@@ -21,8 +20,9 @@ var goldfish = function(stuff, things) {
 function guppy(eggs, pie, green) {
 
 } 
+
+//removed params from this
 /* @doc
-@params: {name: 'stuff', type: 'Boolean'}
 @returns: [{type: 'stuff'}, {type: 'num'}, {type: 'bool'}]
 @functionName: 'rice'
 @descriptions: 'squishy'
@@ -36,7 +36,7 @@ function guppy(eggs, pie, green) {
 @descriptions: 'squishy'
 */
 
-var rice = function(stuff) {
+var rice = function(stuff, things) {
   function chopsticks() {}
 };
 
