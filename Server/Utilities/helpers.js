@@ -160,9 +160,10 @@ var hashCode = function(string) {
 
 
 
-
-
-
+/*
+sodocan.com/api/*:projectName/ref/:functionName/:explanationType/:numEntriesOrEntryID/:numCommentsOrCommentID
+api/:projectName/1/all
+*/
 
 
 
@@ -193,7 +194,7 @@ var getReferences = exports.getReferences = function(path, callback, res) {
           //go through each contexts (not just the ones mentioned)
           //if a specific context is mentioned, use it's depth
           //otherwise use the one specified in all
-          depthSpecs = contexts[context] || contexts.all;
+          var depthSpecs = contexts[context] || contexts.all;
           if (depthSpecs) {
             //default depth is 1, default addtion is 0
             var entryDepth = depthSpecs[0] || '1';
