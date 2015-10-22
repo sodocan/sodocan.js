@@ -13,6 +13,7 @@ var send404 = exports.send404 = function(res, errorMessageOrObj) {
 };
 
 var sendReferences = exports.sendReferences = function(ref, res){
+  res.setHeader('Access-Control-Allow-Origin','*');
   res.send(ref);
 }; // pointless, just do res.send(ref) wherever this was called
 
