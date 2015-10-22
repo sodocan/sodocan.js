@@ -9,18 +9,21 @@ var networkRequest = require('./networkRequest.js');
 //maybe we don't need 'name' for the 'returns' array
 
 var properties = {
-  'functionName': '',
-  'params': [],
-  'returns': [],
-  'group': '',
-  'descriptions': '',
-  'examples': '',
-  'tips': '',
-  'classContext': '', 
-  'project': '',
-  'author': '',
-  'version': '',
-  'contains': ''
+  functionName: '',
+  params: [],
+  returns: [],
+  group: '',
+  descriptions: '',
+  examples: '',
+  tips: '',
+  classContext: '', 
+  project: '',
+  author: '',
+  version: '',
+  includeByDefault: '',
+  contains: '',
+  omit: '',
+  include: ''
 };
 
 var fileOperations = function(paths) {
@@ -162,9 +165,39 @@ var sendParsedToServer = function(string) {
 var parseMain = function(string) {
   // assuming function names are supplied
   var header = parseHeader(string);
+
   var functionInfo = findFunctionInfo(string);
   var commentInfo = parseComments(string);
-  return {header: header, body: combineInfo(functionInfo, commentInfo)};
+  var combinedInfo = combineInfo(functionInfo, commentInfo);
+  var resultsObj = {header: header, body: combinedInfo};
+  removeExcludedEntries(resultsObj);
+  return resultsObj;
+};
+
+//remove entries the user does not wish to include
+var removeExcludedEntries = function(parsedObj) {
+  var functions = parsedObj.body;
+  var resultBody = [];
+  //include all that are not marked with @omit
+  if (parsedObj.header.includeByDefault === 'true') {
+    for (var i = 0; i < functions.length; i++) {
+      //skip current function if it has @omit
+      if (functions[i].omit !== undefined) {
+        continue;
+      }
+      resultBody.push(functions[i]);
+    }
+  //else, only include those marked with @include 
+  } else {
+    for (var i = 0; i < functions.length; i++) {
+      //skip current function if it does not have include
+      if (functions[i].include === undefined) {
+        continue;
+      }
+      resultBody.push(functions[i]);
+    }
+  }
+  parsedObj.body = resultBody;
 };
 
 var parseHeader = function(string) {
@@ -173,12 +206,14 @@ var parseHeader = function(string) {
   var headerObj = {
     project: '',
     author: '',
-    version: ''
+    version: '',
+    includeByDefault: 'true'
   };
   if (header) {
     var entries = parseCommentBlock(header, true);
     entries.forEach(function(entry) {
       var entryObj = processEntry(entry);
+      console.log(entryObj);
       headerObj[entryObj.propertyName] = entryObj.content;
     });
   }
@@ -389,8 +424,14 @@ var propertyIsValid = function(propName) {
 var processEntry = function(entry) {
   //grab property name (in between @ and :)
   //grab contents after colon
-
+  //includes \n and \r to catch @omit and @include
   var propNameRegex = /^\w+?\s*:/; 
+
+  //some keywords have no content, like @omit
+  if (!entry.match(propNameRegex)) {
+    console.log(entry);
+    return processContentlessEntry(entry);
+  } 
   var nameOfProperty = entry.match(propNameRegex).join();
   var propNameLength = nameOfProperty.length;
   nameOfProperty = nameOfProperty.substring(0, propNameLength - 1).trim();
@@ -420,6 +461,14 @@ var processEntry = function(entry) {
   }
   return entryObj;
 };
+
+var processContentlessEntry = function(entry) {
+  var entryObj = {
+    propertyName: entry.trim(),
+    content: ''
+  }
+  return entryObj;
+}
 
 var convertToJS = function(string) {
   var fixedJSON = string.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2": ');
@@ -467,12 +516,10 @@ var splitEntries = function(string) {
   //grab function name (and param names) from following element
   //delete following element
 
-//add check for whether first one is comment or function
 //push into second results array after getting the data from the next 
 //element (more efficient than splice)
 
-//(possible: keep track of which are comments and which are functions to avoid
-  //potential for problems if there are consecutive comment blocks?)  
+
 var combineInfo = function(functionArray, commentArray) {
   var combinedArray = functionArray.concat(commentArray);
   //mark elements to indicate whether they are sourced from a comment,
@@ -566,13 +613,15 @@ var userArgs = process.argv.slice(2);
 console.log(userArgs);
 if (userArgs[0] !== 'spec') fileOperations(userArgs);
 
-
+//TODO: allow a way to omit things (--include and --omit flags to define behavior?)
+//TODO: allow a way to edit results
+//TODO: start blocks with ** to distinguish from normal comments (possibly eliminate
+ // @doc)
 //DONE: grab functionName from next function after a comment block (no need for
  //@functionName property anymore.)
-//TODO: double check that params are getting read from undersscore correctly
-//(_.each?)
+//TODO: add @omit functionality
 //TODO: add @class functionality
-//TODO: start blocks with ** to distinguish from normal comments
+
 
 // @functionName
 // @params
