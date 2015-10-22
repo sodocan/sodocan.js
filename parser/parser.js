@@ -78,19 +78,12 @@ var fileOperations = function(paths) {
     }
   }
 };
-<<<<<<< HEAD
+
 
 var isNetworkRequest = function(path) {
   return (path.match('http://') || path.match('https://'));
 };
 
-=======
-
-var isNetworkRequest = function(path) {
-  return (path.match('http://') || path.match('https://'));
-};
-
->>>>>>> 46dea4df865660ae5cc7045620c3b6b2dd3baa1a
 var constructGroupClassAndIndex = function(outputObj) {
   //add index property to each entry
   //create a list of all classes and groups
