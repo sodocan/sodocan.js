@@ -1,6 +1,8 @@
+//var project = window.location.pathname.split('/')[1];
+var project = 'underscore';
 function getData() {
   $.ajax({
-    url: "http://localhost:3000/api/underscore",
+    url: "/api/"+project+"/all",
     method: "GET",
     error: function(err) {
       console.log(err);
@@ -24,23 +26,32 @@ function populate(arr) {
 
 function buildRef(item) {
   if (typeof item==='string') {
-    var text = arguments[1];
     item = docs[item];
-  } else {
-    var text = item.explanations.descriptions[0];
   }
+  var end = item.explanations.descriptions.length;
+  end = (end>5)?5:(end===0)?1:end;
 
   var ret = '<div id="'+item.functionName+'">';
   ret += '<h3>'+item.functionName+'</h3>';
-  ret += '<p id="'+item.functionName+'_desc">';
-  if (text!==undefined) {
-    text = (typeof text==='string')?text:text.text;
-    ret+='<a class="upvote" onClick="upvote(\''+item.functionName+'\')"></a>';
-    ret+=text;
-  } else {
-    ret += 'Be the first to add a description!';
+  ret += '<div id="'+item.functionName+'_desc">';
+  
+  for (var i=0;i<end;i++) {
+    var eid = (item.explanations.descriptions[i]!==undefined)?item.explanations.descriptions[i].entryID:'new_entry_'+item.functionName;
+
+    ret+='<div id="'+eid+'" style="border: 1px solid #000;margin-top:10px;">';
+    var text = (item.explanations.descriptions[i]!==undefined)?item.explanations.descriptions[i].text:undefined;
+    if (text!==undefined) {
+      text = (typeof text==='string')?text:text.text;
+      ret+='<a class="upvote" onClick="upvote(\''+item.functionName+'\','+item.explanations.descriptions[i].entryID+')"></a>';
+      ret+='<span class="upvotes">'+item.explanations.descriptions[i].upvotes+'</span>';
+      ret+='<p>'+text+'</p>';
+    } else {
+      ret += '<p>Be the first to add a description!</p>';
+    }
+    ret+='</div>';
   }
-  ret +='</p>';
+
+  ret +='</div>';
   ret += '<button id="'+item.functionName+'_but" onClick="edit(\''+item.functionName+'\')">Add Entry</button>';
   ret += '</div>';
   return ret;
@@ -50,14 +61,14 @@ function edit(func) {
   var id = func+'_desc';
   var text = $('#'+id).text();
   var $button = $('#'+func+'_but');
-  $('#'+id).replaceWith('<textarea class="editbox" id="'+id+'">'+text+'</textarea>');
+  $('#'+id).replaceWith('<textarea class="editbox" id="'+id+'">Your entry here</textarea>');
   $button.replaceWith('<button id="'+func+'_but" onClick="save(\''+func+'\')">Save</button>');
 }
 
 function save(func) {
   var text = $('#'+func+'_desc').val();
   $.ajax({
-    url: "http://localhost:3000/addEntry",
+    url: "/addEntry",
     method: "POST",
     contentType: "application/json",
     data: JSON.stringify({
@@ -70,28 +81,40 @@ function save(func) {
       console.log(err);
     },
     success: function(data) {
-      $('#'+func).replaceWith(buildRef(func,text));
+      $.ajax({
+        url: "/api/"+project+"/ref/"+func+"/all",
+        method: "GET",
+        error: function(err) {
+          console.log(err);
+        },
+        success: function(data) {
+          docs[func] = data[0];
+          $('#'+func).replaceWith(buildRef(func));
+        }
+      });
     }
   });
 }
 
-function upvote(func) {
+function upvote(func,entryID) {
   $.ajax({
-    url: "http://localhost:3000/upvote",
+    url: "/upvote",
     method: "POST",
     contentType: "application/json",
     data: JSON.stringify({
       project: docs[func].project,
       functionName:func,
       context:'descriptions',
-      entryID:docs[func].explanations.descriptions[0].entryID
+      entryID:entryID
     }),
     error: function(err) {
       console.log(err);
     },
     success: function(data) {
-      $('#'+func).css('backgroundColor','#0f0')
+      $('#'+entryID).css('backgroundColor','#0f0')
       .animate({backgroundColor:'#fff'},800,function(){$(this).css('backgroundColor','#fff')});
+      var votes = parseInt($('#'+entryID+' .upvotes').text());
+      $('#'+entryID+' .upvotes').text(votes+1);
       console.log(data);
     }
   });
