@@ -100,9 +100,9 @@ function handleRequest(req,res) {
     filePath = DIR+'/'+TEMPLATE+'/index.html';
   }
   
-  var pos = filePath.search(/testProj/);
+  var pos = filePath.search(/underscore/);
   if (pos>-1) {
-    var path = filePath.substr(pos+8);
+    var path = filePath.substr(pos+10);
     filePath = DIR+'/'+path;
   };
   
