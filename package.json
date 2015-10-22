@@ -23,6 +23,11 @@
     "grunt-cli": "^0.1.13",
     "mongoose": "^4.0.0",
     "morgan": "~1.6.1",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "mongoose": "^4.0.0",
+    "mocha": "^1.17.1",
+    "nodemon": "^1.2.1",
+    "request": "^2.34.0",
+    "chai": "^1.9.0"
   }
 }

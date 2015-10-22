@@ -1,5 +1,4 @@
 var helpers = require('./helpers');
-var methodsDB = require('../Databases/Models/methods');
 
 exports.getApi = function(req, res){
   var apiPath = req.url;
