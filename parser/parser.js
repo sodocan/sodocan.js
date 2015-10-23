@@ -271,7 +271,11 @@ var findCommentBlocks = function(string) {
   // right now assumes @doc is the first thing in the block after 0 or more white spaces
   // but not other chars
   var blocks = [];
-  var blockRegex = /\/\*{1}\s*@doc([\s\S]+?)?\*\//g;
+  //OLD VERSION OF REGEX
+  //var blockRegex = /\/\*{1}\s*@doc([\s\S]+?)?\*\//g;
+
+  //any blocks that start with /** and do not contain @header
+  var blockRegex = /\/\*{2}(?![\S\s]*@header)([\s\S]*?)\*\//g;
   var blockMatch = blockRegex.exec(string);
   while (blockMatch) {
     var blockData = {
@@ -308,7 +312,7 @@ var parseFunctionPatternA = function(string, pattern) {
   var matchListA = pattern.exec(string);
   var results = [];  
   while (matchListA) {
-    console.log('A match index is: ', matchListA.index);
+    //console.log('A match index is: ', matchListA.index);
     var paramsList = matchListA[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
@@ -335,7 +339,7 @@ var parseFunctionPatternB = function(string, pattern) {
   var matchListB = pattern.exec(string);
   var results = [];  
   while (matchListB) {
-    console.log('B match index is: ', matchListB.index);
+    //console.log('B match index is: ', matchListB.index);
     var paramsList = matchListB[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
@@ -362,7 +366,7 @@ var parseFunctionPatternC = function(string, pattern) {
   var matchListC = pattern.exec(string);
   var results = [];
   while (matchListC) {
-    console.log('C match index is: ', matchListC.index);
+    //console.log('C match index is: ', matchListC.index);
     var classContext = matchListC[1].trim(); 
     var paramsList = matchListC[3].split(',').map(function(param) {
       return {name: param.trim()};
@@ -395,14 +399,16 @@ var parseCommentBlock = function(commentBlock, isHeader) {
   //@functionName:
   // @params: '...stuff...' 
   //                   @description: '....');
-  commentBlock = commentBlock.substring(2, commentBlock.length - 2);
+  //trim off /** and */
+  commentBlock = commentBlock.substring(3, commentBlock.length - 2);
   commentBlock = commentBlock.trim();
-  //trimming off '@header' or '@docs'
+  //trimming off '@header'
   if (isHeader) {
     commentBlock = commentBlock.substring(7);
-  } else {
-    commentBlock = commentBlock.substring(4);
-  }
+  }  
+  // } else {
+  //   commentBlock = commentBlock.substring(4);
+  // }
   commentBlock = commentBlock.trim();
   // get rid of the first '@' symbol
   commentBlock = commentBlock.substring(1);
@@ -613,15 +619,15 @@ var userArgs = process.argv.slice(2);
 console.log(userArgs);
 if (userArgs[0] !== 'spec') fileOperations(userArgs);
 
-//TODO: allow a way to omit things (--include and --omit flags to define behavior?)
+
 //TODO: allow a way to edit results
-//TODO: start blocks with ** to distinguish from normal comments (possibly eliminate
+//TODO: add @class functionality
+
+//DONE: allow a way to omit things
+//DONE: start blocks with ** to distinguish from normal comments (possibly eliminate
  // @doc)
 //DONE: grab functionName from next function after a comment block (no need for
  //@functionName property anymore.)
-//TODO: add @omit functionality
-//TODO: add @class functionality
-
 
 // @functionName
 // @params
