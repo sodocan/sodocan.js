@@ -36,6 +36,7 @@ var fileOperations = function(paths) {
     },
     body: []
   };
+  
   var outputPath = paths.pop();
   //if the user is parsing local files
   if (!isNetworkRequest(paths[0])) {
@@ -81,7 +82,6 @@ var fileOperations = function(paths) {
     }
   }
 };
-
 
 var isNetworkRequest = function(path) {
   return (path.match('http://') || path.match('https://'));

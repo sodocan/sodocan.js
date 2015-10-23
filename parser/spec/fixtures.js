@@ -62,4 +62,42 @@ var stuff = {
 var otherStuff = {bar: 1, baz: function(grapefruit){}};
 
 var _ = {};
-_.each = function(){};
+_.each = function() {
+
+};
+
+
+// @class
+function Dog() {
+
+}
+// method
+Dog.prototype.method = function() {
+
+};
+
+// @class: Dog
+function makeDog() {
+  var dog = {};
+  // @classContext
+  dog.bark = function() {};
+  // @method
+  dog.play = function() {};
+
+  return dog;
+}
+
+// functionName: makeDog 
+// class constructor
+
+// methods:
+// bark
+// play
+
+
+
+var dog = makeDog();
+dog.bark();
+
+// @namespace
+var Dog = {};
