@@ -48,7 +48,7 @@ var rice = function(stuff, things) {
 @functionName: 'spicyTuna'
 @descriptions: 'top quality fish'
 @group: 'happySaturday'
-@omit
+
 */
 
 function spicyTuna() {
