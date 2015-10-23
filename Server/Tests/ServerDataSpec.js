@@ -167,7 +167,6 @@ describe("Server", function() {
       });
 
     });
-
   });
 });
 

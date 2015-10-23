@@ -174,6 +174,7 @@ api/:projectName/1/all
 
 /* Uncategorized so far */
 var getReferences = exports.getReferences = function(path, callback, res) {
+  console.log('getReferences got run');
 
   var parsedPath = parseApiPath(path);
   if (!parsedPath) {

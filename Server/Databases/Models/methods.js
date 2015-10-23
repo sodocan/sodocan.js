@@ -5,7 +5,7 @@ var testObjs = require('./dummyData').methodsData;
 
 var MethodSchema = new mongoose.Schema({
   project: {type: String, required: true, index: true},
-  functionName: {type: String, required: true},
+  functionName: {type: Strig, required: true},
   group: {type: String},
   reference: mongoose.Schema.Types.Mixed,
   explanations: mongoose.Schema.Types.Mixed,
