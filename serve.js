@@ -96,16 +96,20 @@ function handleRequest(req,res) {
     res.end(ret);
   }
   var filePath = DIR+req.url;
-  if (req.url.match(/[^html|^js]$/)) {
-    filePath = DIR+'/'+TEMPLATE+'/index.html';
-  }
   
   var pos = filePath.search(/underscore/);
   if (pos>-1) {
     var path = filePath.substr(pos+10);
     filePath = DIR+'/'+path;
   };
-  
+
+  if (!/(html|js|css)$/.test(req.url)) {
+    filePath = DIR+'/'+TEMPLATE+'/index.html';
+  }
+  if(/favicon\.ico$/.test(req.url)) {
+    res.writeHead(200);
+    res.end('');
+  }
 
   fs.readFile(filePath, function(err, data) {
     if (err) {

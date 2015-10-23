@@ -1,0 +1,16 @@
+<div id="{{item}}" ng-controller="refCardCtrl" ng-repeat="item in contentRefs">
+  <h3>{{item}}</h3>
+  <div id="{{item}}_desc">
+    <p>{{(docs[item].explanations.descriptions[0])?
+          docs[item].explanations.descriptions[0].text:'No entry found'}}</p>
+    <label>New Entry Text: <input type="text" name="{{item+'NewEntry'}}" ng-model="NewEntry[item]"></label>
+    <label><input type="radio" name="{{item+'NewEntryType'}}" ng-model="NewEntryType[item]" value="description"> Description</label>
+    <label><input type="radio" name="{{item+'NewEntryType'}}" ng-model="NewEntryType[item]" value="example"> Example</label>
+    <label><input type="radio" name="{{item+'NewEntryType'}}" ng-model="NewEntryType[item]" value="tip"> Tip</label>
+    <br />
+    <input type="button" value="Add Entry" ng-click="addEntry(item)">
+  </div>
+    <a ng-click="loadEntryData('descriptions',item)" href="{{item+'/'+-1}}">Load Descriptions</a>
+    <a ng-click="loadEntryData('examples',item)" href="{{item+'/'+-1}}">Load Examples</a>
+    <a ng-click="loadEntryData('tips',item)" href="{{item+'/'+-1}}">Load Tips</a>
+</div>
