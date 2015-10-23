@@ -50,7 +50,7 @@ var mongoFindOne = function(res, searchObj, successC, notFoundC, errorC) {
 
 /* Other Helpers */
 
-var parseApiPath = function(path) {
+var parseApiPath = exports.parseApiPath = function(path) {
   var pathArray = path.split('/');
   var pathArrayPointer = 0;
   var next = function() { //next moves us down the array one
@@ -79,7 +79,11 @@ var parseApiPath = function(path) {
   var contexts = {};
   var context = 'all'; //setting default context
   do {
-    if (!nextPath || nextPath === 'all' || nextPath.slice(0,7) === 'entryID' || !isNaN(+nextPath)) {
+    if (!nextPath
+      || nextPath === 'all'
+      || nextPath.slice(0,7) === 'entryID'
+      || nextPath.slice(0,10) === 'additionID'
+      || !isNaN(+nextPath)) {
       //the first time through, this will put an empty array into context
       //ex (contexts[description] = [])
       contexts[context] = contexts[context] || [];
@@ -101,7 +105,7 @@ var parseApiPath = function(path) {
   };
 };
 
-var convertToDBForm = function(projectName, skeleObj){
+var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj){
   var explanations = {};
   for(var context in skeleObj.explanations){
     explanations[context] = [];

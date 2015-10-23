@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 var request = require('request');
-var helpers = require('../Utilities/helpers.js');
+var helpers = require('./../Utilities/helpers.js');
 var testCases = require('./testCases.js');
 
 /*
@@ -15,44 +15,52 @@ Test cases:
 8. api/sodocan/all/tips/0
 9. api/sodocan/ref/makeItPretty/descriptions/entryID-128/all
 */
-var testCases = {
-  'api/sodocan': {
-    searchObject: {projectName: 'sodocan'},
-    contexts: {all:[]}
-  },
-  'api/sodocan/ref/makeSkele': {
-    searchObject: {projectName: 'sodocan'},
-    contexts: {all:[]}
-  },
-  'api/sodocan/examples',
-  'api/sodocan/descriptions/all',
-  'api/sodocan/descriptions/1/10',
-  'api/sodocan/all/all',
-  'api/sodocan/tips/descriptions',
-  'api/sodocan/all/tips/0',
-  'api/sodocan/ref/makeItPretty/descriptions/entryID-128/all',
-  'api/sodocan/ref/makeItPretty/descriptions/entryID-128/additionID-14': {
-    searchObject: {
-      projectName: 'sodocan',
-      functionName: 'makeItPretty'
-    },
-    contexts: {
-      descriptions: ['entryID-128', 'additionID-14']
+
+// Need this log function because test environment has different
+// global scope as the one the server is running on
+global.log = function() {
+  var start;
+  if (arguments.length > 1 && typeof arguments[0] === 'string') {
+    var header = arguments[0];
+    var addToFront = false;
+    while (header.length < 25) {
+      if (addToFront) {
+        header = '*' + header;
+      } else {
+        header += '*';
+      }
+      addToFront = !addToFront;
     }
+    console.log(header);
+    start = 1;
+  } else {
+    console.log('***********LOG***********');
+    start = 0;
   }
+  for (var i = start; i < arguments.length; i++) {
+    console.log(arguments[i]);
+  }
+  console.log('*************************');
 };
 
 describe("Server helper functions", function() {
 
   beforeEach(function () {
-
   });
 
-  for (var i = 0; i < testCases.length; i++) {
-    var path = testCases[i];
+  var parsePathCases = testCases.parsePathCases;
+
+  for (var path in parsePathCases) {
+    var expectedObj = parsePathCases[path];
     it("should parse path " + path, function() {
       var returnedObj = helpers.parseApiPath(path);
-      expect(returnedObj).to.deep.equal(output)
+      expect(returnedObj).to.deep.equal(expectedObj);
     });
   }
+
+  it("should convert parser output objects to the DB form", function() {
+    var convertFormCase = testCases.convertFormCase;
+    var actualForm = helpers.convertToDBForm.apply(null, convertFormCase.inputs);
+    expect(actualForm).to.deep.equal(convertFormCase.expectedOutput);
+  });
 });
