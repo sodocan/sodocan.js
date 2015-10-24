@@ -1,7 +1,13 @@
+// Original package.json line
+//"test": "node Server/index.js & ./node_modules/.bin/mocha --bail --reporter nyan Server/Tests/ServerDataSpec.js; pkill -n node;"
+
+var mongoose = require('mongoose');
 var expect = require('chai').expect;
 var request = require('request');
 var helpers = require('./../Utilities/helpers.js');
 var testCases = require('./testCases.js');
+var db = require('../Databases/dbconnection.js');
+var db = require('../Databases/dbconnection.js');
 var methodsDB = require('../Databases/Models/methods.js');
 
 /*
@@ -44,93 +50,172 @@ global.log = function() {
   console.log('*************************');
 };
 
+
+/*
 methodsDB.find({project: 'testProj'}).exec(function(){
   log('find was called');
 });
-
 
 //log('remove about to be run');
 methodsDB.remove({project: 'testProj'}, function(err) {
   log('callback inside mongoose remove ran');
   if (err) {
     console.error(err)
-  } else {
+  } else { */
 
-    describe("Server helper functions", function() {
+// before(function(done) {
 
-      beforeEach(function () {
+// });
+
+
+describe("Server", function() {
+
+  before(function (done) {
+
+    var removeTestData = function() {
+      methodsDB.remove({project: 'testProj'}, function(err) {
+        if (err) {
+          log('Mongo remove testProj error', err);
+        } else {
+          done();
+        }
       });
+    };
 
-      var parsePathCases = testCases.parsePathCases;
-
-      for (var path in parsePathCases) {
-        var expectedObj = parsePathCases[path];
-        it("should parse path " + path, function() {
-          var returnedObj = helpers.parseApiPath(path);
-          expect(returnedObj).to.deep.equal(expectedObj);
-        });
-      }
-
-      it("should convert parser output objects to the DB form", function() {
-        var convertFormCase = testCases.convertFormCase;
-        var actualForm = helpers.convertToDBForm.apply(null, convertFormCase.inputs);
-        expect(actualForm).to.deep.equal(convertFormCase.expectedOutput);
+    if (!mongoose.connection.db) {
+      db.on('connected', function() {
+        removeTestData();
       });
+    } else {
+      removeTestData();
+    }
+  });
+
+  describe("Server helper functions", function() {
+
+    var parsePathCases = testCases.parsePathCases;
+
+    for (var path in parsePathCases) {
+      var expectedObj = parsePathCases[path];
+      it("should parse path " + path, function() {
+        var returnedObj = helpers.parseApiPath(path);
+        expect(returnedObj).to.deep.equal(expectedObj);
+      });
+    }
+
+    it("should convert parser output objects to the DB form", function() {
+      var convertFormCase = testCases.convertFormCase;
+      var actualForm = helpers.convertToDBForm.apply(null, convertFormCase.inputs);
+      expect(actualForm).to.deep.equal(convertFormCase.expectedOutput);
     });
 
-    describe("Posts from parser", function() {
+  });
 
-      beforeEach(function () {
-      });
+  describe("Server API", function() {
 
-      // var options = {
-      //   'method': 'POST',
-      //   'uri': 'http://127.0.0.1:4568/signup',
-      //   'json': {
-      //     'username': 'Svnh',
-      //     'password': 'Svnh'
-      //   }
-      // };
+    var parserPostCases = testCases.parserPostCases;
+    var parserPostExpectedReturns = testCases.parserPostExpectedReturns;
 
-      // request(options, function(error, res, body) {
-      //   db.knex('users')
-      //     .where('username', '=', 'Svnh')
-      //     .then(function(res) {
-      //       if (res[0] && res[0]['username']) {
-      //         var user = res[0]['username'];
-      //       }
-      //       expect(user).to.equal('Svnh');
-      //       done();
-      //     }).catch(function(err) {
-      //       throw {
-      //         type: 'DatabaseError',
-      //         message: 'Failed to create test setup data'
-      //       };
-      //     });
-      // });
+    var postACase = function(i) {
+      it("should post skeleton json #" + i, function(done) {
+        log('parserPostCase ' + i, parserPostCases[i]);
+        var options = {
+          'method': 'POST',
+          'uri': 'http://localhost:3000/create',
+          'json': parserPostCases[i]
+        };
 
-      var parserPostCases = testCases.parserPostCases;
+        request(options, function(error, res, body) {
+          console.log('case ' + i);
+          expect(res.statusCode).to.equal(202);
 
-      for (var i = 0; i < parserPostCases.length; i++) {
-        it("should parse path " + path, function() {
-          var options = {
-            'method': 'POST',
-            'uri': 'http://localhost:3000/create',
-            'json': parserPathCases[i]
-          };
+          methodsDB.find({project: 'testProj'}).sort({functionName: 1}).lean().exec(function(err, references) {
+            if (err) {
+              console.error(err);
+            } else {
+              log('object type', typeof references[0]);
+              var references = JSON.parse(JSON.stringify(referencesOriginal));
+              for (var j = 0; j < references.length; j++) {
+                delete references[j]['_id'];
+              }
 
-          request(options, function(error, res, body) {
-            expect(res.statusCode).to.equal(202);
+              expect(references).to.deep.equal(parserPostExpectedReturns[i]);
+              done();
+            }
           });
-        });
-      }
 
-      it("should convert parser output objects to the DB form", function() {
-        var convertFormCase = testCases.convertFormCase;
-        var actualForm = helpers.convertToDBForm.apply(null, convertFormCase.inputs);
-        expect(actualForm).to.deep.equal(convertFormCase.expectedOutput);
+        });
       });
+    };
+
+    for (var i = 0; i < parserPostCases.length; i++) {
+      postACase(i);
+    }
+
+    it ('stuff', function(done) {
+      var options = {
+        'method': 'GET',
+        'uri': 'http://localhost:3000/api/sodocan',
+      };
+
+      request(options, function(error, response, body) {
+        if (error) {
+          console.error(error);
+        }
+        log('response body', body);
+        done();
+      });
+
     });
-  }
+
+  });
 });
+
+// describe("Posts from parser", function() {
+
+//   beforeEach(function () {
+//   });
+
+
+    // request(options, function(error, res, body) {
+    //   db.knex('users')
+    //     .where('username', '=', 'Svnh')
+    //     .then(function(res) {
+    //       if (res[0] && res[0]['username']) {
+    //         var user = res[0]['username'];
+    //       }
+    //       expect(user).to.equal('Svnh');
+    //       done();
+    //     }).catch(function(err) {
+    //       throw {
+    //         type: 'DatabaseError',
+    //         message: 'Failed to create test setup data'
+    //       };
+    //     });
+    // });
+
+    //   var parserPostCases = testCases.parserPostCases;
+
+    //   for (var i = 0; i < parserPostCases.length; i++) {
+    //     it("should parse path " + path, function() {
+    //       var options = {
+    //         'method': 'POST',
+    //         'uri': 'http://localhost:3000/create',
+    //         'json': parserPathCases[i]
+    //       };
+
+    //       request(options, function(error, res, body) {
+    //         expect(res.statusCode).to.equal(202);
+    //       });
+    //     });
+    //   }
+
+    //   it("should convert parser output objects to the DB form", function() {
+    //     var convertFormCase = testCases.convertFormCase;
+    //     var actualForm = helpers.convertToDBForm.apply(null, convertFormCase.inputs);
+    //     expect(actualForm).to.deep.equal(convertFormCase.expectedOutput);
+    //   });
+    // });
+  // }
+// });
 

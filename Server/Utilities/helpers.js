@@ -180,7 +180,7 @@ var getReferences = exports.getReferences = function(path, callback, res) {
     return;
   }
 
-  methodsDB.find(parsedPath.searchObject).sort({functionName: 1}).exec(function(error, references) { //the mongo search
+  methodsDB.find(parsedPath.searchObject).sort({functionName: 1}).lean().exec(function(error, references) { //the mongo search
     if (error || !references.length) {
       if(error){
         send404(res, error);
@@ -249,6 +249,7 @@ var getReferences = exports.getReferences = function(path, callback, res) {
               }
             }
           } else {//if there was no depth, that means we don't want it. delete.
+
             delete entriesObj[context];
           }
         }
