@@ -9,18 +9,21 @@ var networkRequest = require('./networkRequest.js');
 //maybe we don't need 'name' for the 'returns' array
 
 var properties = {
-  'functionName': '',
-  'params': [],
-  'returns': [],
-  'group': '',
-  'descriptions': '',
-  'examples': '',
-  'tips': '',
-  'classContext': '', 
-  'project': '',
-  'author': '',
-  'version': '',
-  'contains': ''
+  functionName: '',
+  params: [],
+  returns: [],
+  group: '',
+  descriptions: '',
+  examples: '',
+  tips: '',
+  classContext: '', 
+  project: '',
+  author: '',
+  version: '',
+  includeByDefault: '',
+  contains: '',
+  omit: '',
+  include: ''
 };
 
 var fileOperations = function(paths) {
@@ -162,9 +165,39 @@ var sendParsedToServer = function(string) {
 var parseMain = function(string) {
   // assuming function names are supplied
   var header = parseHeader(string);
+
   var functionInfo = findFunctionInfo(string);
   var commentInfo = parseComments(string);
-  return {header: header, body: combineInfo(functionInfo, commentInfo)};
+  var combinedInfo = combineInfo(functionInfo, commentInfo);
+  var resultsObj = {header: header, body: combinedInfo};
+  removeExcludedEntries(resultsObj);
+  return resultsObj;
+};
+
+//remove entries the user does not wish to include
+var removeExcludedEntries = function(parsedObj) {
+  var functions = parsedObj.body;
+  var resultBody = [];
+  //include all that are not marked with @omit
+  if (parsedObj.header.includeByDefault === 'true') {
+    for (var i = 0; i < functions.length; i++) {
+      //skip current function if it has @omit
+      if (functions[i].omit !== undefined) {
+        continue;
+      }
+      resultBody.push(functions[i]);
+    }
+  //else, only include those marked with @include 
+  } else {
+    for (var i = 0; i < functions.length; i++) {
+      //skip current function if it does not have include
+      if (functions[i].include === undefined) {
+        continue;
+      }
+      resultBody.push(functions[i]);
+    }
+  }
+  parsedObj.body = resultBody;
 };
 
 var parseHeader = function(string) {
@@ -173,12 +206,14 @@ var parseHeader = function(string) {
   var headerObj = {
     project: '',
     author: '',
-    version: ''
+    version: '',
+    includeByDefault: 'true'
   };
   if (header) {
     var entries = parseCommentBlock(header, true);
     entries.forEach(function(entry) {
       var entryObj = processEntry(entry);
+      console.log(entryObj);
       headerObj[entryObj.propertyName] = entryObj.content;
     });
   }
@@ -236,7 +271,11 @@ var findCommentBlocks = function(string) {
   // right now assumes @doc is the first thing in the block after 0 or more white spaces
   // but not other chars
   var blocks = [];
-  var blockRegex = /\/\*{1}\s*@doc([\s\S]+?)?\*\//g;
+  //OLD VERSION OF REGEX
+  //var blockRegex = /\/\*{1}\s*@doc([\s\S]+?)?\*\//g;
+
+  //any blocks that start with /** and do not contain @header
+  var blockRegex = /\/\*{2}(?![\S\s]*@header)([\s\S]*?)\*\//g;
   var blockMatch = blockRegex.exec(string);
   while (blockMatch) {
     var blockData = {
@@ -273,7 +312,7 @@ var parseFunctionPatternA = function(string, pattern) {
   var matchListA = pattern.exec(string);
   var results = [];  
   while (matchListA) {
-    console.log('A match index is: ', matchListA.index);
+    //console.log('A match index is: ', matchListA.index);
     var paramsList = matchListA[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
@@ -300,7 +339,7 @@ var parseFunctionPatternB = function(string, pattern) {
   var matchListB = pattern.exec(string);
   var results = [];  
   while (matchListB) {
-    console.log('B match index is: ', matchListB.index);
+    //console.log('B match index is: ', matchListB.index);
     var paramsList = matchListB[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
@@ -327,7 +366,7 @@ var parseFunctionPatternC = function(string, pattern) {
   var matchListC = pattern.exec(string);
   var results = [];
   while (matchListC) {
-    console.log('C match index is: ', matchListC.index);
+    //console.log('C match index is: ', matchListC.index);
     var classContext = matchListC[1].trim(); 
     var paramsList = matchListC[3].split(',').map(function(param) {
       return {name: param.trim()};
@@ -360,14 +399,16 @@ var parseCommentBlock = function(commentBlock, isHeader) {
   //@functionName:
   // @params: '...stuff...' 
   //                   @description: '....');
-  commentBlock = commentBlock.substring(2, commentBlock.length - 2);
+  //trim off /** and */
+  commentBlock = commentBlock.substring(3, commentBlock.length - 2);
   commentBlock = commentBlock.trim();
-  //trimming off '@header' or '@docs'
+  //trimming off '@header'
   if (isHeader) {
     commentBlock = commentBlock.substring(7);
-  } else {
-    commentBlock = commentBlock.substring(4);
-  }
+  }  
+  // } else {
+  //   commentBlock = commentBlock.substring(4);
+  // }
   commentBlock = commentBlock.trim();
   // get rid of the first '@' symbol
   commentBlock = commentBlock.substring(1);
@@ -389,8 +430,14 @@ var propertyIsValid = function(propName) {
 var processEntry = function(entry) {
   //grab property name (in between @ and :)
   //grab contents after colon
-
+  //includes \n and \r to catch @omit and @include
   var propNameRegex = /^\w+?\s*:/; 
+
+  //some keywords have no content, like @omit
+  if (!entry.match(propNameRegex)) {
+    console.log(entry);
+    return processContentlessEntry(entry);
+  } 
   var nameOfProperty = entry.match(propNameRegex).join();
   var propNameLength = nameOfProperty.length;
   nameOfProperty = nameOfProperty.substring(0, propNameLength - 1).trim();
@@ -420,6 +467,14 @@ var processEntry = function(entry) {
   }
   return entryObj;
 };
+
+var processContentlessEntry = function(entry) {
+  var entryObj = {
+    propertyName: entry.trim(),
+    content: ''
+  }
+  return entryObj;
+}
 
 var convertToJS = function(string) {
   var fixedJSON = string.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2": ');
@@ -467,12 +522,10 @@ var splitEntries = function(string) {
   //grab function name (and param names) from following element
   //delete following element
 
-//add check for whether first one is comment or function
 //push into second results array after getting the data from the next 
 //element (more efficient than splice)
 
-//(possible: keep track of which are comments and which are functions to avoid
-  //potential for problems if there are consecutive comment blocks?)  
+
 var combineInfo = function(functionArray, commentArray) {
   var combinedArray = functionArray.concat(commentArray);
   //mark elements to indicate whether they are sourced from a comment,
@@ -567,12 +620,14 @@ console.log(userArgs);
 if (userArgs[0] !== 'spec') fileOperations(userArgs);
 
 
+//TODO: allow a way to edit results
+//TODO: add @class functionality
+
+//DONE: allow a way to omit things
+//DONE: start blocks with ** to distinguish from normal comments (possibly eliminate
+ // @doc)
 //DONE: grab functionName from next function after a comment block (no need for
  //@functionName property anymore.)
-//TODO: double check that params are getting read from undersscore correctly
-//(_.each?)
-//TODO: add @class functionality
-//TODO: start blocks with ** to distinguish from normal comments
 
 // @functionName
 // @params

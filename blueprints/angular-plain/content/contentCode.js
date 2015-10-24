@@ -10,7 +10,14 @@ angular.module('sodocan')
             ['$scope','sodocanAPI','sodocanRouter',
               function($scope,sodocanAPI,sodocanRouter) {
   var update = function(path) {
-    $scope.contentDisp = path;
+    if (!displayed[path.ref] && path.ref!==undefined) {
+      $scope.contentRefs.unshift(path.ref);
+      displayed[path.ref]=true;
+    }
   };
+  var displayed = {};
+  $scope.contentRefs=[];
   $scope.$watch('sodocanRoute()',update);
+
+  $scope.docs = sodocanAPI.docs;
 }]);

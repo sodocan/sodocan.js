@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-
+console.log(!!global);
 // I added this. This is not part of the express generator
 global.log = function() {
   var start;
@@ -34,6 +34,7 @@ global.log = function() {
 var app = require('./app');
 var debug = require('debug')('testApp:server');
 var http = require('http');
+var db = require('./Databases/dbconnection.js');
 
 /**
  * Get port from environment and store in Express.

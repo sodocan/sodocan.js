@@ -15,26 +15,43 @@ var send404 = exports.send404 = function(res, errorMessageOrObj) {
 var sendReferences = exports.sendReferences = function(ref, res){
   res.setHeader('Access-Control-Allow-Origin','*');
   res.send(ref);
-};
+}; // pointless, just do res.send(ref) wherever this was called
 
 var mongoUpdateSuccess = exports.mongoUpdateSuccess = function(res){
   res.sendStatus(202);
-};
+}; // pointless, will get rid of this
 
 var mongoUpdateFailure = exports.mongoUpdateFailure = function(res, err){
   console.error(err);
   res.sendStatus(404);
-};
+}; // pointless, replace with send404
 
 
 /* Database Actions */
 
+// successC (required), notFoundC, and errorC are all callback functions
+// successC takes the found reference as a parameter
+// errorC takes the error as a parameter
+var mongoFindOne = function(res, searchObj, successC, notFoundC, errorC) {
+  notFoundC = notFoundC || function() {send404(res, 'reference not found');};
+  errorC = errorC || function(err) {send404(res, err);};
+
+  methodsDB.findOne(searchObj).exec(function(error, reference) {
+    if (error) {
+      errorC(error);
+    } else if (!reference) {
+      notFoundC();
+    } else {
+      successC(reference);
+    }
+  });
+};
 
 
 
 /* Other Helpers */
 
-var parseApiPath = function(path) {
+var parseApiPath = exports.parseApiPath = function(path) {
   var pathArray = path.split('/');
   var pathArrayPointer = 0;
   var next = function() { //next moves us down the array one
@@ -63,7 +80,11 @@ var parseApiPath = function(path) {
   var contexts = {};
   var context = 'all'; //setting default context
   do {
-    if (!nextPath || nextPath === 'all' || nextPath.slice(0,7) === 'entryID' || !isNaN(+nextPath)) {
+    if (!nextPath
+      || nextPath === 'all'
+      || nextPath.slice(0,7) === 'entryID'
+      || nextPath.slice(0,10) === 'additionID'
+      || !isNaN(+nextPath)) {
       //the first time through, this will put an empty array into context
       //ex (contexts[description] = [])
       contexts[context] = contexts[context] || [];
@@ -85,7 +106,7 @@ var parseApiPath = function(path) {
   };
 };
 
-var convertToDBForm = function(projectName, skeleObj){
+var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj){
   var explanations = {};
   for(var context in skeleObj.explanations){
     explanations[context] = [];
@@ -144,9 +165,10 @@ var hashCode = function(string) {
 
 
 
-
-
-
+/*
+sodocan.com/api/*:projectName/ref/:functionName/:explanationType/:numEntriesOrEntryID/:numCommentsOrCommentID
+api/:projectName/1/all
+*/
 
 
 
@@ -159,7 +181,7 @@ var getReferences = exports.getReferences = function(path, callback, res) {
     return;
   }
 
-  methodsDB.find(parsedPath.searchObject).sort({functionName: 1}).exec(function(error, references) { //the mongo search
+  methodsDB.find(parsedPath.searchObject).sort({functionName: 1}).lean().exec(function(error, references) { //the mongo search
     if (error || !references.length) {
       if(error){
         send404(res, error);
@@ -177,7 +199,7 @@ var getReferences = exports.getReferences = function(path, callback, res) {
           //go through each contexts (not just the ones mentioned)
           //if a specific context is mentioned, use it's depth
           //otherwise use the one specified in all
-          depthSpecs = contexts[context] || contexts.all;
+          var depthSpecs = contexts[context] || contexts.all;
           if (depthSpecs) {
             //default depth is 1, default addtion is 0
             var entryDepth = depthSpecs[0] || '1';
@@ -228,6 +250,7 @@ var getReferences = exports.getReferences = function(path, callback, res) {
               }
             }
           } else {//if there was no depth, that means we don't want it. delete.
+
             delete entriesObj[context];
           }
         }
@@ -400,9 +423,10 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
               }
             }
             var addition = {
+              additionID: id,
+              timestamp: new Date(),
               text: addEntryInfo.text,
               upvotes: 0,
-              additionID: id
             };
             contextArray[i].additions.push(addition);
             break;
@@ -422,9 +446,10 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
           }
         }
         var entry = {
+          entryID: id,
+          timestamp: new Date(),
           text: addEntryInfo.text,
           upvotes: 0,
-          entryID: id,
           additions: []
         };
         contextArray.push(entry);
@@ -436,6 +461,7 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
           send404(res);
           return;
         } else {
+          res.setHeader('Access-Control-Allow-Origin','*');
           res.sendStatus(202);
         }
       });

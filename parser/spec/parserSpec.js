@@ -29,17 +29,17 @@ describe("documentation parser", function() {
     expect(typeof parseCommentBlock).to.equal('function');
   });
 
-  it("should be able to find a comment block denotated by /* and */", function() {
-    test = '/* @doc */ \n function(arr){/* @doc stuff */}';
+  it("should be able to find a comment block denotated by /** and */", function() {
+    test = '/** squint */ \n function(arr){/** cormorant @pasta stuff */}';
     var result = findCommentBlocks(test);
-    expect(result[0].blockString).to.equal('/* @doc */');
-    expect(result[1].blockString).to.equal('/* @doc stuff */');  
+    expect(result[0].blockString).to.equal('/** squint */');
+    expect(result[1].blockString).to.equal('/** cormorant @pasta stuff */');  
   });
 
-  it("should ignore blocks that do not contain '@doc'", function() {
-    test = '/* */   /* @doc */';
+  it("should ignore blocks that do not start with two asterisks", function() {
+    test = '/** two */   /* just one */';
     var result = findCommentBlocks(test);
-    expect(result[0].blockString).to.equal('/* @doc */');
+    expect(result[0].blockString).to.equal('/** two */');
     expect(result.length).to.equal(1);
   });
 
@@ -53,11 +53,11 @@ describe("documentation parser", function() {
   });
 
   it("should parse a comment block into separate entries; whether there is a single one or more", function() {
-    var test ='/* @doc \n @functionName: "hey"\n   @descriptions: "man"  */';
+    var test ='/** \n @functionName: "hey"\n   @descriptions: "man"  */';
     var entries = parseCommentBlock(test);
     expect(entries.length).to.equal(2);
     expect(entries).to.deep.equal(['functionName: "hey"', 'descriptions: "man"']);
-    test ='/* @doc \n @descriptions: "man"  */';
+    test ='/** \n @descriptions: "man"  */';
     entries = parseCommentBlock(test);
     expect(entries.length).to.equal(1);
     expect(entries).to.deep.equal(['descriptions: "man"']);
@@ -142,15 +142,13 @@ describe("documentation parser", function() {
     buildExplanations(test);
     expect(test.description).to.equal(undefined);
     expect(typeof test.explanations).to.equal('object');
-    console.log(test.explanations);
-    console.log(test); 
+
   });
 
   it("should parse a header correctly", function() {
     test = "/* @header   \n@project : AirBNB for cowboys " + 
     "  \n@author : Leo Thorp, Lain Jiang  \n@version: 0.0.1 */";
-    console.log('about to parse header');
-    console.log('PARSE HEADER RESULT: ', parseHeader(test));
+    //console.log('PARSE HEADER RESULT: ', parseHeader(test));
   });
 
   it("should turn parsedInfo to HTML", function() {
@@ -176,7 +174,7 @@ describe("documentation parser", function() {
     var funcInfo = findFunctionInfo(fixtures);
     var commentInfo = parseComments(fixtures);
     var combined = combineInfo(funcInfo, commentInfo);
-    console.log('COMBINED: ', combined);
+    //console.log('COMBINED: ', combined);
     expect(combined[2].params[0].name).to.equal('stuff');
     expect(combined[2].params[1].name).to.equal('things');
   });

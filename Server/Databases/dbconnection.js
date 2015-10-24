@@ -1,3 +1,4 @@
+console.log('dbconnection has run');
 var mongoose = require('mongoose');
 
 var dbURI = process.env.MONGOLAB_URI || 'mongodb://localhost/sodocandb';
@@ -10,6 +11,7 @@ db.on('error', function(err) {
     mongoose.connect(dbURI);
   }, 5000);
 });
+
 db.on('connected', function() {
   console.log('Mongoose connection open to ' + dbURI);
 });
