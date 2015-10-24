@@ -15,10 +15,12 @@ var parseMain = docParser.parseMain;
 var buildExplanations = docParser.buildExplanations;
 var parseHeader = docParser.parseHeader;
 var combineInfo = docParser.combineInfo;
+var constructGroupClassAndIndex = docParser.constructGroupClassAndIndex;
+
 var fixtures = fs.readFileSync('./spec/fixtures.js').toString();
 var parsedJSON = fs.readFileSync('./spec/parsedJSON.json').toString();
 
-describe("documentation parser", function() {
+describe("documentation parser basic function", function() {
   var test;
   beforeEach(function () {
     test = '';
@@ -146,7 +148,7 @@ describe("documentation parser", function() {
   });
 
   it("should parse a header correctly", function() {
-    test = "/* @header   \n@project : AirBNB for cowboys " + 
+    test = "/** @header   \n@project : AirBNB for cowboys " + 
     "  \n@author : Leo Thorp, Lain Jiang  \n@version: 0.0.1 */";
     //console.log('PARSE HEADER RESULT: ', parseHeader(test));
   });
@@ -177,5 +179,44 @@ describe("documentation parser", function() {
     //console.log('COMBINED: ', combined);
     expect(combined[2].params[0].name).to.equal('stuff');
     expect(combined[2].params[1].name).to.equal('things');
+  });
+});
+
+describe('document parser class related functionality', function() {
+  var test = '\n' + fs.readFileSync('./spec/fixturesClass.js');
+
+  it("should find classes using @class keyword", function() {
+    var resultObjBody = parseMain(test).body;
+    expect(resultObjBody[0].class).to.equal('Clock');
+    expect(resultObjBody[3].class).to.equal('Dog');   
+  });
+
+  it("should construct the list of all classes found on the header", function() {
+    var resultObj = parseMain(test);
+    constructGroupClassAndIndex(resultObj);
+    console.log(resultObj.header.classList);
+    expect(resultObj.header.classList.length).to.equal(3);
+    expect(resultObj.header.classList[0]).to.equal('Clock');
+    expect(resultObj.header.classList[1]).to.equal('Dog');
+  });
+
+  it("should update all class methods with appropriate class context", function() {
+    var resultObjBody = parseMain(test).body;
+    //console.log('resultObjBody is: ', resultObjBody);
+    expect(resultObjBody[1].classContext).to.equal('Clock');
+    expect(resultObjBody[2].classContext).to.equal('Clock');
+    expect(resultObjBody[4].classContext).to.equal('Dog');
+  });
+
+  it('should not pick up functions that are commented out', function() {
+    var resultObjBody = parseMain(test).body;
+    expect(resultObjBody.length).to.equal(7);
+  });
+
+  it('should reassign class name of a function according to the one specified in the comment block above', function() {
+    var resultObjBody = parseMain(test).body;
+    expect(resultObjBody[5].class).to.equal('Cat');
+    expect(resultObjBody[5].functionName).to.equal('makeCat');
+    expect(resultObjBody[6].classContext).to.equal('Cat');
   });
 });

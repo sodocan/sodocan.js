@@ -1,4 +1,4 @@
-/** @header
+/* @header
 @project: 'underscore'
 @author: 'superman'
 @version: '~0.0.3'
@@ -56,48 +56,10 @@ function spicyTuna() {
 }
 
 var stuff = {
-  foo: function(obj, trapezoid) {}
+  fooBar: function(obj, trapezoid) {}
 };
 
 var otherStuff = {bar: 1, baz: function(grapefruit){}};
 
 var _ = {};
-_.each = function() {
-
-};
-
-
-// // @class
-// function Dog() {
-
-// }
-// // method
-// Dog.prototype.method = function() {
-
-// };
-
-// // @class: Dog
-// function makeDog() {
-//   var dog = {};
-//   // @classContext
-//   dog.bark = function() {};
-//   // @method
-//   dog.play = function() {};
-
-//   return dog;
-// }
-
-// // functionName: makeDog 
-// // class constructor
-
-// // methods:
-// // bark
-// // play
-
-
-
-// var dog = makeDog();
-// dog.bark();
-
-// // @namespace
-// var Dog = {};
+_.each = function(){};
