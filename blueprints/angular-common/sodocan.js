@@ -32,7 +32,7 @@ angular.module( 'sodocan', [])
   // Handle HTTP POST to API here; needs URL string and body JSON
   var sendToAPI = function(url,json,cb) {
     var success = function(data) { cb(null,data.data); };
-    $http.post(url,json,{headers:{'Content-Type':'application/json'}}).then(success,cb);
+    $http.post(API_HOME.slice(0,-4)+url,json,{headers:{'Content-Type':'application/json'}}).then(success,cb);
   };
 
   /* Object to expose
@@ -180,7 +180,8 @@ angular.module( 'sodocan', [])
   };
 
   obj.newDescription = function(ref,text,cb) {
-    sendToAPI('/addEntry',
+    cb = cb || function(){};
+    sendToAPI('addEntry',
               {
                 project: projectName,
                 functionName:ref,
@@ -198,16 +199,40 @@ angular.module( 'sodocan', [])
 
   };
 
-  obj.newTip = function() {
-
+  obj.newTip = function(ref,text,cb) {
+    cb = cb || function(){};
+    sendToAPI('addEntry',
+              {
+                project: projectName,
+                functionName:ref,
+                context:'tips',
+                text:text
+              },
+              function(err,data) {
+                if (err) cb(err);
+                cb(null,data);
+              }
+             );
   };
 
   obj.editExample = function() {
 
   };
 
-  obj.newExample = function() {
-
+  obj.newExample = function(ref,text,cb) {
+    cb = cb || function(){};
+    sendToAPI('addEntry',
+              {
+                project: projectName,
+                functionName:ref,
+                context:'examples',
+                text:text
+              },
+              function(err,data) {
+                if (err) cb(err);
+                cb(null,data);
+              }
+             );
   };
 
   obj.editComment = function() {
@@ -261,7 +286,6 @@ angular.module( 'sodocan', [])
         obj.route.ref = piece;
       }
     }
-    console.log(obj.route);
   };
   
   //obj.update();

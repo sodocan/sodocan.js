@@ -31,6 +31,15 @@ app.post('/upvote', handlers.upvote);
 app.post('/addEntry', handlers.addEntry);
 //NOTE: figure out best practices for above route
 
+// TODO: fit this in better, CORS for POSTing
+app.options('/*', function(req,res) {
+  res.set({
+    'Access-Control-Allow-Headers':'Content-Type',
+    'Access-Control-Allow-Origin':'*',
+  });
+  res.end();
+});
+
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;

@@ -13,29 +13,44 @@ angular.module('sodocan')
     if (type==='descriptions') {
       sodocanAPI.getDescriptions(func,-1,function(err,data) {
         if (err) console.log('____ERROR: '+err);
-        console.log('DESC_ARR: '+data);
+        console.log('DESC_ARR: ');
+        console.log(data);
       });
     }
     if (type==='tips') {
       sodocanAPI.getTips(func,'all',2,function(err,data) {
         if (err) console.log('____ERROR: '+err);
-        console.log('TIPS_ARR: '+data);
+        console.log('TIPS_ARR: ');
+        console.log(data);
       });
     }
     if (type==='examples') {
       sodocanAPI.getExamples(func,-1,0,function(err,data) {
         if (err) console.log('___ERROR: '+err);
-        console.log('EXAMPLE_ARR: '+data);
+        console.log('EXAMPLE_ARR: ');
+        console.log(data);
       });
     }
   };
 
+  function postResp(err,data) {
+    if (err) console.log('___ERROR: '+err);
+    console.log('POST_RESP: '+data);
+  }
+
   $scope.NewEntry = {};
   $scope.NewEntryType = {};
   $scope.addEntry = function(item) {
-    var textID = item+'NewEntry';
-    var type = item+'EntryType';
-    console.log(textID+ ' ____ ' + type);
     console.log($scope.NewEntry[item]+ ' ____ ' +$scope.NewEntryType[item]);
+    if ($scope.NewEntryType[item]==='description') {
+      sodocanAPI.newDescription(item,$scope.NewEntry[item],postResp);
+    }
+    if ($scope.NewEntryType[item]==='example') {
+      sodocanAPI.newExample(item,$scope.NewEntry[item],postResp);
+    }
+    if ($scope.NewEntryType[item]==='tip') {
+      sodocanAPI.newTip(item,$scope.NewEntry[item],postResp);
+    }
+
   };
 }]);

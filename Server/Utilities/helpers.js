@@ -461,6 +461,7 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
           send404(res);
           return;
         } else {
+          res.setHeader('Access-Control-Allow-Origin','*');
           res.sendStatus(202);
         }
       });
