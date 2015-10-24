@@ -7,7 +7,6 @@ var request = require('request');
 var helpers = require('./../Utilities/helpers.js');
 var testCases = require('./testCases.js');
 var db = require('../Databases/dbconnection.js');
-var db = require('../Databases/dbconnection.js');
 var methodsDB = require('../Databases/Models/methods.js');
 
 /*
