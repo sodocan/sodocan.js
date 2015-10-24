@@ -1,16 +1,18 @@
 var db = require('../dbconnection.js');
+console.log('methodsDB getting created');
+var mongoose = require('mongoose');
 var testObjs = require('./dummyData').methodsData;
 
-var MethodSchema = new db.Schema({
+var MethodSchema = new mongoose.Schema({
   project: {type: String, required: true, index: true},
   functionName: {type: String, required: true},
   group: {type: String},
-  reference: db.Schema.Types.Mixed,
-  explanations: db.Schema.Types.Mixed,
+  reference: mongoose.Schema.Types.Mixed,
+  explanations: mongoose.Schema.Types.Mixed,
 });
-
+console.log('schema got created');
 MethodSchema.index({project: 1, functionName: 1});
-var methodsModel =  db.model('methods', MethodSchema);
+var methodsModel =  mongoose.model('methods', MethodSchema);
 
 
 var insertObjs = function(objs){ //inserts dummy data

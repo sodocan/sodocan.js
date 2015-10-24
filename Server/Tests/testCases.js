@@ -162,7 +162,7 @@ exports.parserPostCases = [
 exports.parserPostExpectedReturns = [
   [ // Number 1
     {
-      "_id": "5629a44fa0e915de15f8b8a4",
+      // "_id": 0,
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
@@ -199,7 +199,7 @@ exports.parserPostExpectedReturns = [
       "__v": 0
     },
     {
-      "_id": "5629a44fa0e915de15f8b8a5",
+      // "_id": 1,
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
@@ -238,7 +238,7 @@ exports.parserPostExpectedReturns = [
   ],
   [ // Number 2
     {
-      "_id": "5629a44fa0e915de15f8b8a4",
+      // "_id": 0,
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
@@ -275,7 +275,7 @@ exports.parserPostExpectedReturns = [
       "__v": 0
     },
     {
-      "_id": "5629a44fa0e915de15f8b8a5",
+      // "_id": 1,
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
@@ -320,7 +320,7 @@ exports.parserPostExpectedReturns = [
   ],
   [ // Number 3
     {
-      "_id": "5629a44fa0e915de15f8b8a4",
+      // "_id": 0,
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
@@ -357,7 +357,7 @@ exports.parserPostExpectedReturns = [
       "__v": 0
     },
     {
-      "_id": "5629a44fa0e915de15f8b8a5",
+      // "_id": 1,
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
@@ -400,7 +400,7 @@ exports.parserPostExpectedReturns = [
       "__v": 0
     },
     {
-      "_id": "5629a58cd87a67741639098f",
+      //"_id": 2,
       "project": "testProj",
       "functionName": "method3",
       "group": "testGroup",
