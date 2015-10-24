@@ -239,8 +239,22 @@ angular.module( 'sodocan', [])
 
   };
 
-  obj.newComment = function() {
-
+  // untested, does this really need proj,funcName, context, and ID?
+  obj.newComment = function(entryID,ref,text,cb) {
+    cb = cb || function(){};
+    sendToAPI('addEntry',
+              {
+                entryID:entryID,
+                project: projectName,
+                functionName:ref,
+                context:'examples',
+                text:text
+              },
+              function(err,data) {
+                if (err) cb(err);
+                cb(null,data);
+              }
+             );
   };
 
   return obj;
