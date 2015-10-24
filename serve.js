@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var PORT=4000;
 var DIR=__dirname+'/blueprints';
-var TEMPLATE = 'angular-plain';
+var TEMPLATE = 'angular-sodone';
 var headers = {'Access-Control-Allow-Origin':'*'};
 
 var countfor = {};
@@ -96,7 +96,7 @@ function handleRequest(req,res) {
     res.end(ret);
   }
   var filePath = DIR+req.url;
-  if (req.url.match(/[^html|^js]$/)) {
+  if (req.url.match(/[^html|^js|^css]$/)) {
     filePath = DIR+'/'+TEMPLATE+'/index.html';
   }
   

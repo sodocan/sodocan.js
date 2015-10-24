@@ -1,0 +1,10 @@
+<div ng-controller='sodocanMethodCtrl'>
+  <span class="methodName">{{method.functionName}}</span>
+  <span class="params">({{printReference('params')}}) {{printReference('returns')}} </span>
+  <button class='btn-active'>DE</button>
+  <button class='btn-active'>EX</button>
+  <button class='btn-active'>TI</button>
+  <div ng-repeat='(explanationType, entryArray) in method.explanations'>
+    <div sodocan-explanation>
+  </div>
+</div>
