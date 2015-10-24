@@ -23,7 +23,8 @@ var properties = {
   includeByDefault: '',
   contains: '',
   omit: '',
-  include: ''
+  include: '',
+  class: ''
 };
 
 var fileOperations = function(paths) {
@@ -36,7 +37,7 @@ var fileOperations = function(paths) {
     },
     body: []
   };
-  
+
   var outputPath = paths.pop();
   //if the user is parsing local files
   if (!isNetworkRequest(paths[0])) {
@@ -46,7 +47,7 @@ var fileOperations = function(paths) {
     //var outputArray = [];
     var numberOfFiles = paths.length;
     for (var i = 0; i < numberOfFiles; i++) {
-      var parsedFileContents = parseMain(fs.readFileSync(paths[i]).toString());
+      var parsedFileContents = parseMain('\n' + fs.readFileSync(paths[i]).toString());
       if (parsedFileContents.header.project !== '') {
         outputObj.header = parsedFileContents.header;
       }
@@ -290,11 +291,12 @@ var findCommentBlocks = function(string) {
 
 var findFunctionInfo = function(string) {
   // checks for independent functions: var xyz = function() {}
-  var functionPatternA = /(?:[{,]|var)[\n\r]?\s*([a-zA-Z0-9_]+)\s*[=:]\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  // (?!\/{2})
+  var functionPatternA = /[\n\r](?!\/{2})(?:[{,]|var)[\n\r]?\s*([a-zA-Z0-9_]+)\s*[=:]\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
   // checks for independent functions: function xyz() = {}
-  var functionPatternB = /function\s*([a-zA-Z0-9_]+)\s*\(([a-zA-Z0-9_,\s]*)\)/g;
+  var functionPatternB = /[\n\r](?!\/{2})\s*function\s*([a-zA-Z0-9_]+)\s*\(([a-zA-Z0-9_,\s]*)\)/g;
   // checks for class methods: a.xyz = function() {}
-  var functionPatternC = /((?:[a-zA-Z0-9_]+\.)+)([a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  var functionPatternC = /[\n\r](?!\/{2})((?:[a-zA-Z0-9_]+\.)+)([a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
   // TODO possibly patternD: checks for class methods: var d3 = {xyz: function(){}}
   // and find the object name to be the context
 
@@ -302,7 +304,7 @@ var findFunctionInfo = function(string) {
   var functionInfoB = parseFunctionPatternB(string, functionPatternB);
   var functionInfoC = parseFunctionPatternC(string, functionPatternC);
   var functionInfo = functionInfoA.concat(functionInfoB).concat(functionInfoC);
-
+  console.log(functionInfo);
   return functionInfo.sort(function(a, b) {
     return a.index > b.index;
   });
@@ -313,6 +315,7 @@ var parseFunctionPatternA = function(string, pattern) {
   var results = [];  
   while (matchListA) {
     //console.log('A match index is: ', matchListA.index);
+    // console.log('current match to patternA is: ', matchListA);
     var paramsList = matchListA[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
@@ -340,6 +343,7 @@ var parseFunctionPatternB = function(string, pattern) {
   var results = [];  
   while (matchListB) {
     //console.log('B match index is: ', matchListB.index);
+    // console.log('current match to patternB is: ', matchListB);
     var paramsList = matchListB[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
@@ -472,9 +476,9 @@ var processContentlessEntry = function(entry) {
   var entryObj = {
     propertyName: entry.trim(),
     content: ''
-  }
+  };
   return entryObj;
-}
+};
 
 var convertToJS = function(string) {
   var fixedJSON = string.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2": ');
@@ -528,6 +532,8 @@ var splitEntries = function(string) {
 
 var combineInfo = function(functionArray, commentArray) {
   var combinedArray = functionArray.concat(commentArray);
+  // object that stores all the class constructor names in the document
+  var classStore = {};
   //mark elements to indicate whether they are sourced from a comment,
   //to be safe if user does something weird with ordering comments/functions
   for (var i = 0; i < combinedArray.length; i++) {
@@ -563,6 +569,17 @@ var combineInfo = function(functionArray, commentArray) {
         (current.functionName === '' || current.functionName === next.functionName)) {
         current.params = next.params;
       }
+      //if @class keyword is present, grab the class's name from the following javascript
+      if (current.class !== undefined) {
+        current.class = current.functionName;
+        classStore[current.functionName] = current.functionName;
+      }
+      // try a match against pattern of method declaration
+      // if match, then store classContext in current object
+      var classContext = current.functionName.match(/^([a-zA-Z0-9_]+)\./);
+      if (classContext && classStore[classContext]) {
+        current.classContext = current.classContext || classContext;
+      }
     }
     delete current.fromComment;
     results.push(current);
@@ -574,8 +591,6 @@ var combineInfo = function(functionArray, commentArray) {
   }
   return results;
 };
-
-
 
 //OLD VERSION  
 // var oldCombineInfo = function(functionArr, commentArray) {
@@ -622,6 +637,13 @@ if (userArgs[0] !== 'spec') fileOperations(userArgs);
 
 //TODO: allow a way to edit results
 //TODO: add @class functionality
+//separate name of class from name of constructor function.  entry example:
+//class: Dog
+//constructor: makeDog
+//methods: Dog.bark()
+
+//TODO: class inheritance 
+//TODO: only count functions that are not commented out
 
 //DONE: allow a way to omit things
 //DONE: start blocks with ** to distinguish from normal comments (possibly eliminate

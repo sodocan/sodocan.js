@@ -67,37 +67,37 @@ _.each = function() {
 };
 
 
-// @class
-function Dog() {
+// // @class
+// function Dog() {
 
-}
-// method
-Dog.prototype.method = function() {
+// }
+// // method
+// Dog.prototype.method = function() {
 
-};
+// };
 
-// @class: Dog
-function makeDog() {
-  var dog = {};
-  // @classContext
-  dog.bark = function() {};
-  // @method
-  dog.play = function() {};
+// // @class: Dog
+// function makeDog() {
+//   var dog = {};
+//   // @classContext
+//   dog.bark = function() {};
+//   // @method
+//   dog.play = function() {};
 
-  return dog;
-}
+//   return dog;
+// }
 
-// functionName: makeDog 
-// class constructor
+// // functionName: makeDog 
+// // class constructor
 
-// methods:
-// bark
-// play
+// // methods:
+// // bark
+// // play
 
 
 
-var dog = makeDog();
-dog.bark();
+// var dog = makeDog();
+// dog.bark();
 
-// @namespace
-var Dog = {};
+// // @namespace
+// var Dog = {};
