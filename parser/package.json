@@ -1,6 +1,6 @@
 {
   "name": "sodocan-parser",
-  "version": "1.0.0",
+  "version": "0.0.5",
   "description": "",
   "main": "parser.js",
   "preferGlobal": true,
@@ -21,7 +21,9 @@
   "files": [
     "parser.js",
     "parsedToHTML.js",
-    "networkRequest.js"
+    "networkRequest.js",
+    "bodyHTMLTemplate.html",
+    "headerHTMLTemplate.html"
   ],
   "bin": {
     "parse": "parser.js"
