@@ -11,6 +11,8 @@ deploy:
   provider: heroku
   api_key:
     secure: bDlIocZm0Ckly1fwDRKw3IRN9HHYOlgRDLeWgYivW7+DSVQFILEva5BxiJ0+ODBGtPXGIZGoLJY7Oq5eqzeYAi2wMMXDOtKlXbq+B2Vq+W6LQSV1I3RgKp6zq20mwgcxWQaMiIEHYtkAjbTYegVa1idLjQKZ+5XUvnSGGM/uk0vL89pTCSduxjzOalEDMCzb67a5bgFYV+J/9qOJyvMfj+HFIpkzsU4lNmmMdc3uJk/TQoEAokpOPc5Q0a4V9eFxfwexX/0C0PtH8Gxr0QSqrOqwg8Jm9DRM/2E9XciCR6tLeh28IisW1+ZUbWuMX2o0J/uQOK2LQ3rylNv1Cf1nW440dm8JvyDrqRD72xmWGlF4XLuj1n+18wcszJuPJA40jw1I2NFg1+snL8dHTwEmWVBkO3zVlpmZDBdobtwJuhh8UgtWikhZzb9l67zPnhQarBFIVhR+kwuTd+4tqDr4nAlrWaFYwLmrf5q9L4GvgNqzsWLv1MTu+YCA2vlv3Rygl6LH/bJjpILCPvgawUEE/WHquhExSiNCmKgAWk4QEqORiRi7r7P9sFbxT8k0KX4UUEM6q9O6x09WeqA3gDsLszbIarLIC5y0755D8Hv6MQRTSGoHy7+WeZf0Ng8O51FEdMSlzk5vBs2iYxW9GqWBTtLY/lre2UdyYmE4i7I73Pc=
+  app: 
+    sodocan-staging
   on:
     repo: sodocan/sodocan.js
     branch: master
