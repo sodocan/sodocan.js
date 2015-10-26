@@ -988,6 +988,12 @@ exports.upvoteCases = [
           additions: []
         },
         {
+          entryID: 907176294,
+          additions: [],
+          upvotes: 0,
+          text: 'tipsblahblah'
+        },
+        {
           entryID: 346578302,
           text: 'Adding a test entry',
           upvotes: 0,
@@ -1032,4 +1038,27 @@ exports.upvoteCases = [
       "__v": 0
     }
   }
-]
+];
+
+exports.duplicateEntryCases = [
+  {
+    type: 'entry',
+    postJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      text: 'Adding another test entry'
+    }
+  },
+  {
+    type: 'comment',
+    postJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      entryID: 346578302,
+      text: 'Adding another test comment'
+    }
+  }
+];
+

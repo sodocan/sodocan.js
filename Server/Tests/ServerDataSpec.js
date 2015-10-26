@@ -1,6 +1,3 @@
-// Original package.json line
-//"test": "node Server/index.js & ./node_modules/.bin/mocha --bail --reporter nyan Server/Tests/ServerDataSpec.js; pkill -n node;"
-
 var mongoose = require('mongoose');
 var expect = require('chai').expect;
 var request = require('request');
@@ -238,7 +235,6 @@ describe("Server", function() {
                 delete additions[j].timestamp;
               }
             }
-
             expect(ref).to.deep.equal(addEntryCase.expectedRef);
           })
           .then(done)
@@ -252,7 +248,74 @@ describe("Server", function() {
       postAndGetAnEntry(ind);
     }
 
-    var upvoteCases = exports.upvoteCases;
+    var upvoteCases = testCases.upvoteCases;
+
+    var postEntryAndUpvote = function(ind) {
+      it(upvoteCases[ind].should, function(done) {
+        var upvoteCase = upvoteCases[ind];
+        postOptions.uri = 'http://localhost:3000/addEntry';
+        postOptions.json = upvoteCase.addEntryJson;
+        getOptions.resolveWithFullResponse = false;
+        getOptions.uri = upvoteCase.getUri;
+        reqprom(postOptions)
+          .then(function(res) {
+            expect(res.statusCode).to.equal(202);
+            postOptions.uri = 'http://localhost:3000/upvote'
+            postOptions.json = upvoteCase.upvoteJson;
+            return reqprom(postOptions);
+          })
+          .then(function(res) {
+            expect(res.statusCode).to.equal(202);
+            return reqprom(getOptions);
+          })
+          .then(function(body) {
+            body = JSON.parse(body);
+            var ref = body[0];
+            delete ref['_id'];
+            var tips = ref.explanations.tips;
+            var additions;
+            for (var i = 0; i < tips.length; i++) {
+              delete tips[i].timestamp;
+              additions = tips[i].additions;
+              for (var j = 0; j < additions.length; j++) {
+                delete additions[j].timestamp;
+              }
+            }
+            log('ref', JSON.stringify(ref));
+            expect(ref).to.deep.equal(upvoteCase.expectedRef);
+          })
+          .then(done)
+          .catch(function(err) {
+            console.error(err);
+          });
+      });
+    };
+
+    for (var ind = 0; ind < upvoteCases.length; ind++) {
+      postEntryAndUpvote(ind);
+    }
+
+    var duplicateEntryCases = testCases.duplicateEntryCases;
+
+    var postADuplicateEntry = function(ind) {
+      it('should not allow duplicate ' + duplicateEntryCases[ind].type, function(done) {
+        var duplicateEntryCase = duplicateEntryCases[ind];
+        postOptions.uri = 'http://localhost:3000/addEntry';
+        postOptions.json = duplicateEntryCase.postJson;
+        reqprom(postOptions)
+          .then(function() {
+            log('Test Fail', 'Did not send 404 for duplicate ' + duplicateEntryCase.type);
+          })
+          .catch(function(res) {
+            expect(res.statusCode).to.equal(404);
+            done();
+          })
+      });
+    };
+
+    for (var ind = 0; ind < duplicateEntryCases.length; ind++) {
+      postADuplicateEntry(ind);
+    }
 
   });
 });
