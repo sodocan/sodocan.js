@@ -27,5 +27,4 @@ client/lib
 #parser
 parser/node_modules
 
-.*
 *.vim
