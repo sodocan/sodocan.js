@@ -7,3 +7,11 @@ before_install:
 - npm install -g grunt-cli
 install:
 - npm install
+deploy:
+  provider: heroku
+  api_key:
+    secure: KAB1cTuGz9m3IgA36SFM8eLXqKkhcwantCmC07D79GFrua+CCRyKsbnpuSieAblZLuYOCJvjQbC5xWsbsAHDlhdgfh5baCl1umRR7suCYo9L8E5nbp/ytk9p0p23HTrfb67p48rHDMkRYYzfGFv1mx5lFk99cI4DFz/IC4oKHZnvKOeV+50UukfAqOAuFvTpCKv1IKoAdPPvZwUITbYXJ0rJWN/Ig/0Jk48u2Et6dS43TjkzzFcLHYFilachy2u3NrF+4uePIDCOmflqRze1ITvhCrNDHVqqsnhQuNC4PGZE9VedEiasJ9oADU2L3bIcVg3WOPLhSJZEUCOlwzK5jqVV8xf5y8C1xD9Ro8CKASMiiLVxWv/RWpmC1rvSQw7QJ+Fz/l0pBxz8DvvqtCy7Wah1R7gG9AJuRN2Rj4JD5tZZS0eIALANjq0PET3005IBfS5n6/imexIUOQ/30Pn+mPxOH0aG8OD1404eQRNUT/gRxf0/ZCRrAzoz+bwcJtrKeKQbCueQgYOwOdwdNMFSmxPcEdW/HzLX8CY4hGv4PllcmF0hysjrihVTKIo/yR+IA8C2oK4yh4GjyQoD5hbWO4qrGM4yKG3HQVK5hqMWPjJsHNYeog+oBtXapI/8Xj7O16U5wrgIkWm42RmTlJIKIEnKwPTJbF4dONEDR8svU2U=
+  app: sodocan.js
+  on: 
+    repo: sodocan/sodocan.js
+    branch: master
