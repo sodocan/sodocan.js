@@ -167,9 +167,11 @@ describe("Server", function() {
 
       // Recursion with promises
       var getNextInvalidCase = function(i) {
-        if (typeof path === 'string') {
-          expect(false).to.be.true;
-          expect(path).to.equal('should send 404');
+        if (typeof i === 'string') {
+          // this is an intentionally failing test
+          // because if this if statement got triggered
+          // the test should fail
+          expect(i).to.equal('should send 404');
           return;
         }
         //log('i', i);
@@ -194,7 +196,10 @@ describe("Server", function() {
         if (i < getInvalidCases.length) {
           promise.then(getNextInvalidCase)
         } else {
-          promise.then(function() {done();});
+          promise.then(function() {
+            log('Successfully got 404 errors for each invalid path');
+            done();
+          });
         }
       };
 
@@ -206,81 +211,48 @@ describe("Server", function() {
       resolveWithFullResponse: true
     };
 
-    it('should add an entry and get it', function(done) {
-      postOptions.uri = 'http://localhost:3000/addEntry';
-      postOptions.json =   {
-        project: 'testProj',
-        functionName: 'method1',
-        context: 'tips',
-        text: 'Adding a test entry'
-      };
-      //getOptions.resolveWithFullResponse = true;
-      getOptions.uri = 'http://localhost:3000/api/testProj/ref/method1/tips/entryID-346578302';
+    var addEntryCases = testCases.addEntryCases;
 
-      reqprom(postOptions)
-        .then(function(res) {
-          expect(res.statusCode).to.equal(202);
-          return reqprom(getOptions);
-        })
-        .then(function(body) {
-          //body = JSON.parse(body);
-          //
-        })
-        .then(done)
-        .catch(function(err) {
-          log('error');
-          console.error(err);
-        });
-    });
+    var postAndGetAnEntry = function(ind) {
+      it(addEntryCases[ind].should, function(done) {
+        var addEntryCase = addEntryCases[ind];
+        postOptions.uri = 'http://localhost:3000/addEntry';
+        postOptions.json = addEntryCase.postJson;
+        getOptions.resolveWithFullResponse = false;
+        getOptions.uri = addEntryCase.getUri;
+        reqprom(postOptions)
+          .then(function(res) {
+            expect(res.statusCode).to.equal(202);
+            return reqprom(getOptions);
+          })
+          .then(function(body) {
+            body = JSON.parse(body);
+            var ref = body[0];
+            delete ref['_id'];
+            var tips = ref.explanations.tips;
+            var additions;
+            for (var i = 0; i < tips.length; i++) {
+              delete tips[i].timestamp;
+              additions = tips[i].additions;
+              for (var j = 0; j < additions.length; j++) {
+                delete additions[j].timestamp;
+              }
+            }
+
+            expect(ref).to.deep.equal(addEntryCase.expectedRef);
+          })
+          .then(done)
+          .catch(function(err) {
+            console.error(err);
+          });
+      });
+    };
+
+    for (var ind = 0; ind < addEntryCases.length; ind++) {
+      postAndGetAnEntry(ind);
+    }
+
+    var upvoteCases = exports.upvoteCases;
 
   });
 });
-
-// describe("Posts from parser", function() {
-
-//   beforeEach(function () {
-//   });
-
-
-    // request(options, function(error, res, body) {
-    //   db.knex('users')
-    //     .where('username', '=', 'Svnh')
-    //     .then(function(res) {
-    //       if (res[0] && res[0]['username']) {
-    //         var user = res[0]['username'];
-    //       }
-    //       expect(user).to.equal('Svnh');
-    //       done();
-    //     }).catch(function(err) {
-    //       throw {
-    //         type: 'DatabaseError',
-    //         message: 'Failed to create test setup data'
-    //       };
-    //     });
-    // });
-
-    //   var parserPostCases = testCases.parserPostCases;
-
-    //   for (var i = 0; i < parserPostCases.length; i++) {
-    //     it("should parse path " + path, function() {
-    //       var options = {
-    //         'method': 'POST',
-    //         'uri': 'http://localhost:3000/create',
-    //         'json': parserPathCases[i]
-    //       };
-
-    //       request(options, function(error, res, body) {
-    //         expect(res.statusCode).to.equal(202);
-    //       });
-    //     });
-    //   }
-
-    //   it("should convert parser output objects to the DB form", function() {
-    //     var convertFormCase = testCases.convertFormCase;
-    //     var actualForm = helpers.convertToDBForm.apply(null, convertFormCase.inputs);
-    //     expect(actualForm).to.deep.equal(convertFormCase.expectedOutput);
-    //   });
-    // });
-  // }
-// });
-

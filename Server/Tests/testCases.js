@@ -902,7 +902,134 @@ exports.getValidCases = {
 exports.getInvalidCases = [
   '/notApi/testProj',
   '/api/otherProj',
-  '/api/testProj/ref/nonExistentMethod',
-  '/api/testProj/descriptions',
-  ''
+  '/api/testProj/ref/nonExistentMethod'
 ];
+
+exports.addEntryCases = [
+  { // case 1
+    should: 'should add an entry and get it',
+    postJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      text: 'Adding a test entry'
+    },
+    getUri: 'http://localhost:3000/api/testProj/ref/method1/tips/entryID-346578302',
+    expectedRef: {
+      project: 'testProj',
+      functionName: 'method1',
+      group: 'testGroup',
+      reference: {returns:[], params: []},
+      explanations: {tips: [{
+        entryID: 346578302,
+        text: 'Adding a test entry',
+        upvotes: 0,
+        additions: []
+      }]},
+      "__v": 0
+    }
+  },
+  { // case 2
+    should: 'should add a comment and get it',
+    postJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      entryID: 346578302,
+      text: 'Adding a test comment'
+    },
+    getUri: 'http://localhost:3000/api/testProj/ref/method1/tips/entryID-346578302/additionID-192693359',
+    expectedRef: {
+      project: 'testProj',
+      functionName: 'method1',
+      group: 'testGroup',
+      reference: {returns:[], params: []},
+      explanations: {tips: [{
+        entryID: 346578302,
+        text: 'Adding a test entry',
+        upvotes: 0,
+        additions: [{
+          additionID: 192693359,
+          text: 'Adding a test comment',
+          upvotes: 0,
+        }]
+      }]},
+      "__v": 0
+    }
+  }
+];
+
+exports.upvoteCases = [
+  { // case 1
+    should: 'should upvote an entry and get entries by descending upvotes and no comments',
+    addEntryJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      text: 'Adding another test entry'
+    },
+    upvoteJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      entryID: 415745888
+    },
+    getUri: 'http://localhost:3000/api/testProj/ref/method1/tips/all',
+    expectedRef: {
+      project: 'testProj',
+      functionName: 'method1',
+      group: 'testGroup',
+      reference: {returns:[], params: []},
+      explanations: {tips: [
+        {
+          entryID: 415745888,
+          text: 'Adding another test entry',
+          upvotes: 1,
+          additions: []
+        },
+        {
+          entryID: 346578302,
+          text: 'Adding a test entry',
+          upvotes: 0,
+          additions: []
+        }
+      ]},
+      "__v": 0
+    }
+  },
+  { // case 2
+    should: 'should upvote a comment and get top-voted comment',
+    addEntryJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      entryID: 346578302,
+      text: 'Adding another test comment'
+    },
+    upvoteJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      entryID: 346578302,
+      additionID: 1653167667
+    },
+    getUri: 'http://localhost:3000/api/testProj/ref/method1/tips/entryID-346578302/1',
+    expectedRef: {
+      project: 'testProj',
+      functionName: 'method1',
+      group: 'testGroup',
+      reference: {returns:[], params: []},
+      explanations: {tips: [{
+        entryID: 346578302,
+        text: 'Adding a test entry',
+        upvotes: 0,
+        additions: [{
+          additionID: 1653167667,
+          text: 'Adding another test comment',
+          upvotes: 1,
+        }]
+      }]},
+      "__v": 0
+    }
+  }
+]
