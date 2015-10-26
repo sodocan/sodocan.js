@@ -1,9 +1,30 @@
 {
   "name": "sodocan-parser",
-  "version": "1.0.0",
+  "version": "0.0.5",
   "description": "",
   "main": "parser.js",
   "preferGlobal": true,
+  "author": {
+    "name": "sodocan.js",
+    "url": "sodocan.herokuapp.com"
+  }, 
+  "contributors": [{
+    "name": "Lai 'Lain' Jiang",
+    "email": "lain.lai.jiang@gmail.com",
+    "url": "lainjiang.io"
+  },
+  {
+    "name": "Leo Thorp",
+    "email": "leo.thorp1@gmail.com",
+    "url": "leothorp.com"
+  }],
+  "files": [
+    "parser.js",
+    "parsedToHTML.js",
+    "networkRequest.js",
+    "bodyHTMLTemplate.html",
+    "headerHTMLTemplate.html"
+  ],
   "bin": {
     "parse": "parser.js"
   },
@@ -16,7 +37,7 @@
     "sinon": "^1.17.1"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha spec"
+    "test": "./node_modules/.bin/mocha spec --bail --reporter nyan"
   },
   "author": "",
   "license": "ISC"

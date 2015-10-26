@@ -1,4 +1,4 @@
-/** @header
+/* @header
 @project: 'underscore'
 @author: 'superman'
 @version: '~0.0.3'
@@ -56,7 +56,7 @@ function spicyTuna() {
 }
 
 var stuff = {
-  foo: function(obj, trapezoid) {}
+  fooBar: function(obj, trapezoid) {}
 };
 
 var otherStuff = {bar: 1, baz: function(grapefruit){}};

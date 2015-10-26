@@ -23,7 +23,8 @@ var properties = {
   includeByDefault: '',
   contains: '',
   omit: '',
-  include: ''
+  include: '',
+  class: ''
 };
 
 var fileOperations = function(paths) {
@@ -39,22 +40,24 @@ var fileOperations = function(paths) {
   var outputPath = paths.pop();
   //if the user is parsing local files
   if (!isNetworkRequest(paths[0])) {
-    var defaultProjectName = paths[0].match(/\/?([^\/]+)\./)[1];
+    var defaultProjectName = paths[0];
     //last path in array is the output file; earlier ones are js files to parse
     //outputPath is a directory
     //var outputArray = [];
-    var numberOfFiles = paths.length;
-    for (var i = 0; i < numberOfFiles; i++) {
-      var parsedFileContents = parseMain(fs.readFileSync(paths[i]).toString());
+  
+    paths = getAllFilePaths(paths);
+   
+    for (var i = 0; i < paths.length; i++) {
+      var parsedFileContents = parseMain('\n' + fs.readFileSync(paths[i]).toString());
       if (parsedFileContents.header.project !== '') {
         outputObj.header = parsedFileContents.header;
       }
       outputObj.body = outputObj.body.concat(parsedFileContents.body);
     }
-    if (outputObj.header.projectName === '') {
-      outputObj.header.projectName = defaultProjectName;
+    if (outputObj.header.project === '') {
+      outputObj.header.project = defaultProjectName;
     }
-
+    
     constructGroupClassAndIndex(outputObj);
     // to write JSON and HTML files
     //create the specified directory if is does not exist
@@ -82,6 +85,30 @@ var fileOperations = function(paths) {
   }
 };
 
+var getAllFilePaths = function(paths, pathStart) {
+  console.log('paths: ', paths);
+  pathStart = pathStart || '';
+  var results = [];
+  for (var i = 0; i < paths.length; i++) {
+    var current;
+    if (pathStart !== '') {
+      current = pathStart + paths[i];
+    }  
+    else {
+      current = paths[i];
+    }
+    if (fs.statSync(current).isDirectory()) {
+      var filenameArray = fs.readdirSync(current);
+      results = results.concat(getAllFilePaths(filenameArray, current + '/'));
+    } else {
+      if (paths[i].substring(paths[i].length - 3) === '.js') {
+        results.push(current);
+      }  
+    }
+  }
+  console.log('results of current level are: ', results);
+  return results;
+};
 
 var isNetworkRequest = function(path) {
   return (path.match('http://') || path.match('https://'));
@@ -97,14 +124,12 @@ var constructGroupClassAndIndex = function(outputObj) {
   for (var i = 0; i < outputObj.body.length; i++) {
     outputObj.body[i].index = i;
     var group = outputObj.body[i].group;
-    var classContext = outputObj.body[i].classContext;
+    if (outputObj.body[i].class !== undefined) {
+      classList.push(outputObj.body[i].class);
+    }
     if (group && !groupStore[group]) {
       groupList.push(group);
       groupStore[group] = group;
-    }
-    if (classContext && !classStore[classContext]) {
-      classList.push(classContext);
-      classStore[classContext] = classContext;
     }
   }
 
@@ -258,7 +283,7 @@ var buildExplanations = function(blockObj) {
 };
 
 var findHeader = function(string) {
-  var headerRegex = /\/\*\s*@header(?:[\s\S]+?)?\*\//;
+  var headerRegex = /\/\*{2}\s*@header(?:[\s\S]+?)?\*\//;
   var headerString = string.match(headerRegex);
   if (headerString) {
     headerString = headerString.join();
@@ -290,19 +315,23 @@ var findCommentBlocks = function(string) {
 
 var findFunctionInfo = function(string) {
   // checks for independent functions: var xyz = function() {}
-  var functionPatternA = /(?:[{,]|var)[\n\r]?\s*([a-zA-Z0-9_]+)\s*[=:]\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  // (?!\/{2})
+  var functionPatternA = /[\n\r](?!\/{2})\s*(?:var)?\s*([a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
   // checks for independent functions: function xyz() = {}
-  var functionPatternB = /function\s*([a-zA-Z0-9_]+)\s*\(([a-zA-Z0-9_,\s]*)\)/g;
-  // checks for class methods: a.xyz = function() {}
-  var functionPatternC = /((?:[a-zA-Z0-9_]+\.)+)([a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
-  // TODO possibly patternD: checks for class methods: var d3 = {xyz: function(){}}
+  var functionPatternB = /[\n\r](?!\/{2})\s*function\s*([a-zA-Z0-9_]+)\s*\(([a-zA-Z0-9_,\s]*)\)/g;
+  // checks for obj methods: a.xyz = function() {}
+  //var functionPatternC = /[\n\r](?!\/{2})((?:[a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  var functionPatternC = /[\n\r](?!\/{2})[\t ]*((?:[a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  // checks for obj methods: var d3 = {xyz: function(){}}
+  var functionPatternD = /[\n\r](?!\/{2})(?:(?:var)? *\w* *= *{?\w* *: *\w*, *)* *(\w*) *: *function\(([\w_, ]*)\)/g;
   // and find the object name to be the context
 
   var functionInfoA = parseFunctionPatternA(string, functionPatternA);
   var functionInfoB = parseFunctionPatternB(string, functionPatternB);
   var functionInfoC = parseFunctionPatternC(string, functionPatternC);
-  var functionInfo = functionInfoA.concat(functionInfoB).concat(functionInfoC);
-
+  var functionInfoD = parseFunctionPatternD(string, functionPatternD);
+  var functionInfo = functionInfoA.concat(functionInfoB).concat(functionInfoC).concat(functionInfoD);
+  // console.log(functionInfo);
   return functionInfo.sort(function(a, b) {
     return a.index > b.index;
   });
@@ -313,6 +342,7 @@ var parseFunctionPatternA = function(string, pattern) {
   var results = [];  
   while (matchListA) {
     //console.log('A match index is: ', matchListA.index);
+    // console.log('current match to patternA is: ', matchListA);
     var paramsList = matchListA[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
@@ -340,6 +370,7 @@ var parseFunctionPatternB = function(string, pattern) {
   var results = [];  
   while (matchListB) {
     //console.log('B match index is: ', matchListB.index);
+    // console.log('current match to patternB is: ', matchListB);
     var paramsList = matchListB[2].split(',').map(function(param){
       return {'name': param.trim()};
     });
@@ -367,13 +398,13 @@ var parseFunctionPatternC = function(string, pattern) {
   var results = [];
   while (matchListC) {
     //console.log('C match index is: ', matchListC.index);
-    var classContext = matchListC[1].trim(); 
-    var paramsList = matchListC[3].split(',').map(function(param) {
+    // var classContext = matchListC[1].trim(); 
+    var paramsList = matchListC[2].split(',').map(function(param) {
       return {name: param.trim()};
     });
     paramsList = paramsList[0].name === '' ? [] : paramsList;
     var obj = {
-      functionName: classContext + matchListC[2],
+      functionName: matchListC[1],
       params: paramsList,
       returns: [],
       explanations: {
@@ -381,11 +412,37 @@ var parseFunctionPatternC = function(string, pattern) {
         examples: '',
         tips: ''
       },
-      classContext: classContext.slice(0, classContext.length - 1),
+      classContext: '',
       index: matchListC.index
     };
     results.push(obj);
     matchListC = pattern.exec(string);
+  }
+  return results;
+};
+
+var parseFunctionPatternD = function(string, pattern) {
+  var matchListD = pattern.exec(string);
+  var results = [];  
+  while (matchListD) {
+    var paramsList = matchListD[2].split(',').map(function(param){
+      return {'name': param.trim()};
+    });
+    paramsList = paramsList[0].name === '' ? [] : paramsList;
+    var obj = {
+      functionName: matchListD[1],
+      params: paramsList,
+      returns: [],
+      explanations: {
+        descriptions: '',
+        examples: '',
+        tips: ''
+      },
+      classContext: '',
+      index: matchListD.index
+    };
+    results.push(obj);
+    matchListD = pattern.exec(string);
   }
   return results;
 };
@@ -472,9 +529,9 @@ var processContentlessEntry = function(entry) {
   var entryObj = {
     propertyName: entry.trim(),
     content: ''
-  }
+  };
   return entryObj;
-}
+};
 
 var convertToJS = function(string) {
   var fixedJSON = string.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2": ');
@@ -528,6 +585,8 @@ var splitEntries = function(string) {
 
 var combineInfo = function(functionArray, commentArray) {
   var combinedArray = functionArray.concat(commentArray);
+  // object that stores all the class constructor names in the document
+  var classStore = {};
   //mark elements to indicate whether they are sourced from a comment,
   //to be safe if user does something weird with ordering comments/functions
   for (var i = 0; i < combinedArray.length; i++) {
@@ -543,13 +602,25 @@ var combineInfo = function(functionArray, commentArray) {
   //take functionName and params info from the following function if not provided in a comment
   for (var i = 0; i < combinedArray.length; i++) {
 
+    var current = combinedArray[i];
+
+    // try a match against pattern of method declaration
+    // if match, then store classContext in current object
+    var classContext = current.functionName.match(/^([a-zA-Z0-9_]+)\./);
+
+    if (classContext) {
+      classContext = classContext[1];
+    }
+    if (classContext && classStore[classContext]) {
+      current.classContext = current.classContext || classContext;
+    }
+    
     //add to results and break if we're on the last element
     if (i === combinedArray.length - 1) {
       results.push(combinedArray[i]);
       break;
     } 
-
-    var current = combinedArray[i];
+    
     var next = combinedArray[i + 1];
     //we're only interested in taking info from the next entry if we're on a comment
     //and the next one is a JS entry
@@ -563,10 +634,18 @@ var combineInfo = function(functionArray, commentArray) {
         (current.functionName === '' || current.functionName === next.functionName)) {
         current.params = next.params;
       }
+      //if @class keyword is present, grab the class's name from the following javascript
+      //console.log('current class is: ', current.class);
+      if (current.class !== undefined) {
+        if (current.class === '') {
+          current.class = current.functionName;
+          console.log('current class is:', current.class);
+        }
+        classStore[current.class] = current.class;
+      }
     }
     delete current.fromComment;
     results.push(current);
-
     //skip next element, if it is the JS corresponding to the current comment 
     if (next.functionName === current.functionName) {
       i++;
@@ -574,8 +653,6 @@ var combineInfo = function(functionArray, commentArray) {
   }
   return results;
 };
-
-
 
 //OLD VERSION  
 // var oldCombineInfo = function(functionArr, commentArray) {
@@ -611,18 +688,31 @@ module.exports = {
   findFunctionInfo: findFunctionInfo,
   parseMain: parseMain,
   buildExplanations: buildExplanations,
-  combineInfo: combineInfo
+  combineInfo: combineInfo,
+  constructGroupClassAndIndex: constructGroupClassAndIndex
 };
 
 //for command line use
+var executingProgram = process.argv[1];
 var userArgs = process.argv.slice(2);
+console.log(process.argv);
 console.log(userArgs);
-if (userArgs[0] !== 'spec') fileOperations(userArgs);
+if (executingProgram.substring(executingProgram.length - 6) === '/parse') {
+  fileOperations(userArgs);
+} 
+// console.log('arg: ', userArgs);
+// console.log('END RESULT: ', getAllFilePaths(userArgs));
 
 
 //TODO: allow a way to edit results
-//TODO: add @class functionality
+//TODO: class inheritance 
 
+//DONE: add @class functionality
+//separate name of class from name of constructor function.  entry example:
+//class: Dog
+//constructor: makeDog
+//methods: Dog.bark()
+//DONE: only count functions that are not commented out
 //DONE: allow a way to omit things
 //DONE: start blocks with ** to distinguish from normal comments (possibly eliminate
  // @doc)
