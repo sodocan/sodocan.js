@@ -28,3 +28,4 @@ client/lib
 parser/node_modules
 
 *.vim
+.*
