@@ -32,17 +32,22 @@ var mongoUpdateFailure = exports.mongoUpdateFailure = function(res, err){
 // successC (required), notFoundC, and errorC are all callback functions
 // successC takes the found reference as a parameter
 // errorC takes the error as a parameter
-var mongoFindOne = function(res, searchObj, successC, notFoundC, errorC) {
+// if sortObj is null, then findOne is used instead of find
+var mongoFind = function(res, searchObj, sortObj, successC, notFoundC, errorC) {
   notFoundC = notFoundC || function() {send404(res, 'reference not found');};
   errorC = errorC || function(err) {send404(res, err);};
 
-  methodsDB.findOne(searchObj).exec(function(error, reference) {
+  var finder = sortObj
+    ? methodsDB.find(searchObj).sort(sortObj)
+    : methodsDB.findOne(searchObj);
+
+  finder.lean().exec(function(error, references) {
     if (error) {
       errorC(error);
-    } else if (!reference) {
+    } else if (sortObj ? !references.length : !references) {
       notFoundC();
     } else {
-      successC(reference);
+      successC(references);
     }
   });
 };
@@ -288,14 +293,12 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
     return;
   }
 
-  methodsDB.findOne(searchObject).exec(function(error, reference) { //the mongo search
+  methodsDB.findOne(searchObject).lean().exec(function(error, reference) { //the mongo search
     if (error || !reference) {
       if(error){
         send404(res, error);
-        return;
       } else {
         send404(res, 'found no references');
-        return;
       }
     } else {
 
@@ -312,7 +315,7 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
       var entryFound = false;
       var contextArray = reference.explanations[context];
       if (!contextArray) {
-        console.error('context not found');
+        send404(res, 'context not found');
         return;
       }
       for (var i = 0; i < contextArray.length; i++) {
@@ -359,7 +362,6 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
       methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
         if (error) {
           send404(res, error);
-          return;
         } else {
           res.sendStatus(202);
         }
@@ -385,27 +387,23 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
   };
 
   if (!searchObject.project || !searchObject.functionName) {
-    send404(res);
+    send404(res, 'project or functionName not provided');
     return;
   }
 
-  methodsDB.findOne(searchObject).exec(function(error, reference) { //the mongo search
+  methodsDB.findOne(searchObject).lean().exec(function(error, reference) { //the mongo search
     if (error || !reference) {
       if(error){
-        console.error(error);
-        send404(res);
-        return;
+        send404(res, error);
       } else {
-        console.error('found no references');
-        send404(res);
-        return;
+        send404(res, 'found no references');
       }
     } else {
 
       var context = addEntryInfo.context;
       var contextArray = reference.explanations[context];
       if (!contextArray) {
-        console.error('context not found');
+        send404(res, 'context not found');
         return;
       }
       var id = hashCode(addEntryInfo.text);
@@ -418,8 +416,7 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
             entryFound = true;
             for (var j = 0; j < contextArray[i].additions.length; j++) {
               if (contextArray[i].additions[j].additionID === id) {
-                console.error('duplicate entry');
-                send404(res);
+                send404(res, 'duplicate entry');
                 return;
               }
             }
@@ -434,15 +431,13 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
           }
         }
         if (!entryFound) {
-          console.error('entryID not found');
-          send404(res);
+          send404(res, 'entryID not found');
           return;
         }
       } else {
         for (var i = 0; i < contextArray.length; i++) {
           if (contextArray[i].entryID === id) {
-            console.error('duplicate entry');
-            send404(res);
+            send404(res, 'duplicate entry');
             return;
           }
         }
@@ -458,9 +453,7 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
 
       methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
         if (error) {
-          console.error(error);
-          send404(res);
-          return;
+          send404(res, error);
         } else {
           res.setHeader('Access-Control-Allow-Origin','*');
           res.sendStatus(202);
@@ -478,13 +471,11 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
     functionName: method.functionName
   };
 
-  methodsDB.findOne(searchObj, function(error, foundMethod) {
-    if (error) {
-      console.error(error);
-      completedMethodEntry(error);
-    } else if (foundMethod) {
-      // then iterate over entries to see if any of them differ
-      // from existing ones and add them
+  // replacement using helper
+  var cb = {
+
+    success: function(foundMethod) {
+      log('postSkeleton mongoFindOne success');
       var explanations = method.explanations;
       for (var context in explanations) { //should be changed to explanations
         var newEntryText = explanations[context]; // this is a string
@@ -524,12 +515,12 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
           completedMethodEntry();
         }
       });
-      // upsert modified foundMethod to database
-        // res.statusCode(202).end() inside callback of database upsert
+    },
 
-    } else {
+    notFound: function() {
+      log('postSkeleton mongoFindOne notFound');
       // convertToDBForm and then insert
-        // res.statusCode(202).end() inside callback of database upsert
+      // res.statusCode(202).end() inside callback of database upsert
       (new methodsDB(convertToDBForm(skull.project, method))).save(function(err){
         if(err){
           completedMethodEntry(err);
@@ -537,8 +528,83 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
           completedMethodEntry();
         }
       });
+    },
+
+    error: function(err) {
+      log('postSkeleton mongoFindOne error');
+      console.error(err);
+      completedMethodEntry(err);
     }
-  });
+
+  };
+
+  // Since the third argument is null, this will use mongo's findOne
+  mongoFind(null, searchObj, null, cb.success, cb.notFound, cb.error);
+
+
+
+
+  // methodsDB.findOne(searchObj).lean().exec(function(error, foundMethod) {
+  //   if (error) {
+  //     console.error(error);
+  //     completedMethodEntry(error);
+  //   } else if (foundMethod) {
+  //     // then iterate over entries to see if any of them differ
+  //     // from existing ones and add them
+  //     var explanations = method.explanations;
+  //     for (var context in explanations) { //should be changed to explanations
+  //       var newEntryText = explanations[context]; // this is a string
+  //       if (newEntryText) { //only do work if there is text
+  //         var existingEntries = foundMethod.explanations[context]; // array
+  //         var match = false;
+  //         for (var j = 0; j < existingEntries.length; j++) {
+  //           var existingEntry = existingEntries[j]; // object
+  //           if (newEntryText === existingEntry.text) {
+  //             match = true;
+  //             break;
+  //           }
+  //         }
+  //         if (!match) {
+  //           var newEntry = {
+  //             text: newEntryText,
+  //             upvotes: 0,
+  //             additions: [],
+  //             entryID: hashCode(newEntryText)
+  //           };
+  //           existingEntries.push(newEntry);
+  //         }
+  //       }
+  //     }
+
+  //     methodsDB.update({
+  //       project: foundMethod.project,
+  //       functionName: foundMethod.functionName
+  //     },
+  //     {
+  //       explanations: foundMethod.explanations
+  //     }, function(err){
+  //       if(err){
+  //         completedMethodEntry(err);
+
+  //       } else {
+  //         completedMethodEntry();
+  //       }
+  //     });
+  //     // upsert modified foundMethod to database
+  //       // res.statusCode(202).end() inside callback of database upsert
+
+  //   } else {
+  //     // convertToDBForm and then insert
+  //       // res.statusCode(202).end() inside callback of database upsert
+  //     (new methodsDB(convertToDBForm(skull.project, method))).save(function(err){
+  //       if(err){
+  //         completedMethodEntry(err);
+  //       } else {
+  //         completedMethodEntry();
+  //       }
+  //     });
+  //   }
+  // });
 };
 
 
