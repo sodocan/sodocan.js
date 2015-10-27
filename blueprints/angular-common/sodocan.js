@@ -17,8 +17,39 @@ angular.module( 'sodocan', [])
   
   // Takes context objects, such as from router or controllers,
   // and returns it as API URL string
-  var objToUrl = function() {
-    // TODO: pull logic out of getFuncs
+  // Slight misnomer, also accepts arguments array in the format:
+  // [ref,entry#,add#,cb]
+  var objToUrl = function(toConvert) {
+
+    // arguments
+    if (Array.isArray(toConvert)) {
+      var ref,entryNum,commentNum,cb;
+      if (typeof toConvert[0] === 'function' || !toConvert[0]) {
+        ref = '';
+        entryNum = -1;
+        commentNum = -1;
+        cb = toConvert[0] || function(){};
+      } else if (typeof toConvert[1] === 'function') {
+        entryNum = 1;
+        commentNum = 1;
+        cb = toConvert[1];
+      } else if (typeof toConvert[2] === 'function') {
+        entryNum = toConvert[1];
+        commentNum = 1;
+        cb = toConvert[2];
+      } else if (toConvert.length===4) {
+        entryNum = toConvert[1];
+        commentNum = toConvert[2];
+        cb = toConvert[3];
+      } else {
+        // TODO: WARNING: Fails silently on malformed input
+        return 'ERROR';
+      }
+      if (entryNum===-1) entryNum = 'all';
+      if (commentNum===-1) commentNum = 'all';
+    }
+
+      return built;
   };
 
   // Handle HTTP request to API here; requests project if not passed
@@ -111,18 +142,27 @@ angular.module( 'sodocan', [])
     });
   };
 
-  obj.getTips = function(ref) {
+  obj.getTips = function() {
 
-    var entryNum,commentNum,cb;
-    if (typeof arguments[1] === 'function') {
+    var ref,entryNum,commentNum,cb;
+
+    if (typeof arguments[0] === 'function' || !arguments[0]) {
+      ref = '';
+      entryNum = -1;
+      commentNum = -1;
+      cb = arguments[0] || function(){};
+    } else if (typeof arguments[1] === 'function') {
+      ref = arguments[0];
       entryNum = 1;
       commentNum = 1;
       cb = arguments[1];
     } else if (typeof arguments[2] === 'function') {
+      ref = arguments[0];
       entryNum = arguments[1];
       commentNum = 1;
       cb = arguments[2];
     } else if (arguments.length===4) {
+      ref = arguments[0];
       entryNum = arguments[1];
       commentNum = arguments[2];
       cb = arguments[3];
@@ -131,6 +171,7 @@ angular.module( 'sodocan', [])
       return;
     }
     if (entryNum===-1) entryNum = 'all';
+    if (commentNum===-1) commentNum = 'all';
 
     getFromAPI('ref/'+ref+'/tips/'+entryNum+'/'+commentNum,function(err,data) {
       
@@ -142,10 +183,15 @@ angular.module( 'sodocan', [])
     });
   };
 
-  // additions
-  obj.getComments = function(entryID,cb) {
+  // additions TODO: needs everything passed, this format needs to be rethought
+  // no easy way to update larger docs object from an entryID
+  obj.getComments = function(context,entryID,commentNum,cb) {
     
-    
+    getFromAPI(context+'/'+entryID+'/'+commentNum,function(err,data) {
+      if (err) cb(err);
+
+      cb(null,data[0]);
+    });
 
   };
 
@@ -158,24 +204,29 @@ angular.module( 'sodocan', [])
       var ref = '';
     }
     var contextURL = '';
-    if (!refObj['context']) {
-      var contexts = Object.keys(refObj['context']);
+    if (refObj.context && !refObj.context.ref) {
+      var contexts = Object.keys(refObj.context);
       for (var i=0; i<contexts.length;i++) {
-        // TODO: loop over context arr and build str
+        contextURL += refObj.context[contexts[i]].reduce(function(a,c) {
+          c = (c===-1)?'all':c;
+          return a+'/'+c;
+        },contexts[i]);
+        contextURL += '/';
       }
     } else {
-      
+      if (refObj.context && refObj.context.ref) {
+        contextURL += refObj.context.ref.reduce(function(a,c) {
+          c = (c===-1)?'all':c;
+          return a+'/'+c;
+        },'');
+      }
     }
-    /*
-    getFromAPI(ref+entryNum+'/'+commentNum,function(err,data) {
-      
-      if (err) cb(err);
-      
-      obj.docs[ref] = data[0];
-      cb(null,obj.docs[ref].explanations.tips);
 
+    getFromAPI(ref+contextURL,function(err,data) {
+      if (err) cb(err);
+      obj.docs[ref] = data[0];
+      cb(null,obj.docs[ref]);
     });
-    */
   };
 
   /* Send methods
