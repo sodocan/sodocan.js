@@ -441,7 +441,7 @@ angular.element(document).ready(function() {
         });
         angular.module('sodocan').constant('projectName',projName);
         angular.module('sodocan').constant('sodocanInit',ret);
-        console.log(ret);
-        angular.bootstrap(document,['sodocan']);
+        var app = window.sodocanApp || 'sodocan';
+        angular.bootstrap(document,[app]);
       });
 });
