@@ -4,6 +4,9 @@ var favicon = require('serve-favicon'); // currently not used
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var expressSession = require('express-session');
 
 //var crowdsourceRouter = require('./Routes/crowdsource');
 var usersRouter = require('./Routes/users');
@@ -21,9 +24,24 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(expressSession({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'StaticPages'))); // will this be used?
 
-app.use('/users', usersRouter); // might change later to not use router
+var User = require('./Databases/Models/users.js');
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
+// app.use('/users', usersRouter); // might change later to not use router
+app.use('/users', usersRouter);
+
 
 app.get('/api/*', handlers.getApi);
 app.post('/create', handlers.postSkeleton);
