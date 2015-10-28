@@ -1,10 +1,7 @@
-<div class="three columns" ng-controller="sodocanSidebarCtrl">
-  <div class="sidebar">
-    <div ng-repeat="method in allMethods">
-      <div>
-      {{method}}
-      </div>
-    </div>
-  </div>
-  &nbsp;
+<div ng-controller="sodocanSidebarCtrl">
+  <ul class="side-nav fixed">
+    <li class="bold" ng-repeat="method in allMethods">
+      <a href="#"> {{method}}</a>
+    </li>
+  </ul>
 </div>

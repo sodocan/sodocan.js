@@ -1,4 +1,5 @@
-angular.module('sodocan')
+
+var app = angular.module('sodone',['sodocan'])
 .directive('sodocanApp', function() {
   return {
     restrict: 'A',

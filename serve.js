@@ -103,7 +103,7 @@ function handleRequest(req,res) {
     filePath = DIR+'/'+path;
   };
 
-  if (!/(html|js|css)$/.test(req.url)) {
+  if (!/(html|js|css|png)$/.test(req.url)) {
     filePath = DIR+'/'+TEMPLATE+'/index.html';
   }
   if(/favicon\.ico$/.test(req.url)) {

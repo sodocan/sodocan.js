@@ -1,3 +1,21 @@
-<div class="entry" ng-controller="sodocanEntryCtrl">
-{{entry.text}}
+<div class="row" ng-controller="sodocanEntryCtrl">
+  <div class="col s10">
+    <div style="float:left">
+      <img src="../angular-sodone/images/respond.png" height=15 class="tint"> </img>
+    </div>
+    <div class="explanation-text">
+      {{entry.text}}
+    </div>
+    <div>
+      <div ng-repeat="comment in entry.additions">
+        <div sodocan-comment>
+      </div>
+    </div>
+  </div>
 </div>
+  <div class="col s1 upvote">
+    {{entry.upvotes}}
+    <i class="material-icons tiny">navigation</i>
+  </div>
+</div>
+

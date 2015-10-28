@@ -1,4 +1,4 @@
-angular.module('sodocan')
+angular.module('sodone')
 .directive('sodocanSidebar', function(){
   return {
     restrict: 'A',

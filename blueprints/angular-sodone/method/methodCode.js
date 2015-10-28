@@ -1,4 +1,4 @@
-angular.module('sodocan')
+angular.module('sodone')
 .directive('sodocanMethod', function(){
   return {
     restrict: 'A',
@@ -31,4 +31,15 @@ angular.module('sodocan')
     }
     return result; 
   };
+  // console.log('methods:',$scope.method);
+  // console.log('$scope:',$scope);
+  // sodocanAPI.getDescriptions($scope.method.functionName,5,5, function(err,data){
+  //   console.log('descriptions',err,data); 
+  // });
+  // sodocanAPI.getExamples($scope.method.functionName,5,5, function(err,data){
+  //   console.log('examples',err,data); 
+  // });
+  sodocanAPI.getDescriptions($scope.method.functionName,5,5, function(err,data){
+    // console.log('tips',sodocanAPI.docs,data); 
+  });
 }]);

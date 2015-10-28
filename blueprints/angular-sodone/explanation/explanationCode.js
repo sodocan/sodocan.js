@@ -1,4 +1,4 @@
-angular.module('sodocan')
+angular.module('sodone')
 .directive('sodocanExplanation',function(){
   return{
     restrict: 'A',
