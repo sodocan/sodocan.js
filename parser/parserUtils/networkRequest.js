@@ -1,6 +1,7 @@
 var https = require('https');
-var URL = require('url');
+var http = require('http');
 var fs = require('fs');
+var URL = require('url');
 
 var githubAPICallForFile = function(fileInfo, cb) {
   //       github.com/username/repo/(always)/branch/folders.../filename
@@ -48,10 +49,32 @@ var parseUrl = function(url) {
   console.log('pathForAPICall: ', pathForAPICall);
   return [pathForAPICall, username, path[1]];
 };
-
 //parseUrl('https://github.com/lainjiang/Jupitr/blob/test/index.js');
+
+var sendParsedToServer = function(string) {
+  var options = {
+    host:'localhost',
+    port: '3000',
+    headers: {
+      "content-type": "application/json",
+    },
+    path: '/create/',
+    method: 'POST'
+  };
+  var request = http.request(options, function(res) {
+    console.log("statusCode: ", res.statusCode);
+    console.log("headers: ", res.headers);
+  });
+
+  request.on('error', function(err) {
+    console.log('POST request error: ', err);
+  });
+  request.write(string);
+  request.end();
+};
 
 module.exports = {
   githubAPICallForFile: githubAPICallForFile,
-  parseUrl: parseUrl
+  parseUrl: parseUrl,
+  sendParsedToServer: sendParsedToServer
 };  

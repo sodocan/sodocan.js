@@ -5,12 +5,12 @@ var parsedToHTML = function(jsonString) {
   var jsonData = JSON.parse(jsonString);
 
   // compile header HTML
-  var headerSource = fs.readFileSync(__dirname + '/headerHTMLTemplate.html').toString();
+  var headerSource = fs.readFileSync(__dirname + '/../parserTemplates/headerHTMLTemplate.html').toString();
   var headerTemplate = Handlebars.compile(headerSource);
   var headerHTMLString = headerTemplate(jsonData.header);
 
   // compile body HTML
-  var bodySource = fs.readFileSync(__dirname + '/bodyHTMLTemplate.html').toString();
+  var bodySource = fs.readFileSync(__dirname + '/../parserTemplates/bodyHTMLTemplate.html').toString();
   var bodyTemplate = Handlebars.compile(bodySource);
   var bodyHTMLString = '';
   console.log('length of body array: ', jsonData.body.length);
