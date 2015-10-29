@@ -15,6 +15,7 @@ Icon
 .Spotlight-V100
 .Trashes
 node_modules/
+bower_components/
 db/
 client/lib
 

@@ -1,0 +1,84 @@
+.side-nav {
+  padding-top: 110px;
+  z-index: 0;
+}
+.side-nav li{
+  height: 30px;
+}
+.side-nav a{
+  line-height: 30px;
+}
+.thin{
+  height: 20px !important;
+  line-height: 20px;
+}
+.main{
+  padding-left: 260px;
+  padding-top: 30px;
+}
+.contextBtn{
+  padding: 0 2px;
+  height: 20px;
+  line-height: 20px;
+  vertical-align: top;
+}
+.card {
+  margin: 0.2rem 0 0.2rem 0;
+}
+.card h3{
+  margin-top: 0;
+}
+.tint{
+  opacity: 0.3;
+  cursor: pointer;
+  transition: opacity 0.5s;
+}
+.tint:hover{
+  opacity: 1;
+  transition: opacity 0.5s;
+}
+.card h6{
+  font-size: 1.3rem;
+  font-weight: 500;
+  display: inline-block;
+}
+.upvote{
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+.upvote i, .upvoteComments i{
+  cursor: pointer;
+}
+.explanation-text{
+  padding-left: 15px;
+}
+.comments{
+  padding-left: 10px;
+  padding-right: 5px;
+  margin-left: 20px;
+  margin-right: 50px;
+}
+.post{
+  width: 80%;
+  display: inline-block;
+}
+.upvoteComments{
+  width: 20%;
+  float: right;
+  text-align: right;
+}
+.inline{
+  display: inline-block;
+}
+.suggest{
+  font-weight: 300;
+  font-size: .9rem;
+}
+.off{
+  background-color: gray;
+}
+.submit{
+  position: relative;
+  left: 50%;
+}
+
