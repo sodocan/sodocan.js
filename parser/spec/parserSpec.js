@@ -1,21 +1,25 @@
 var expect = require('chai').expect;
-var docParser = require('../parser.js');
-var parsedToHTML = require('../parsedToHTML.js');
 var fs = require('fs');
 
-var findCommentBlocks = docParser.findCommentBlocks;
-var parseCommentBlock = docParser.parseCommentBlock;
-var splitEntries = docParser.splitEntries;
-var processEntry = docParser.processEntry;
-var properties = docParser.properties;
-var convertToJS = docParser.convertToJS;
-var parseComments = docParser.parseComments;
-var findFunctionInfo = docParser.findFunctionInfo;
-var parseMain = docParser.parseMain;
-var buildExplanations = docParser.buildExplanations;
-var parseHeader = docParser.parseHeader;
-var combineInfo = docParser.combineInfo;
-var constructGroupClassAndIndex = docParser.constructGroupClassAndIndex;
+var docParser = require('../parser.js');
+var parsedToHTML = require('../parserUtils/parsedToHTML.js');
+var helper = require('../parserUtils/parserHelper.js');
+var parseAndCombine = require('../parserUtils/parseAndCombine.js');
+
+var findCommentBlocks = helper.findCommentBlocks;
+var splitEntries = helper.splitEntries;
+var parseCommentBlock = helper.parseCommentBlock;
+var processEntry = helper.processEntry;
+var convertToJS = helper.convertToJS;
+var buildExplanations = helper.buildExplanations;
+var constructGroupClassAndIndex = helper.constructGroupClassAndIndex;
+var properties = helper.properties;
+
+var combineInfo = parseAndCombine.combineInfo;
+var parseFunctionInfo = parseAndCombine.parseFunctionInfo;
+var parseComments = parseAndCombine.parseComments;
+var parseMain = parseAndCombine.parseMain;
+var parseHeader = parseAndCombine.parseHeader;
 
 var fixtures = fs.readFileSync('./spec/fixtures.js').toString();
 var parsedJSON = fs.readFileSync('./spec/parsedJSON.json').toString();
@@ -24,11 +28,6 @@ describe("documentation parser basic function", function() {
   var test;
   beforeEach(function () {
     test = '';
-  });
-  
-  it("should contain functions findCommentBlock and parseCommentBlock", function() {
-    expect(typeof findCommentBlocks).to.equal('function');
-    expect(typeof parseCommentBlock).to.equal('function');
   });
 
   it("should be able to find a comment block denotated by /** and */", function() {
@@ -118,7 +117,7 @@ describe("documentation parser basic function", function() {
   });
 
   it("should parse the names of functions even without comments", function() {
-    var results = findFunctionInfo(fixtures);
+    var results = parseFunctionInfo(fixtures);
     // console.log('result of function names: ', results);
     expect(results.length).to.equal(8);
     expect(results[0].functionName).to.equal('goldfish');
@@ -159,21 +158,21 @@ describe("documentation parser basic function", function() {
   });
 
   it("should have same length as old combineInfo", function() {
-    var funcInfo = findFunctionInfo(fixtures);
+    var funcInfo = parseFunctionInfo(fixtures);
     var commentInfo = parseComments(fixtures);
     expect(combineInfo(funcInfo, commentInfo).length).to.equal(8);
   });
 
   it("should grab the functionName from the JavaScript function following a comment block" +
     "if none is provided in the comment", function() {
-    var funcInfo = findFunctionInfo(fixtures);
+    var funcInfo = parseFunctionInfo(fixtures);
     var commentInfo = parseComments(fixtures);
     var combined = combineInfo(funcInfo, commentInfo);
     expect(combined[0].functionName).to.equal('goldfish');
   });
 
   it("should grab the params from the JS following a comment without params", function() {
-    var funcInfo = findFunctionInfo(fixtures);
+    var funcInfo = parseFunctionInfo(fixtures);
     var commentInfo = parseComments(fixtures);
     var combined = combineInfo(funcInfo, commentInfo);
     //console.log('COMBINED: ', combined);

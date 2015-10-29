@@ -28,6 +28,7 @@
     "morgan": "~1.6.1",
     "nodemon": "^1.2.1",
     "request": "^2.34.0",
+    "request-promise": "^1.0.2",
     "serve-favicon": "~2.3.0"
   }
 }

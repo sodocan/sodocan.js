@@ -4,20 +4,19 @@
   "description": "",
   "main": "parser.js",
   "preferGlobal": true,
-  "author": {
-    "name": "sodocan.js",
-    "url": "sodocan.herokuapp.com"
-  }, 
-  "contributors": [{
-    "name": "Lai 'Lain' Jiang",
-    "email": "lain.lai.jiang@gmail.com",
-    "url": "lainjiang.io"
-  },
-  {
-    "name": "Leo Thorp",
-    "email": "leo.thorp1@gmail.com",
-    "url": "leothorp.com"
-  }],
+  "author": "",
+  "contributors": [
+    {
+      "name": "Lai 'Lain' Jiang",
+      "email": "lain.lai.jiang@gmail.com",
+      "url": "lainjiang.io"
+    },
+    {
+      "name": "Leo Thorp",
+      "email": "leo.thorp1@gmail.com",
+      "url": "leothorp.com"
+    }
+  ],
   "files": [
     "parser.js",
     "parsedToHTML.js",
@@ -32,13 +31,13 @@
     "handlebars": "^4.0.3"
   },
   "devDependencies": {
+    "babel": "^5.8.29",
     "chai": "^3.3.0",
     "mocha": "^2.3.3",
     "sinon": "^1.17.1"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha spec --bail --reporter nyan"
+    "test": "./node_modules/.bin/mocha spec/parserSpec.js --bail --reporter nyan --compilers js:babel/register"
   },
-  "author": "",
   "license": "ISC"
 }
