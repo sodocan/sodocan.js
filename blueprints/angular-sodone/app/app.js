@@ -1,5 +1,5 @@
 
-var app = angular.module('sodone',['sodocan'])
+var app = angular.module('sodocan')
 .directive('sodocanApp', function() {
   return {
     restrict: 'A',
@@ -14,5 +14,9 @@ var app = angular.module('sodone',['sodocan'])
     console.log('path', path); 
     $scope.contentDisp = path;
   };
+  $scope.$on('globalContextButton', function(event, context,state){
+    $scope.$broadcast('localContextButton', context, state); 
+    console.log('app listened');
+  });
   $scope.$watch('sodocanRoute()',update);
 }]);

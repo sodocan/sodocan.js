@@ -1,4 +1,4 @@
-angular.module('sodone')
+angular.module('sodocan')
 .directive('sodocanComment',function(){
   return{
     retrict: 'A',
@@ -8,5 +8,8 @@ angular.module('sodone')
 })
 .controller('sodocanCommentCtrl',['$scope','sodocanAPI','sodocanRouter',
   function($scope, sodocanAPI, sodocanRouter){
-    console.log($scope);
+    console.log('comments',$scope);
+    $scope.upvote = function(){
+      $scope.comment.upvotes++;
+    };
 }]);

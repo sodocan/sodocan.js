@@ -1,4 +1,4 @@
-angular.module('sodone')
+angular.module('sodocan')
 .directive('sodocanSidebar', function(){
   return {
     restrict: 'A',
@@ -8,5 +8,6 @@ angular.module('sodone')
 })
 .controller('sodocanSidebarCtrl',['$scope', 'sodocanAPI', 'sodocanRouter',
   function($scope, sodocanAPI, sodocanRouter){
+    console.log(sodocanAPI.docs);
     $scope.allMethods = Object.keys(sodocanAPI.docs); 
 }]);

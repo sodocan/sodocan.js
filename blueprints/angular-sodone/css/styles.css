@@ -77,3 +77,8 @@
 .off{
   background-color: gray;
 }
+.submit{
+  position: relative;
+  left: 50%;
+}
+
