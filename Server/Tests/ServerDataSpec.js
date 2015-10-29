@@ -34,6 +34,8 @@ global.log = function() {
   console.log('*************************');
 };
 
+var expectNum = 0;
+
 // Begin tests
 describe("Server", function() {
 
@@ -68,6 +70,7 @@ describe("Server", function() {
       it("should parse path " + path, function(done) {
         var expectedObj = parsePathCases[path];
         var returnedObj = helpers.parseApiPath(path);
+        log('expectNum', ++expectNum);
         expect(returnedObj).to.deep.equal(expectedObj);
         done();
       });
@@ -80,6 +83,7 @@ describe("Server", function() {
     it("should convert parser output objects to the DB form", function(done) {
       var convertFormCase = testCases.convertFormCase;
       var actualForm = helpers.convertToDBForm.apply(null, convertFormCase.inputs);
+      log('expectNum', ++expectNum);
       expect(actualForm).to.deep.equal(convertFormCase.expectedOutput);
       done();
     });
@@ -102,6 +106,7 @@ describe("Server", function() {
         };
 
         request(options, function(error, res, body) {
+          log('expectNum', ++expectNum);
           expect(res.statusCode).to.equal(202);
 
           methodsDB.find({project: 'testProj'}).sort({functionName: 1}).lean().exec(function(err, references) {
@@ -112,6 +117,7 @@ describe("Server", function() {
                 delete references[j]['_id'];
               }
 
+              log('expectNum', ++expectNum);
               expect(references).to.deep.equal(parserPostExpectedReturns[i]);
               done();
             }
@@ -143,10 +149,12 @@ describe("Server", function() {
             console.error(error);
           }
           body = JSON.parse(body);
+          log('expectNum', ++expectNum);
           expect(Array.isArray(body)).to.be.true;
           for (var j = 0; j < body.length; j++) {
             delete body[j]['_id'];
           }
+          log('expectNum', ++expectNum);
           expect(body).to.deep.equal(getValidCases[path]);
           done();
         });
@@ -168,6 +176,7 @@ describe("Server", function() {
           // this is an intentionally failing test
           // because if this if statement got triggered
           // the test should fail
+          log('expectNum', ++expectNum);
           expect(i).to.equal('should send 404');
           return;
         }
@@ -178,11 +187,13 @@ describe("Server", function() {
         var promise = reqprom(getOptions)
           .then(function(res) {
             log('Did not get 404', path);
+            log('expectNum', ++expectNum);
             expect(res.statusCode).to.equal(404);
           })
           .catch(function(res) {
             if (res.statusCode) {
               //log('successfully errored');
+              log('expectNum', ++expectNum);
               expect(res.statusCode).to.equal(404);
               return i + 1;
             }
@@ -219,6 +230,7 @@ describe("Server", function() {
         getOptions.uri = addEntryCase.getUri;
         reqprom(postOptions)
           .then(function(res) {
+            log('expectNum', ++expectNum);
             expect(res.statusCode).to.equal(202);
             return reqprom(getOptions);
           })
@@ -235,6 +247,7 @@ describe("Server", function() {
                 delete additions[j].timestamp;
               }
             }
+            log('expectNum', ++expectNum);
             expect(ref).to.deep.equal(addEntryCase.expectedRef);
           })
           .then(done)
@@ -259,12 +272,14 @@ describe("Server", function() {
         getOptions.uri = upvoteCase.getUri;
         reqprom(postOptions)
           .then(function(res) {
+            log('expectNum', ++expectNum);
             expect(res.statusCode).to.equal(202);
             postOptions.uri = 'http://localhost:3000/upvote'
             postOptions.json = upvoteCase.upvoteJson;
             return reqprom(postOptions);
           })
           .then(function(res) {
+            log('expectNum', ++expectNum);
             expect(res.statusCode).to.equal(202);
             return reqprom(getOptions);
           })
@@ -282,6 +297,7 @@ describe("Server", function() {
               }
             }
             log('ref', JSON.stringify(ref));
+            log('expectNum', ++expectNum);
             expect(ref).to.deep.equal(upvoteCase.expectedRef);
           })
           .then(done)
@@ -307,6 +323,7 @@ describe("Server", function() {
             log('Test Fail', 'Did not send 404 for duplicate ' + duplicateEntryCase.type);
           })
           .catch(function(res) {
+            log('expectNum', ++expectNum);
             expect(res.statusCode).to.equal(404);
             done();
           })

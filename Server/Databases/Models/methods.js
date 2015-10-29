@@ -1,4 +1,4 @@
-var db = require('../dbconnection.js');
+// var db = require('../dbconnection.js');
 console.log('methodsDB getting created');
 var mongoose = require('mongoose');
 var testObjs = require('./dummyData').methodsData;
@@ -12,7 +12,7 @@ var MethodSchema = new mongoose.Schema({
 });
 console.log('schema got created');
 MethodSchema.index({project: 1, functionName: 1});
-var methodsModel =  mongoose.model('methods', MethodSchema);
+var methodsModel =  mongoose.model('Method', MethodSchema);
 
 
 var insertObjs = function(objs){ //inserts dummy data

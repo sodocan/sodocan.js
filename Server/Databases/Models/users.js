@@ -1,12 +1,17 @@
-var db = require('../dbconnection.js');
+// var db = require('../dbconnection.js');
+var mongoose = require('mongoose');
+var passportLocalMongoose = require('passport-local-mongoose');
 
-var UserSchema = new db.Schema({
+var UserSchema = new mongoose.Schema({
   username: {type: String, required: true},
-  password: {type: String, required: true},
+  password: {type: String},
   karma: {type: Number, default: 0},
-  explanations: {type: Array, default: []},
-  additions: {type: Array, default: []}
+  // explanations: {type: Array, default: []},
+  // additions: {type: Array, default: []}
 });
+
+UserSchema.plugin(passportLocalMongoose);
+
 
 /* explanations: [
   {
@@ -65,4 +70,4 @@ UserSchema.pre('save', function (next) {
   });
 });
 */
-module.exports = mongoose.model('users', UserSchema);
+module.exports = mongoose.model('User', UserSchema);
