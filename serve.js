@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var PORT=4000;
 var DIR=__dirname+'/blueprints';
-var TEMPLATE = 'angular-sodone';
+var TEMPLATE = 'angular-plain';
 var headers = {'Access-Control-Allow-Origin':'*'};
 
 var countfor = {};
@@ -96,14 +96,14 @@ function handleRequest(req,res) {
     res.end(ret);
   }
   var filePath = DIR+req.url;
-
+  
   var pos = filePath.search(/underscore/);
   if (pos>-1) {
     var path = filePath.substr(pos+10);
     filePath = DIR+'/'+path;
   };
 
-  if (!/(html|js|css|png)$/.test(req.url)) {
+  if (!/(html|js|css)$/.test(req.url)) {
     filePath = DIR+'/'+TEMPLATE+'/index.html';
   }
   if(/favicon\.ico$/.test(req.url)) {
