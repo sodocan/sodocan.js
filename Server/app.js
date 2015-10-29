@@ -9,6 +9,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var GitHubStrategy = require('passport-github').Strategy;
 var authConfig = require('./authenticationConfig');
 var expressSession = require('express-session');
+var everyauth = require('everyauth');
 
 //var crowdsourceRouter = require('./Routes/crowdsource');
 var usersRouter = require('./Routes/users');
@@ -31,8 +32,10 @@ app.use(expressSession({
   resave: false,
   saveUninitialized: false
 }));
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(everyauth.middleware(app));
+
+// app.use(passport.initialize());
+// app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'StaticPages'))); // will this be used?
 
 var User = require('./Databases/Models/users.js');
