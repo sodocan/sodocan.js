@@ -6,6 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var GitHubStrategy = require('passport-github2').Strategy;
+var authConfig = require('./authenticationConfig');
 var expressSession = require('express-session');
 
 //var crowdsourceRouter = require('./Routes/crowdsource');
@@ -35,18 +37,40 @@ app.use(express.static(path.join(__dirname, 'StaticPages'))); // will this be us
 
 var User = require('./Databases/Models/users.js');
 passport.use(new LocalStrategy(User.authenticate()));
+
+passport.use(new GitHubStrategy({
+  clientID: authConfig.github.clientID,
+  clientSecret: authConfig.github.clientSecret,
+  callbackURL: authConfig.github.callbackURL
+}, function(accessToken, refreshToken, profile, done) {
+  console.log('done(): ', done);
+  // process.nextTick(function() {
+  //   return done(null, profile);
+  // });
+  User.findOrCreate({githubId: profile.id}, function(error, user) {
+    console.log('error', error);
+
+    return done(error, user);
+  });
+}));
+
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 
 // app.use('/users', usersRouter); // might change later to not use router
-app.use('/users', usersRouter);
+app.use('/auth', usersRouter);
 
+app.use(function(err, req, res, next) {
+  console.error(err);
+  next();
+});
 
 app.get('/api/*', handlers.getApi);
 app.post('/create', handlers.postSkeleton);
 app.post('/upvote', handlers.upvote);
 app.post('/addEntry', handlers.addEntry);
+
 //NOTE: figure out best practices for above route
 
 // TODO: fit this in better, CORS for POSTing

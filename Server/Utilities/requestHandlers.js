@@ -25,6 +25,8 @@ exports.postSkeleton = function(req, res) {
   }
 };
 
+
+
 exports.upvote = function(req, res) {
   helpers.upvote(req.body, res);
 };
@@ -74,17 +76,35 @@ exports.registerGetHandler = function(req, res, next) {
 };
 
 exports.registerPostHandler = function(req, res, next) {
+  console.log(req.body);
   User.register(new User({username: req.body.username}), req.body.password, function(err, user) {
     if (err) {
+      console.log(err);
       console.log('registration error!!');
       res.sendStatus(400);
       res.end();
       return;
     }
+    log('user', user);
     passport.authenticate('local')(req, res, function() {
       res.redirect('/');
     });
-
-
   });
-}
+};
+
+exports.checkIfAuthenticated = function(req, res, next) {
+  if (req.user) {
+    //next(req, res);
+    next();
+  } else {
+    // for now will just redirect, but eventually might want to
+    // change it to an error callback for situations where we
+    // might not want to redirect to the login page
+    res.redirect('/users/login');
+  }
+};
+
+exports.logoutHandler = function(req, res, next) {
+  req.logout();
+  res.redirect('/users/login');
+};
