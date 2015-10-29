@@ -46,9 +46,15 @@
           <div style="right:0">
             
                 <ul>
-                  <li ><a class="waves-effect btn contextBtn off">EX</a></li>
-                  <li ><a class="waves-effect btn contextBtn off">DE</a></li>
-                  <li ><a class="waves-effect btn contextBtn off ">TI</a></li>
+                  <li class="right">
+                    <a ng-class="styles.descriptions.style" ng-click="clickedContext('descriptions')" class="waves-effect waves-light btn contextBtn">DE</a>
+                  </li>
+                  <li class="right">
+                    <a ng-class="styles.examples.style" ng-click="clickedContext('examples')" class="waves-effect waves-light btn contextBtn">EX</a>
+                  </li>
+                  <li class="right">
+                    <a ng-class="styles.tips.style" ng-click="clickedContext('tips')" class="waves-effect waves-light btn contextBtn">TI</a>
+                  </li>                
                 </ul>
           </div>
           </div>

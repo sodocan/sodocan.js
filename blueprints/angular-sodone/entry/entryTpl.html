@@ -1,7 +1,7 @@
 <div class="row" ng-controller="sodocanEntryCtrl">
   <div class="col s10">
     <div style="float:left">
-      <img src="../angular-sodone/images/respond.png" height=15 class="tint"> </img>
+      <img ng-click="toggleTextArea()" src="../angular-sodone/images/respond.png" height=15 class="tint"> </img>
     </div>
     <div class="explanation-text">
       {{entry.text}}
@@ -11,11 +11,22 @@
         <div sodocan-comment>
       </div>
     </div>
+    <div ng-repeat="comment in tempComments">
+      <div sodocan-comment>
+      </div>
+    </div>
+    <form>
+    <div class="input-field" ng-hide="hideTextArea">
+      <textarea id="textArea{{$id}}" ng-model="commentText" class="materialize-textarea"></textarea>
+      <label for="textArea{{$id}}">Your comment for this entry</label>
+      <a ng-click="submitComment()" href="#" class="btn submit">Submit</a>
+    </div>
+  </form>
   </div>
 </div>
   <div class="col s1 upvote">
     {{entry.upvotes}}
-    <i class="material-icons tiny">navigation</i>
+    <i ng-click="upvote()" class="material-icons tiny">navigation</i>
   </div>
 </div>
 

@@ -17,8 +17,39 @@ angular.module( 'sodocan', [])
   
   // Takes context objects, such as from router or controllers,
   // and returns it as API URL string
-  var objToUrl = function() {
-    // TODO: pull logic out of getFuncs
+  // Slight misnomer, also accepts arguments array in the format:
+  // [ref,entry#,add#,cb]
+  var objToUrl = function(toConvert) {
+
+    // arguments
+    if (Array.isArray(toConvert)) {
+      var ref,entryNum,commentNum,cb;
+      if (typeof toConvert[0] === 'function' || !toConvert[0]) {
+        ref = '';
+        entryNum = -1;
+        commentNum = -1;
+        cb = toConvert[0] || function(){};
+      } else if (typeof toConvert[1] === 'function') {
+        entryNum = 1;
+        commentNum = 1;
+        cb = toConvert[1];
+      } else if (typeof toConvert[2] === 'function') {
+        entryNum = toConvert[1];
+        commentNum = 1;
+        cb = toConvert[2];
+      } else if (toConvert.length===4) {
+        entryNum = toConvert[1];
+        commentNum = toConvert[2];
+        cb = toConvert[3];
+      } else {
+        // TODO: WARNING: Fails silently on malformed input
+        return 'ERROR';
+      }
+      if (entryNum===-1) entryNum = 'all';
+      if (commentNum===-1) commentNum = 'all';
+    }
+
+      return built;
   };
 
   // Handle HTTP request to API here; requests project if not passed
@@ -48,10 +79,7 @@ angular.module( 'sodocan', [])
 
   // Shorthand to allow one query for multiple, varying context data
   obj.getReference = function(refObj,cb) {
-    $http.get(projectURL+ref).success(function(data) {
-      obj.docs = data;
-      if (typeof cb === 'function') cb(null,data);
-    });
+    // TODO: getRef shorthand
   };
 
   obj.getDescriptions = function(ref) {
@@ -78,7 +106,7 @@ angular.module( 'sodocan', [])
       
       if (err) cb(err);
       
-      obj.docs[ref] = data[0];
+      obj.docs[ref].explanations.descriptions = data[0].explanations.descriptions;
       cb(null,obj.docs[ref].explanations.descriptions);
 
     });
@@ -108,24 +136,33 @@ angular.module( 'sodocan', [])
       
       if (err) cb(err);
       
-      obj.docs[ref] = data[0];
+      obj.docs[ref].explanations.examples = data[0].explanations.examples;
       cb(null,obj.docs[ref].explanations.examples);
 
     });
   };
 
-  obj.getTips = function(ref) {
+  obj.getTips = function() {
 
-    var entryNum,commentNum,cb;
-    if (typeof arguments[1] === 'function') {
+    var ref,entryNum,commentNum,cb;
+
+    if (typeof arguments[0] === 'function' || !arguments[0]) {
+      ref = '';
+      entryNum = -1;
+      commentNum = -1;
+      cb = arguments[0] || function(){};
+    } else if (typeof arguments[1] === 'function') {
+      ref = arguments[0];
       entryNum = 1;
       commentNum = 1;
       cb = arguments[1];
     } else if (typeof arguments[2] === 'function') {
+      ref = arguments[0];
       entryNum = arguments[1];
       commentNum = 1;
       cb = arguments[2];
     } else if (arguments.length===4) {
+      ref = arguments[0];
       entryNum = arguments[1];
       commentNum = arguments[2];
       cb = arguments[3];
@@ -134,30 +171,61 @@ angular.module( 'sodocan', [])
       return;
     }
     if (entryNum===-1) entryNum = 'all';
+    if (commentNum===-1) commentNum = 'all';
 
     getFromAPI('ref/'+ref+'/tips/'+entryNum+'/'+commentNum,function(err,data) {
       
       if (err) cb(err);
       
-      obj.docs[ref] = data[0];
+      obj.docs[ref].explanations.tips = data[0].explanations.tips;
       cb(null,obj.docs[ref].explanations.tips);
 
     });
   };
 
-  // additions
-  obj.getComments = function(entryID,cb) {
+  // additions TODO: needs everything passed, this format needs to be rethought
+  // no easy way to update larger docs object from an entryID
+  obj.getComments = function(context,entryID,commentNum,cb) {
     
-    
+    getFromAPI(context+'/'+entryID+'/'+commentNum,function(err,data) {
+      if (err) cb(err);
+
+      cb(null,data[0]);
+    });
 
   };
 
   // API.refreshTop requeries initial load, replaces existing docs object
   // Inefficiently allows for top-level settings changes
-  obj.refreshTop = function(cb) {
-    $http.get(projectURL).success(function(data) {
-      obj.docs = data;
-      if (typeof cb === 'function') cb(null,data);
+  obj.refreshTop = function(refObj,cb) {
+    if (refObj['ref']) {
+      var ref = 'ref/'+refObj['ref']+'/';
+    } else {
+      var ref = '';
+    }
+    var contextURL = '';
+    if (refObj.context && !refObj.context.ref) {
+      var contexts = Object.keys(refObj.context);
+      for (var i=0; i<contexts.length;i++) {
+        contextURL += refObj.context[contexts[i]].reduce(function(a,c) {
+          c = (c===-1)?'all':c;
+          return a+'/'+c;
+        },contexts[i]);
+        contextURL += '/';
+      }
+    } else {
+      if (refObj.context && refObj.context.ref) {
+        contextURL += refObj.context.ref.reduce(function(a,c) {
+          c = (c===-1)?'all':c;
+          return a+'/'+c;
+        },'');
+      }
+    }
+
+    getFromAPI(ref+contextURL,function(err,data) {
+      if (err) cb(err);
+      obj.docs[ref] = data[0];
+      cb(null,obj.docs[ref]);
     });
   };
 
@@ -260,6 +328,7 @@ angular.module( 'sodocan', [])
   return obj;
 }])
 
+// TODO: provider
 .factory('sodocanRouter', ['$location', '$http','$rootScope','sodocanAPI',
                            function($location,$http,$rootScope,sodocanAPI) {
   var contexts = {
@@ -294,7 +363,7 @@ angular.module( 'sodocan', [])
           if (obj.route.context[context]<2) obj.route.context[context].push(piece);
         } else {
           if(!obj.route.context['ref']) obj.route.context['ref']=[];
-          if (obj.route.context['ref']<2) obj.route.context['ref'].push(piece);
+          if (obj.route.context['ref'].length<2) obj.route.context['ref'].push(piece);
         }
       } else {
         obj.route.ref = piece;
@@ -322,9 +391,44 @@ angular.element(document).ready(function() {
     var $initInjector = angular.injector(['ng']);
     var $http = $initInjector.get('$http');
 
-    var project = window.location.pathname.split('/')[1];
+    // 99% of this can be eaten by a RouteProvider
+    var path = window.location.pathname.split('/').filter(function(val) {
+      return !(val==='');
+    });
+    var project = path.shift();
+    var piece,context,route = {};
+    route.context = {};
+    var contexts = {
+      'descriptions':true,
+      'tips':true,
+      'examples':true
+    };
+    while (path.length>0) {
+      piece = path.shift();
+      if (contexts[piece]) {
+        route.context[piece] = [];
+        context = piece;
+      } else if (isFinite(piece)) {
+        // only numbers in actual URL to avoid ambiguity
+        if (piece==='-1') piece='all';
+        if (context!==undefined) {
+          if (route.context[context]<2) route.context[context].push(piece);
+        } else {
+          if(!route.context['ref']) route.context['ref']=[];
+          if (route.context['ref'].length<2) route.context['ref'].push(piece);
+        }
+      } else {
+        route.ref = piece;
+      }
+    }
 
-    $http.get(API_HOME+project).then(
+    var entryadds ='';
+    if (route.context['ref'] && route.context['ref'].length) {
+      entryadds = route.context['ref'].reduce(function(a,c) {
+        return a+'/'+c;
+      },'');
+    }
+    $http.get(API_HOME+project+entryadds).then(
       function(resp) {
         var ret = {docs:{}};
         var projName;
@@ -337,6 +441,7 @@ angular.element(document).ready(function() {
         });
         angular.module('sodocan').constant('projectName',projName);
         angular.module('sodocan').constant('sodocanInit',ret);
-        angular.bootstrap(document,['sodocan']);
+        var app = window.sodocanApp || 'sodocan';
+        angular.bootstrap(document,[app]);
       });
 });

@@ -1,4 +1,4 @@
-angular.module('sodone')
+angular.module('sodocan')
 .directive('sodocanMethod', function(){
   return {
     restrict: 'A',
@@ -31,6 +31,45 @@ angular.module('sodone')
     }
     return result; 
   };
+
+  $scope.styles = {
+    'descriptions':{
+      'on': false,
+      'style': ''
+    },
+    'tips':{
+      'on': false,
+      'style': ''
+    },
+    'examples':{
+      'on': false,
+      'style': ''
+    }
+  };
+
+  $scope.entriesNum = 1;
+  $scope.commentsNum = 1; 
+
+  $scope.$on('localContextButton', function(event, context, state){
+    $scope.clickedContext(context, state);
+  });
+
+  $scope.clickedContext = function(context, state){
+    if(state){
+      console.log("state");
+      $scope.styles[context].on = state;
+    }else{
+      console.log('non state');
+      $scope.styles[context].on = !$scope.styles[context].on;
+    }
+    if(!$scope.styles[context].on){
+      $scope.styles[context].style = '';
+    }
+    else{
+      $scope.styles[context].style = 'off';    
+    }
+  };
+
   // console.log('methods:',$scope.method);
   // console.log('$scope:',$scope);
   // sodocanAPI.getDescriptions($scope.method.functionName,5,5, function(err,data){
