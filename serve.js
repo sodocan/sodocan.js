@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var PORT=4000;
 var DIR=__dirname+'/blueprints';
-var TEMPLATE = 'angular-plain';
+var TEMPLATE = 'angular-sodone';
 var headers = {'Access-Control-Allow-Origin':'*'};
 
 var countfor = {};
@@ -103,7 +103,7 @@ function handleRequest(req,res) {
     filePath = DIR+'/'+path;
   };
 
-  if (!/(html|js|css)$/.test(req.url)) {
+  if (!/(html|js|css|png)$/.test(req.url)) {
     filePath = DIR+'/'+TEMPLATE+'/index.html';
   }
   if(/favicon\.ico$/.test(req.url)) {
