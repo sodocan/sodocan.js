@@ -11,7 +11,7 @@ router.get('/', handlers.checkIfAuthenticated, function(req, res, next) {
 router.get('/login', handlers.loginGetHandler)
   .post('/login', passport.authenticate('local', {
   successRedirect: '/',
-  failureRedirect: '/users/login'
+  failureRedirect: '/auth/login'
 }), handlers.loginPostHandler);
 
 router.get('/register', handlers.registerGetHandler)
@@ -25,9 +25,13 @@ router.get('/github',
     log('github next got run');
 });
 
-router.get('/github/callback', passport.authenticate('github', {
-  failureRedirect: '/login'
-}), function(req, res) {
+var authenticateFunction = passport.authenticate('github', {
+  failureRedirect: '/auth/login'
+});
+
+// console.log(authenticateFunction.toString());
+
+router.get('/github/callback', authenticateFunction, function(req, res) {
   log('callback authentication finished and next handler has run');
   res.redirect('/');
 });

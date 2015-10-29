@@ -29,6 +29,7 @@
     "morgan": "~1.6.1",
     "nodemon": "^1.2.1",
     "passport": "^0.3.0",
+    "passport-github": "^1.0.0",
     "passport-github2": "^0.1.9",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^3.1.0",

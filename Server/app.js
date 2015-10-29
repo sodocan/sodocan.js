@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var GitHubStrategy = require('passport-github2').Strategy;
+var GitHubStrategy = require('passport-github').Strategy;
 var authConfig = require('./authenticationConfig');
 var expressSession = require('express-session');
 
@@ -42,27 +42,47 @@ passport.use(new GitHubStrategy({
   clientID: authConfig.github.clientID,
   clientSecret: authConfig.github.clientSecret,
   callbackURL: authConfig.github.callbackURL
-}, function(accessToken, refreshToken, profile, done) {
-  console.log('done(): ', done);
-  // process.nextTick(function() {
-  //   return done(null, profile);
-  // });
-  User.findOrCreate({githubId: profile.id}, function(error, user) {
-    console.log('error', error);
+// }, function(accessToken, refreshToken, profile, done) {
+//   console.log('done(): ', done);
+//   // process.nextTick(function() {
+//   //   return done(null, profile);
+//   // });
+//   User.findOrCreate({githubId: profile.id}, function(error, user) {
+//     console.log('error', error);
 
-    return done(error, user);
+//     return done(error, user);
+//   });
+// }
+}, function(accessToken, refreshToken, profile, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+
+    // To keep the example simple, the user's GitHub profile is returned to
+    // represent the logged-in user.  In a typical application, you would want
+    // to associate the GitHub account with a user record in your database,
+    // and return that user instead.
+    return done(null, profile);
   });
 }));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+// passport.serializeUser(function(user, done) {
+//   done(null, user);
+// });
 
+// passport.deserializeUser(function(obj, done) {
+//   done(null, obj);
+// });
 
 // app.use('/users', usersRouter); // might change later to not use router
 app.use('/auth', usersRouter);
 
 app.use(function(err, req, res, next) {
+  console.log(err);
   console.error(err);
+  console.error(new Error('404').stack);
+  console.log('next: ', next);
   next();
 });
 

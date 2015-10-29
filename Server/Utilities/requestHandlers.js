@@ -100,11 +100,11 @@ exports.checkIfAuthenticated = function(req, res, next) {
     // for now will just redirect, but eventually might want to
     // change it to an error callback for situations where we
     // might not want to redirect to the login page
-    res.redirect('/users/login');
+    res.redirect('/auth/login');
   }
 };
 
 exports.logoutHandler = function(req, res, next) {
   req.logout();
-  res.redirect('/users/login');
+  res.redirect('/auth/login');
 };
