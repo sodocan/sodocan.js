@@ -12,16 +12,16 @@ var send404 = exports.send404 = function(res, errorMessageOrObj) {
   res.status(404).end();
 };
 
-var sendReferences = exports.sendReferences = function(ref, res){
+var sendReferences = exports.sendReferences = function(ref, res) {
   res.setHeader('Access-Control-Allow-Origin','*');
   res.send(ref);
 }; // pointless, just do res.send(ref) wherever this was called
 
-var mongoUpdateSuccess = exports.mongoUpdateSuccess = function(res){
+var mongoUpdateSuccess = exports.mongoUpdateSuccess = function(res) {
   res.sendStatus(202);
 }; // pointless, will get rid of this
 
-var mongoUpdateFailure = exports.mongoUpdateFailure = function(res, err){
+var mongoUpdateFailure = exports.mongoUpdateFailure = function(res, err) {
   console.error(err);
   res.sendStatus(404);
 }; // pointless, replace with send404
