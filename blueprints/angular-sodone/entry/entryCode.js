@@ -8,20 +8,19 @@ angular.module('sodocan')
 })
 .controller('sodocanEntryCtrl',['$scope', 'sodocanAPI', 'sodocanRouter',
   function($scope, sodocanAPI, sodocanRouter){
-    console.log($scope);
     $scope.upvote = function(){
       $scope.entry.upvotes++;
     };
 
     $scope.tempComments = []; 
-    pushLocalComment = function(){
+    $scope.pushLocalComment = function(){
       var theComment = {
         text: $scope.commentText,
         upvotes: 0
       };
-      $scope.$apply(function(){
-        tempComments.push(theComment);
-      });  
+      console.log($scope);
+      console.log($scope.commentText);
+      $scope.tempComments.push(theComment);  
     };
 
     $scope.hideTextArea = true; 
@@ -31,12 +30,11 @@ angular.module('sodocan')
 
     $scope.submitComment = function(){
       if($scope.commentText){
-        console.log("submitting");
         // sodocanAPI.newComment($scope.entry.entryID, $scope.methodName,
         //  $scope.explanationType, $scope.commentText);
-        pushLocalComment(); 
-        //$scope.commentText = ''; 
-        //$scope.toggleTextArea();
+        $scope.pushLocalComment(); 
+        $scope.commentText = ''; 
+        $scope.toggleTextArea();
       }  
     };
 }]);

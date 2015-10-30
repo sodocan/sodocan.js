@@ -2,6 +2,11 @@
 <div ng-controller='sodocanMethodCtrl' class="card grey lighten-4">
   <div class="card-content">
     <span class="col s1"> 
+      <form>
+      <!-- without browser default, 'select' will not render. Angular doesn't play nicely with jQuery (which materialize depends on) -->
+      <select class="browser-default" ng-change="changedEntrySelection()" ng-model="selectedEntryOption" ng-options="option.text for option in entryOptions">
+      </select>
+    </form>
       <div class="grey-text text-lighten-1"><a href="#">Entries</a></div>
       <div class="grey-text text-lighten-1">Comments</div>
     </span>
@@ -10,6 +15,7 @@
       <span>({{printReference('params')}}) {{printReference('returns')}} </span>
       <div ng-repeat='(explanationType, entryArray) in method.explanations'>
         <div sodocan-explanation>
+        </div>
       </div>
     </span>
   </div>
