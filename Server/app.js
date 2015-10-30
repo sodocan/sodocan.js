@@ -27,19 +27,30 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+// app.use(express.methodOverride());
 app.use(expressSession({
   secret: 'secret',
   resave: false,
   saveUninitialized: false
 }));
-app.use(everyauth.middleware(app));
+//app.use(everyauth.middleware(app));
 
-// app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'StaticPages'))); // will this be used?
 
 var User = require('./Databases/Models/users.js');
-passport.use(new LocalStrategy(User.authenticate()));
+//passport.use(new LocalStrategy(User.authenticate()));
+
+//passport.serializeUser(User.serializeUser());
+//passport.deserializeUser(User.deserializeUser());
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
 
 passport.use(new GitHubStrategy({
   clientID: authConfig.github.clientID,
@@ -68,21 +79,17 @@ passport.use(new GitHubStrategy({
   });
 }));
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-// passport.serializeUser(function(user, done) {
-//   done(null, user);
-// });
 
-// passport.deserializeUser(function(obj, done) {
-//   done(null, obj);
-// });
+
+
+
+
 
 // app.use('/users', usersRouter); // might change later to not use router
 app.use('/auth', usersRouter);
 
 app.use(function(err, req, res, next) {
-  console.log(err);
+  // console.log(err);
   console.error(err);
   console.error(new Error('404').stack);
   console.log('next: ', next);
