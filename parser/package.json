@@ -1,6 +1,6 @@
 {
   "name": "sodocan-parser",
-  "version": "0.0.63",
+  "version": "0.0.64",
   "description": "Command line tool to turn your Javascript source code and comments into documentation",
   "main": "parser.js",
   "preferGlobal": true,
