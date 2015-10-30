@@ -9,7 +9,7 @@ It recognizes industry standard keywords such as @param and @description, as ill
 In addition, sodocan-parser can also take comment-less js files and compile a basic list of function names and parameter names. 
 
 [![NPM version](https://badge.fury.io/js/sodocan-parser.svg)](https://npmjs.org/package/sodocan-parser)
-[![Travis Status](https://travis-ci.org/sodocan/sodocan.js/?branch=master)](https://travis-ci.org/sodocan/sodocan.js)
+[![Travis Status](https://travis-ci.org/sodocan/sodocan.js.svg/?branch=master)](https://travis-ci.org/sodocan/sodocan.js)
 
 # Installation
 
