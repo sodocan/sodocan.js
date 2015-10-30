@@ -69,21 +69,11 @@ passport.use(new GitHubStrategy({
 // }
 }, function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
-    process.nextTick(function () {
+      console.log('github profile: ', profile);
+      done(null, profile);
 
-    // To keep the example simple, the user's GitHub profile is returned to
-    // represent the logged-in user.  In a typical application, you would want
-    // to associate the GitHub account with a user record in your database,
-    // and return that user instead.
-    return done(null, profile);
-  });
+
 }));
-
-
-
-
-
-
 
 // app.use('/users', usersRouter); // might change later to not use router
 app.use('/auth', usersRouter);
@@ -143,7 +133,5 @@ app.use(function(err, req, res, next) {
   // });
   res.end();
 });
-
-
 
 module.exports = app;
