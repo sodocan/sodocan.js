@@ -9,6 +9,7 @@
     <div>
       <div ng-repeat="comment in entry.additions">
         <div sodocan-comment>
+        </div>
       </div>
     </div>
     <div ng-repeat="comment in tempComments">
@@ -16,14 +17,13 @@
       </div>
     </div>
     <form>
-    <div class="input-field" ng-hide="hideTextArea">
-      <textarea id="textArea{{$id}}" ng-model="commentText" class="materialize-textarea"></textarea>
-      <label for="textArea{{$id}}">Your comment for this entry</label>
-      <a ng-click="submitComment()" href="#" class="btn submit">Submit</a>
-    </div>
-  </form>
+      <div class="input-field" ng-hide="hideTextArea">
+        <textarea id="textArea{{$id}}" ng-model="commentText" class="materialize-textarea"></textarea>
+        <label for="textArea{{$id}}">Your comment for this entry</label>
+        <a ng-click="submitComment()" href="#" class="btn submit">Submit</a>
+      </div>
+    </form>
   </div>
-</div>
   <div class="col s1 upvote">
     {{entry.upvotes}}
     <i ng-click="upvote()" class="material-icons tiny">navigation</i>

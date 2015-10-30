@@ -2,7 +2,7 @@ angular.module('sodocan')
 .directive('sodocanContent', function() {
   return {
     restrict: 'A',
-    replace: 'true',
+    replace: true,
     templateUrl: 'angular-sodone/content/contentTpl.html'
   };
 })

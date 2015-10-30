@@ -3,7 +3,7 @@ var app = angular.module('sodocan')
 .directive('sodocanApp', function() {
   return {
     restrict: 'A',
-    replace: 'true',
+    replace: true,
     templateUrl: 'angular-sodone/app/appTpl.html'
   };
 })

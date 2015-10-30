@@ -284,7 +284,7 @@ angular.module( 'sodocan', [])
   };
 
   obj.editExample = function() {
-
+    
   };
 
   obj.newExample = function(ref,text,cb) {

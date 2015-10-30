@@ -8,7 +8,6 @@ angular.module('sodocan')
 })
 .controller('sodocanCommentCtrl',['$scope','sodocanAPI','sodocanRouter',
   function($scope, sodocanAPI, sodocanRouter){
-    console.log('comments',$scope);
     $scope.upvote = function(){
       $scope.comment.upvotes++;
     };
