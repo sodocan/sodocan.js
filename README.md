@@ -1,4 +1,5 @@
 # Sodocan
+[![Travis Status](https://travis-ci.org/sodocan/sodocan.js.svg?branch=master)](https://travis-ci.org/sodocan/sodocan.js)
 
 # Sodocan.js
 
