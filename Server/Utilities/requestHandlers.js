@@ -39,7 +39,7 @@ exports.loginGetHandler = function(req, res, next) {
   console.log('login get received');
   log('__dirname', __dirname);
   var path = __dirname + '/../StaticPages/login.html';
-  console.log('does it exist?', fs.existsSync(path));
+  // console.log('does it exist?', fs.existsSync(path));
   //console.log(res.sendfile);
   //res.sendFile(path);
   fs.readFile(path, 'utf8', function(err, html) {
@@ -63,7 +63,7 @@ exports.registerGetHandler = function(req, res, next) {
   console.log('login get received');
   log('__dirname', __dirname);
   var path = __dirname + '/../StaticPages/register.html';
-  console.log('does it exist?', fs.existsSync(path));
+  // console.log('does it exist?', fs.existsSync(path));
   //console.log(res.sendfile);
   //res.sendFile(path);
   fs.readFile(path, 'utf8', function(err, html) {
@@ -76,11 +76,11 @@ exports.registerGetHandler = function(req, res, next) {
 };
 
 exports.registerPostHandler = function(req, res, next) {
-  console.log(req.body);
+  // console.log(req.body);
   User.register(new User({username: req.body.username}), req.body.password, function(err, user) {
     if (err) {
-      console.log(err);
-      console.log('registration error!!');
+      // console.log(err);
+      // console.log('registration error!!');
       res.sendStatus(400);
       res.end();
       return;
@@ -93,7 +93,8 @@ exports.registerPostHandler = function(req, res, next) {
 };
 
 exports.checkIfAuthenticated = function(req, res, next) {
-  if (req.user) {
+  console.log('is authenticated function: ',req.isAuthenticated.toString());
+  if (req.isAuthenticated()) {
     //next(req, res);
     next();
   } else {
