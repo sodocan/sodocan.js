@@ -363,6 +363,7 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
         if (error) {
           send404(res, error);
         } else {
+          res.setHeader('Access-Control-Allow-Origin','*');
           res.sendStatus(202);
         }
       });

@@ -15,12 +15,13 @@ angular.module( 'sodocan', [])
 
   var projectURL = API_HOME+projectName+'/';
   
-  // Takes context objects, such as from router or controllers,
-  // and returns it as API URL string
+  // Takes context data from functions, either as arguments (array) or ref obj
+  // and returns parsed object (URL, ref, and callback)
   // Slight misnomer, also accepts arguments array in the format:
   // [ref,entry#,add#,cb]
-  var objToUrl = function(toConvert) {
+  var parseRefObj = function(toConvert) {
 
+    var built;
     // arguments
     if (Array.isArray(toConvert)) {
       var ref,entryNum,commentNum,cb;
@@ -30,26 +31,66 @@ angular.module( 'sodocan', [])
         commentNum = -1;
         cb = toConvert[0] || function(){};
       } else if (typeof toConvert[1] === 'function') {
-        entryNum = 1;
-        commentNum = 1;
+        ref = 'ref/'+toConvert[0]+'/';
+        entryNum = false;
+        commentNum = false;
         cb = toConvert[1];
       } else if (typeof toConvert[2] === 'function') {
-        entryNum = toConvert[1];
-        commentNum = 1;
+        ref = 'ref/'+toConvert[0]+'/';
+        entryNum = toConvert[1]+'/';
+        commentNum = false;
         cb = toConvert[2];
       } else if (toConvert.length===4) {
-        entryNum = toConvert[1];
+        ref = 'ref/'+toConvert[0]+'/';
+        entryNum = toConvert[1]+'/';
         commentNum = toConvert[2];
         cb = toConvert[3];
       } else {
-        // TODO: WARNING: Fails silently on malformed input
-        return 'ERROR';
+        // TODO: WARNING: this error isn't helpful
+        throw new Error('Bad input to getContext');
       }
       if (entryNum===-1) entryNum = 'all';
       if (commentNum===-1) commentNum = 'all';
-    }
+      built = ref;
+      built += (entryNum!==false)?entryNum:'';
+      built += (commentNum!==false)?commentNum:'';
 
-      return built;
+    // reference object
+    } else {
+      if (toConvert['ref']) {
+        var ref = 'ref/'+toConvert['ref']+'/';
+      } else {
+        var ref = '';
+      }
+      built = '';
+      if (toConvert.context && !toConvert.context.ref) {
+        var contexts = Object.keys(toConvert.context);
+        for (var i=0; i<contexts.length;i++) {
+          built += toConvert.context[contexts[i]].reduce(function(a,c) {
+            c = (c===-1)?'all':c;
+            return a+'/'+c;
+          },contexts[i]);
+          built += '/';
+        }
+      } else {
+        if (toConvert.context && toConvert.context.ref) {
+          built += toConvert.context.ref.reduce(function(a,c) {
+            c = (c===-1)?'all':c;
+            return a+'/'+c;
+          },'');
+        }
+      }
+    }    
+
+    // must pass reference updating all is what refreshTop is for
+    var reference = ref.match(/\/(\w+)\//) || false;
+    if (reference) reference = reference[1];
+
+    return {
+      url: built,
+      ref: reference,
+      cb: cb
+    };
   };
 
   // Handle HTTP request to API here; requests project if not passed
@@ -79,107 +120,78 @@ angular.module( 'sodocan', [])
 
   // Shorthand to allow one query for multiple, varying context data
   obj.getReference = function(refObj,cb) {
-    // TODO: getRef shorthand
+    
+    var parsed;
+
+    // Making convenience functions more, well, convenient means you can pass parsed
+    // object in as well. ES6 version will hopefully be neater
+    var preParsed = false;
+    if (refObj.hasOwnProperty('url') && refObj.hasOwnProperty('cb') && refObj.hasOwnProperty('ref')) {
+      preParsed = true;
+      parsed = refObj;
+    }
+
+    if (!preParsed) {
+      parsed = parseRefObj(refObj);
+    }
+    
+    getFromAPI(parsed.url,function(err,data) {
+      if (err) cb(err);
+      if (parsed.ref) {
+        ret = obj.docs[parsed.ref].explanations = data[0].explanations;
+      } else {
+        data.map(function(method) {
+          obj.docs[method.functionName] = method;
+        });
+        ret = obj.docs;
+      }
+
+      cb(null,ret);
+    });
+
   };
 
-  obj.getDescriptions = function(ref) {
-    var entryNum,commentNum,cb;
-    if (typeof arguments[1] === 'function') {
-      entryNum = 1;
-      commentNum = 1;
-      cb = arguments[1];
-    } else if (typeof arguments[2] === 'function') {
-      entryNum = arguments[1];
-      commentNum = 1;
-      cb = arguments[2];
-    } else if (arguments.length===4) {
-      entryNum = arguments[1];
-      commentNum = arguments[2];
-      cb = arguments[3];
-    } else {
-      // TODO: WARNING: fails silently on bad input
-      return;
-    }
-    if (entryNum===-1) entryNum = 'all';
-
-    getFromAPI('ref/'+ref+'/'+entryNum+'/'+commentNum,function(err,data) {
-      
-      if (err) cb(err);
-      
-      obj.docs[ref].explanations.descriptions = data[0].explanations.descriptions;
-      cb(null,obj.docs[ref].explanations.descriptions);
-
+  obj.getDescriptions = function() {
+    var parsed = parseRefObj(Array.prototype.slice.call(arguments));
+    // see Tips for specific query
+    obj.getReference(parsed,function(err,data) {
+      if (err) parsed.cb(err);
+      if (parsed.ref) {
+        parsed.cb(null,data.descriptions);
+      } else {
+        parsed.cb(null,data);
+      }
     });
   };
 
-  obj.getExamples = function(ref) {
-    var entryNum,commentNum,cb;
-    if (typeof arguments[1] === 'function') {
-      entryNum = 1;
-      commentNum = 1;
-      cb = arguments[1];
-    } else if (typeof arguments[2] === 'function') {
-      entryNum = arguments[1];
-      commentNum = 1;
-      cb = arguments[2];
-    } else if (arguments.length===4) {
-      entryNum = arguments[1];
-      commentNum = arguments[2];
-      cb = arguments[3];
-    } else {
-      // TODO: WARNING: fails silently on bad input
-      return;
-    }
-    if (entryNum===-1) entryNum = 'all';
-
-    getFromAPI('ref/'+ref+'/examples/'+entryNum+'/'+commentNum,function(err,data) {
-      
-      if (err) cb(err);
-      
-      obj.docs[ref].explanations.examples = data[0].explanations.examples;
-      cb(null,obj.docs[ref].explanations.examples);
-
+  obj.getExamples = function() {
+    var parsed = parseRefObj(Array.prototype.slice.call(arguments));
+    // see Tips for specific query
+    obj.getReference(parsed,function(err,data) {
+      if (err) parsed.cb(err);
+      if (parsed.ref) {
+        parsed.cb(null,data.examples);
+      } else {
+        parsed.cb(null,data);
+      }
     });
   };
 
   obj.getTips = function() {
-
-    var ref,entryNum,commentNum,cb;
-
-    if (typeof arguments[0] === 'function' || !arguments[0]) {
-      ref = '';
-      entryNum = -1;
-      commentNum = -1;
-      cb = arguments[0] || function(){};
-    } else if (typeof arguments[1] === 'function') {
-      ref = arguments[0];
-      entryNum = 1;
-      commentNum = 1;
-      cb = arguments[1];
-    } else if (typeof arguments[2] === 'function') {
-      ref = arguments[0];
-      entryNum = arguments[1];
-      commentNum = 1;
-      cb = arguments[2];
-    } else if (arguments.length===4) {
-      ref = arguments[0];
-      entryNum = arguments[1];
-      commentNum = arguments[2];
-      cb = arguments[3];
-    } else {
-      // TODO: WARNING: fails silently on bad input
-      return;
-    }
-    if (entryNum===-1) entryNum = 'all';
-    if (commentNum===-1) commentNum = 'all';
-
-    getFromAPI('ref/'+ref+'/tips/'+entryNum+'/'+commentNum,function(err,data) {
-      
-      if (err) cb(err);
-      
-      obj.docs[ref].explanations.tips = data[0].explanations.tips;
-      cb(null,obj.docs[ref].explanations.tips);
-
+    var parsed = parseRefObj(Array.prototype.slice.call(arguments));
+    // Optional: minimizes network data,
+    //           TODO: benchmark and see if it matters
+    parsed.url = parsed.url.split('/');
+    parsed.url.splice(2,0,'tips');
+    parsed.url=parsed.url.join('/');
+    // </optional>
+    obj.getReference(parsed,function(err,data) {
+      if (err) parsed.cb(err);
+      if (parsed.ref) {
+        parsed.cb(null,data.tips);
+      } else {
+        parsed.cb(null,data);
+      }
     });
   };
 
@@ -197,6 +209,7 @@ angular.module( 'sodocan', [])
 
   // API.refreshTop requeries initial load, replaces existing docs object
   // Inefficiently allows for top-level settings changes
+  // FUNCTION_UNDER_REVIEW TODO WARNING
   obj.refreshTop = function(refObj,cb) {
     if (refObj['ref']) {
       var ref = 'ref/'+refObj['ref']+'/';
@@ -238,7 +251,8 @@ angular.module( 'sodocan', [])
 
   };
 
-  // Shorthand that lacks UI support, update all of below in one query
+  // No support for multiple context updates at once,
+  // currently only generic alias for helper functions below
   obj.newReference = function() {
 
   };
@@ -307,15 +321,15 @@ angular.module( 'sodocan', [])
 
   };
 
-  // untested, does this really need proj,funcName, context, and ID?
-  obj.newComment = function(entryID,ref,text,cb) {
+  // TODO: does this really need proj,funcName, context, and ID?
+  obj.newComment = function(entryID,ref,context,text,cb) {
     cb = cb || function(){};
     sendToAPI('addEntry',
               {
                 entryID:entryID,
                 project: projectName,
                 functionName:ref,
-                context:'examples',
+                context:context,
                 text:text
               },
               function(err,data) {
@@ -323,6 +337,38 @@ angular.module( 'sodocan', [])
                 cb(null,data);
               }
              );
+  };
+
+  obj.upvote = function(entryID,ref,context,addID,cb) {
+    if (typeof addID === 'function') {
+      cb = addID;
+      sendToAPI('upvote',
+                {
+                  entryID:entryID,
+                  project:projectName,
+                  functionName:ref,
+                  context:context
+                },
+                function(err,data) {
+                  if (err) cb(err);
+                  cb(null,data);
+                }
+               );
+    } else {
+      sendToAPI('upvote',
+                {
+                  entryID:entryID,
+                  project:projectName,
+                  functionName:ref,
+                  context:context,
+                  additionID:addID
+                },
+                function(err,data) {
+                  if(err) cb(err);
+                  cb(null,data);
+                }
+               );
+    }
   };
 
   return obj;
