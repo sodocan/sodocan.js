@@ -77,6 +77,10 @@ exports.registerGetHandler = function(req, res, next) {
 
 exports.registerPostHandler = function(req, res, next) {
   // console.log(req.body);
+  if (req.body.username.substring(req.body.username.length - 4) === '.git') {
+    res.sendStatus(400);
+    res.end('illegal username (cannot end in .git)');
+  }
   User.register(new User({username: req.body.username}), req.body.password, function(err, user) {
     if (err) {
       // console.log(err);
@@ -93,7 +97,7 @@ exports.registerPostHandler = function(req, res, next) {
 };
 
 exports.checkIfAuthenticated = function(req, res, next) {
-  console.log('is authenticated function: ',req.isAuthenticated.toString());
+  // console.log('is authenticated function: ',req.isAuthenticated.toString());
   if (req.isAuthenticated()) {
     //next(req, res);
     next();
