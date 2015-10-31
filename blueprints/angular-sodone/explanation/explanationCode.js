@@ -37,9 +37,22 @@ angular.module('sodocan')
       $scope.toggleTextArea();
     }
   };
+  //routing for actions
   var submitType = {
     examples: sodocanAPI.newExample,
     descriptions: sodocanAPI.newDescription, 
     tips:sodocanAPI.newTip 
   };
+  //Icons display / hide with mouse over
+  $scope.iconCSS = 'hide-icon'; 
+  $scope.mouseEnter = function(){
+    $scope.iconCSS = 'icon';
+  };
+  $scope.mouseLeave = function(){
+    $scope.iconCSS = 'hide-icon';
+  };
+  $scope.showModal = function(){
+    $scope.$emit('clickedShowModal'); 
+  };
+
 }]);

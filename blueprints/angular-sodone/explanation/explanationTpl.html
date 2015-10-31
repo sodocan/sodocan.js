@@ -1,6 +1,8 @@
-<div class="card grey lighten-3" ng-controller="sodocanExplanationCtrl" ng-hide="styles[explanationType].on">
+<div class="card grey lighten-3" ng-controller="sodocanExplanationCtrl" ng-hide="styles[explanationType].on" ng-mouseenter="mouseEnter()" ng-mouseleave="mouseLeave()">
   <img ng-click="toggleTextArea()" src="../angular-sodone/images/respond.png" height=15 class="tint"> </img>
   <h6>{{explanationType}}</h6>
+  <i class="material-icons right" ng-class="iconCSS">queue</i>  
+  <i class="material-icons right" ng-class="iconCSS" ng-click="showModal()">settings</i>
   <div ng-repeat='entry in entryArray'>
     <div sodocan-entry>
     </div>

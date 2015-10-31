@@ -18,5 +18,9 @@ var app = angular.module('sodocan')
     $scope.$broadcast('localContextButton', context, state); 
     console.log('app listened');
   });
+  $scope.$on('clickedShowModal',function(){
+    $scope.$broadcast('displayModal'); 
+  }); 
+
   $scope.$watch('sodocanRoute()',update);
 }]);
