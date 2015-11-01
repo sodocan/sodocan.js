@@ -4,7 +4,8 @@ module.exports = function(grunt) {
     
     concat: {
       dist: {
-        //
+        src: ['public/Client/js/*.js'],
+        dest: 'public/dist/<%= pkg.name %>.js'
       }
     },
 
