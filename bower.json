@@ -1,0 +1,22 @@
+{
+  "name": "sodocan",
+  "description": "",
+  "main": "Server/index.js",
+  "authors": [
+    "Lai 'Lain' Jiang <lain.lai.jiang@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "http://sodocan-staging.herokuapp.com",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "blueprints/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.5"
+  }
+}

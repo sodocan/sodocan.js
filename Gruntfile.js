@@ -4,10 +4,7 @@ module.exports = function(grunt) {
     
     concat: {
       dist: {
-        src: [
-          // insert
-        ],
-        //insert
+        //
       }
     },
 
@@ -57,7 +54,7 @@ module.exports = function(grunt) {
     cssmin: {
       dist: {
         files: {
-          //insert
+          'public/dist/style.min.css': 'public/client/css/*.css'
         }
       }
     },
@@ -73,7 +70,7 @@ module.exports = function(grunt) {
         ]
       },
       css: {
-        files: '', // insert
+        files: 'public/client/css/*.css',
         tasks: ['cssmin']
       }
     },
@@ -85,30 +82,6 @@ module.exports = function(grunt) {
         host: 'localhost'
       }
     },
-
-    shell: {
-      
-      // seeds database with 50 records
-      seeddb: {
-        command: 'node db/seed-data.js 50'
-      },
-      
-      // rebases from upstream staging
-      rebase: {
-        command: 'git pull --rebase upstream staging'
-      },
-      
-      // pushes to remote origin branch
-      push: {
-        command: 'git push origin'
-      },
-      
-      // installs dependencies via npm and bower
-      depends: {
-        command: 'npm install'
-      }
-      
-    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -117,21 +90,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-cssmin'); 
   grunt.loadNpmTasks('grunt-mocha-test');
-  grunt.loadNpmTasks('grunt-shell');
-  grunt.loadNpmTasks('grunt-nodemon');
-
-  grunt.registerTask('server-dev', function (target) {
-    // Running nodejs in a different process and displaying output on the main console
-    var nodemon = grunt.util.spawn({
-         cmd: 'grunt',
-         grunt: true,
-         args: 'nodemon'
-    });
-    nodemon.stdout.pipe(process.stdout);
-    nodemon.stderr.pipe(process.stderr);
-
-    grunt.task.run([ 'watch' ]);
-  });
 
   ////////////////////////////////////////////////////
   //              Main grunt tasks                  //
@@ -161,12 +119,11 @@ module.exports = function(grunt) {
     // 'jshint',
     // 'mochaTest'
   ]);
-
-  // TODO -- add build processes    
+  
   grunt.registerTask('build', [
-    // 'concat',
-    // 'uglify',
-    // 'cssmin'
+    'concat',
+    'uglify',
+    'cssmin'
   ]);
   
   // runs server via nodemon

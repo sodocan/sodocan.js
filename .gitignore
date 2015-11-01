@@ -16,7 +16,8 @@ Icon
 .Trashes
 node_modules/
 db/
-Client/lib
+public/Client/lib
+public/Client/css
 /bower_components
 
 # Floobits
