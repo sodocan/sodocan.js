@@ -210,7 +210,7 @@
    PARSER SECTION      
 ============================== -->
 
-<section class="focus" id="focus">
+<section class="parser" id="parser">
 <div class="container">
   
   <!-- SECTION HEADER -->
@@ -229,47 +229,78 @@
   <!-- 4 FOCUS BOXES -->
   <div class="row">
     
-    <!-- FIRST FOCUS BOXES -->
-    <div class="col-lg-6 col-sm-6 focus-box red wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
-      <div class="service-icon">
-        <i class="pixeden pd-icon-monitor"></i> <!-- FOCUS ICON-->
-      </div>
-      <h5 class="red-border-bottom">stuff</h5> <!-- FOCUS HEADING -->
-      <p> <!-- FOCUS DESCRIPTION -->
-         stuff stuff stuff
-      </p>
-    </div>
-    <!-- / END FIRST FOCUS BOX. Other boxes has same format -->
-    
-    <div class="col-lg-6 col-sm-6 focus-box green wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
-      <div class="service-icon">
-        <span class="pixeden pd-icon-camera"></span>
-      </div>
-      <h5 class="green-border-bottom">stuff stuff</h5>
-      <p>
-         stuff stuff stuff
-      </p>
-    </div>
-    
-<!--     <div class="col-lg-3 col-sm-3 focus-box blue wow fadeInRight animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
+    <div class="col-lg-12 col-sm-12 parser-command blue wow fadeInRight animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
       <div class="service-icon">
         <i class="pixeden pd-icon-email-marketing"></i>
       </div>
-      <h5 class="blue-border-bottom">stuff stuff</h5>
-      <p>
-         stuff stuff stuff
-      </p>
     </div>
-    
-    <div class="col-lg-3 col-sm-3 focus-box yellow wow fadeInRight animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
+
+    <!-- FIRST FOCUS BOXES -->
+    <div class="col-lg-4 col-sm-4 parser-box red wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
       <div class="service-icon">
-        <i class="pixeden pd-icon-check"></i>
+        <pre>
+$ parse [dir or filepath(s)] [outputDir]
+{ functionName: _.pluck,
+  params: [{ 
+    name: obj }, {
+    name: key }],
+  returns: [{type: array}], ... }       
+        </pre>
+        <i class="pixeden pd-icon-monitor"></i> <!-- FOCUS ICON-->
       </div>
-      <h5 class="yellow-border-bottom">Stuff Stuff</h5>
-      <p>
-         stuff stuff stuff
-      </p>
-    </div> -->
+      <h5 class="red-border-bottom">Source Code</h5> <!-- FOCUS HEADING -->
+    </div>
+    <!-- / END FIRST FOCUS BOX. Other boxes has same format -->
+    
+    <div class="col-lg-4 col-sm-4 parser-box green wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
+      <div class="service-icon">
+        <pre>{header: {
+  project: yourProj
+  author: :awesomeBeard:
+  version: ~0.5.2
+}, body: [{
+  functionName: _.pluck,
+  params: [{
+name: obj }, {
+name: key }],
+  returns: [{type: array}], ...
+}, {
+  functionName: Car,
+  class: Car
+  description: constructor func
+}, {
+  functionName: Car.prototype.drive,
+  classContext: Car
+}]</pre>
+        <span class="pixeden pd-icon-camera"></span>
+      </div>
+      <h5 class="green-border-bottom">Output</h5>
+    </div>
+
+    <div class="col-lg-4 col-sm-4 parser-box green wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
+      <div class="service-icon">
+        <pre>{header: {
+  project: yourProj
+  author: :awesomeBeard:
+  version: ~0.5.2
+}, body: [{
+  functionName: _.pluck,
+  params: [{
+name: obj }, {
+name: key }],
+  returns: [{type: array}], ...
+}, {
+  functionName: Car,
+  class: Car
+  description: constructor func
+}, {
+  functionName: Car.prototype.drive,
+  classContext: Car
+}]</pre>
+        <span class="pixeden pd-icon-camera"></span>
+      </div>
+      <h5 class="green-border-bottom">Output</h5>
+    </div>
   </div>
   <!-- / END 4 FOCUS BOXES -->
   
