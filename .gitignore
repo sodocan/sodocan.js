@@ -19,6 +19,7 @@ node_modules/
 db/
 public/js
 public/css
+public/dist/sodocan.js
 
 # Floobits
 .floo
