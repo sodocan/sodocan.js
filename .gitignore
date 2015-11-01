@@ -17,9 +17,9 @@ Icon
 node_modules/
 /bower_components
 db/
-public/Client/js
-public/Client/css
-public/dist
+public/js
+public/css
+public/dist/sodocan.js
 
 # Floobits
 .floo
