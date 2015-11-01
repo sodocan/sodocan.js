@@ -39,7 +39,8 @@ app.use(expressSession({
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static(path.join(__dirname, 'StaticPages'))); // will this be used?
+// app.use(express.static(path.join(__dirname, 'StaticPages'))); // will this be used?
+app.use(express.static(path.join(__dirname, '../public')));
 
 var User = require('./Databases/Models/users.js');
 passport.use(new LocalStrategy(User.authenticate()));

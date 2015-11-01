@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     
     concat: {
       dist: {
-        src: ['public/Client/js/*.js'],
+        src: ['public/js/*.js'],
         dest: 'public/dist/<%= pkg.name %>.js'
       }
     },
@@ -53,7 +53,7 @@ module.exports = function(grunt) {
     cssmin: {
       dist: {
         files: {
-          'public/dist/style.min.css': 'public/client/css/*.css'
+          'public/dist/style.min.css': 'public/css/*.css'
         }
       }
     },
@@ -69,16 +69,8 @@ module.exports = function(grunt) {
         ]
       },
       css: {
-        files: 'public/client/css/*.css',
+        files: 'public/css/*.css',
         tasks: ['cssmin']
-      }
-    },
-    
-    // drops jupiter database
-    'mongo-drop': {
-      options: {
-        dbname: 'jupitr',
-        host: 'localhost'
       }
     },
   });
