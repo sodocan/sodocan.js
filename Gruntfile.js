@@ -32,9 +32,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          '': [
-            // insert
-          ]
+          'public/dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
         }
       }
     },
