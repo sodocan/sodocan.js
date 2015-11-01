@@ -9,7 +9,9 @@ var LocalStrategy = require('passport-local').Strategy;
 var GitHubStrategy = require('passport-github').Strategy;
 var authConfig = require('./authenticationConfig');
 var expressSession = require('express-session');
-var everyauth = require('everyauth');
+// var everyauth = require('everyauth');
+var BearerStrategy = require('passport-http-bearer').Strategy;
+var jwt = require('jwt-simple');
 
 //var crowdsourceRouter = require('./Routes/crowdsource');
 var usersRouter = require('./Routes/users');
@@ -40,7 +42,7 @@ app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'StaticPages'))); // will this be used?
 
 var User = require('./Databases/Models/users.js');
-//passport.use(new LocalStrategy(User.authenticate()));
+passport.use(new LocalStrategy(User.authenticate()));
 
 //passport.serializeUser(User.serializeUser());
 //passport.deserializeUser(User.deserializeUser());
@@ -69,21 +71,65 @@ passport.use(new GitHubStrategy({
 // }
 }, function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
-    process.nextTick(function () {
 
-    // To keep the example simple, the user's GitHub profile is returned to
-    // represent the logged-in user.  In a typical application, you would want
-    // to associate the GitHub account with a user record in your database,
-    // and return that user instead.
-    return done(null, profile);
-  });
+    User.findOne({
+      username: profile.username + '.git'
+    },
+    function(err, user) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      if (user) {
+          console.log('user already found in database');
+          done(null, user);
+      } else {
+        var user = new User({
+          username: profile.username + '.git',
+        });
+        user.save(function(err) {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log('saving user...');
+            done(null, user);
+          }
+        });
+      }
+    });
 }));
 
+passport.use(new BearerStrategy(function(token, done) {
+  // User.findOne({access_token: token}, function(err, user) {
+  //   if (err) {
+  //     console.error(err);
+  //     return done(err);
+  //   }
+  //   if (!user) {
+  //     return done(null, false);
+  //   }
 
+  //   return done(null, user, {scope: 'all'});
+  // });
+  try {
+    var decoded = jwt.decode(token, process.env.tokenSecret || authConfig.tokenSecret);
+    User.findOne({username: decoded.username}, function(err, user) {
+      if (err) {
+        console.error(err);
+        return done(err);
+      }
 
-
-
-
+      if (!user) {
+        return done(null, false);
+      } else {
+        return done(null, user);
+      }
+    });
+  }
+  catch(err) {
+    return done(null, false);
+  }
+}));
 
 // app.use('/users', usersRouter); // might change later to not use router
 app.use('/auth', usersRouter);
@@ -98,8 +144,8 @@ app.use(function(err, req, res, next) {
 
 app.get('/api/*', handlers.getApi);
 app.post('/create', handlers.postSkeleton);
-app.post('/upvote', handlers.upvote);
-app.post('/addEntry', handlers.addEntry);
+app.post('/upvote', passport.authenticate('bearer', {session: false}), handlers.upvote);
+app.post('/addEntry', passport.authenticate('bearer', {session: false}), handlers.addEntry);
 
 //NOTE: figure out best practices for above route
 
@@ -143,7 +189,5 @@ app.use(function(err, req, res, next) {
   // });
   res.end();
 });
-
-
 
 module.exports = app;
