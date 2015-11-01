@@ -15,9 +15,11 @@ Icon
 .Spotlight-V100
 .Trashes
 node_modules/
-db/
-Client/lib
 /bower_components
+db/
+public/Client/js
+public/Client/css
+public/dist
 
 # Floobits
 .floo
