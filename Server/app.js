@@ -101,20 +101,13 @@ passport.use(new GitHubStrategy({
 }));
 
 passport.use(new BearerStrategy(function(token, done) {
-  // User.findOne({access_token: token}, function(err, user) {
-  //   if (err) {
-  //     console.error(err);
-  //     return done(err);
-  //   }
-  //   if (!user) {
-  //     return done(null, false);
-  //   }
-
-  //   return done(null, user, {scope: 'all'});
-  // });
   try {
     var decoded = jwt.decode(token, process.env.tokenSecret || authConfig.tokenSecret);
-    User.findOne({username: decoded.username}, function(err, user) {
+    log('decoded',decoded);
+    if (decoded.expiration < Date.now()) {
+      return done(null, false);
+    }
+    User.findOne({username: decoded.username, session: decoded.session}, function(err, user) {
       if (err) {
         console.error(err);
         return done(err);

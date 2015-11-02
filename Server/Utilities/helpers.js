@@ -1,5 +1,7 @@
 var methodsDB = require('../Databases/Models/methods.js');
-
+var passport = require('passport');
+var jwt = require('jwt-simple');
+var authConfig = require('../authenticationConfig');
 /* Server Response Actions */
 
 var send404 = exports.send404 = function(res, errorMessageOrObj) {
@@ -608,4 +610,22 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
   // });
 };
 
-
+var createToken = exports.createToken = function(req, res, next, authenticateType) {
+  passport.authenticate(authenticateType, {session: false}, function(err, user) {
+    log('callback in passport authenticate got run');
+    if (err) { console.log('error loggin'); }
+    if (!user) {
+      return res.json(401, { error: 'message'} );
+    }
+    log('user', user);
+    var token = jwt.encode({
+      username: user.username,
+      expiration: authConfig.calculateTokenExpiration(),
+      session: user.session
+    }, process.env.tokenSecret || authConfig.tokenSecret);
+    // log('token', token);
+    // log('decoded', jwt.decode(token, 'superSecret'));
+    log('token contents: ',jwt.decode(token, process.env.tokenSecret || authConfig.tokenSecret));
+    res.json({access_token: token});
+  })(req, res, next);
+};
