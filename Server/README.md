@@ -1,9 +1,9 @@
 # Server API
 
-The server serves as the central hub for all the data that populates the blueprints. It receives this data from both the parser, and users. 
+The server serves as the central hub for all the data that populates the blueprints. It receives this data from both the parser, and users.
 
 ### Post requests from Parser:
-  ##### *localhost:3000*/create 
+  ##### *localhost:3000*/create
    All parser results should be posted here. If this is the first time an entry is posted, it is converted to the proper for easy GET requests. If the method already exists, we check to see if the text of your entry is the same as any of the current entries. If the text is the same, we do nothing. If the text does not match, we push it into the array as a new entry.
 
    *Example Post JSON*
@@ -28,12 +28,12 @@ The server serves as the central hub for all the data that populates the bluepri
     ]
   }
   ```
-  ### Get From Client: 
+  ### Get From Client:
   ##### *localhost*:3000/api
-  All get requests, return the requested methods, their params (inputs and outputs) along with the requested number of entries and comments for the requested explanation type. If no amount of entries is specified, we default to 1. If no amount of comments are specified, we default to 0. 
+  All get requests, return the requested methods, their params (inputs and outputs) along with the requested number of entries and comments for the requested explanation type. If no amount of entries is specified, we default to 1. If no amount of comments are specified, we default to 0.
 
 
-  **/api/** - All get requests involving methods, will go through api  
+  **/api/** - All get requests involving methods, will go through api
   **/api/project** - will request every method in the project, and default to requesting top rated entry, with no additions <br>
   **/api/project/2/all** - will request every method of a project, the top 2 entries for each method, and every addition, for every method <br>
   **/api/project/1/0/tips/0/0/description/all/all** - will request every method in a project. Explicitly stating you want no entries or additions for tips, and every entry and every addition for description. <br>
@@ -80,13 +80,13 @@ The server serves as the central hub for all the data that populates the bluepri
         }
       ]
   ```
-  ### Post requests from Client: 
+  ### Post requests from Client:
     #### For upvoting
     ##### *localhost:3000*/upvote - upvotes entires or comments
     *Example Post JSON*
     ```
     {
-      project: 
+      project:
       functionName:
       context:
       entryID:
@@ -96,7 +96,7 @@ The server serves as the central hub for all the data that populates the bluepri
 
     ```
   ### For new entries / comments
-  #### *localhost:3000*/addEntry 
+  #### *localhost:3000*/addEntry
   *Example Post JSON*
   ```
   {
@@ -108,3 +108,22 @@ The server serves as the central hub for all the data that populates the bluepri
     [username/ip:] -- not needed yet, but will probably want this
   }
   ```
+
+  ### Authentication
+
+  -Get requests do not require authentication (anyone can view docs without logging in)
+
+  -all content modifying post requests (/upvote, /addEntry) and  /logout require auth
+
+  -upon logging in, the server will send back a JSON object with the property access_token.  The value
+  of this property is an encrypted JSON web token.  this should be placed in localStorage, and must be placed in the body of all the authenticated requests listed above, with the property name access_token.
+  Example:
+  ```
+  req.body = { access_token : [token string received on login] };
+  ```
+
+  -tokens will expire after 24hrs (this can be changed in authenticationConfig.js).  Requesting an authenticated route with an expired token, will result in a '401: Unauthorized' response.  The user must log in again to receive a fresh token.
+
+  -logging out will require a post request to the /logout path, and should also remove the token from localStorage.
+  Once a user has logged out, the token they were using will no longer work.
+

@@ -2,6 +2,7 @@ var helpers = require('./helpers');
 var fs = require('fs');
 var User = require('../Databases/Models/users.js');
 var passport = require('passport');
+
 exports.getApi = function(req, res){
   var apiPath = req.url;
   helpers.getReferences(apiPath, helpers.sendReferences, res);
@@ -52,12 +53,12 @@ exports.loginGetHandler = function(req, res, next) {
   });
 };
 
-exports.loginPostHandler = function(req, res, next) {
-  // console.log('login post received ', req);
-  console.log('postHandler got run');
-  log('body', req.body);
-  res.end();
-};
+// exports.loginPostHandler = function(req, res, next) {
+//   // console.log('login post received ', req);
+//   console.log('postHandler got run');
+//   log('body', req.body);
+//   res.end();
+// };
 
 exports.registerGetHandler = function(req, res, next) {
   console.log('login get received');
@@ -110,6 +111,34 @@ exports.checkIfAuthenticated = function(req, res, next) {
 };
 
 exports.logoutHandler = function(req, res, next) {
-  req.logout();
-  res.redirect('/auth/login');
+  // req.logout();
+  //log('request', req);
+  log('request.user', req.user);
+  //var reqString = JSON.stringify(req);
+  //log('matches for username: ', reqString.match('124'));
+  User.findOne({username: req.user.username}).exec(function(err, user) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    if (user) {
+      user.session++;
+      user.save(function(err) {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        // res.redirect('/auth/login');
+        res.end('logged out');
+      });
+    }
+  });
+};
+
+exports.loginPostHandler = function(req, res, next) {
+  helpers.createToken(req, res, next, 'local');
+};
+
+exports.githubLoginPostHandler = function(req, res, next) {
+  helpers.createToken(req, res, next, 'github');
 };

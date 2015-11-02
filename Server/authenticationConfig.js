@@ -5,3 +5,9 @@ exports.github = {
 };
 
 exports.tokenSecret = 'superSecret';
+
+exports.calculateTokenExpiration = function() {
+  var timeInHours = 24;
+  var timeInMilliseconds = timeInHours * 3600000;
+  return Date.now() + timeInMilliseconds;
+};
