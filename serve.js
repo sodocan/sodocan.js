@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var PORT=4000;
 var DIR=__dirname+'/blueprints';
-var TEMPLATE = 'angular-sodone';
+var TEMPLATE = 'angular-plain';
 var headers = {'Access-Control-Allow-Origin':'*'};
 
 var countfor = {};

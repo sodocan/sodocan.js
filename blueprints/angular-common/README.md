@@ -6,8 +6,8 @@ some helpful functions -- all you need to do is include 'sodocan' as a
 dependency to your app module, and pass-as-a-global `window.sodocanApp` name of
 your app (as string). Your app will be bootstrapped to the document after the
 initial load data has been received from the API server. For the moment, the
-sodocanCtrl controller must be left on the top level tag as well to properly
-populate the initial data.
+`sodocanCtrl` controller must be left on the top level tag as well to properly
+populate the initial data and enable some helpful tools.
 
 But wait, why is that useful? The current version of the plain demo has a
 custom app, sure, but all the directives are still built on the `sodocan`
@@ -170,3 +170,47 @@ Creates new comment (also labeled additions) for given entry.
 
 Adds upvote to given entry, or if given additionID (usually referred to as
 comments in these docs), upvotes the comment under that entry.
+
+## Sodocan Router Quickguide
+
+Naming this a router may confuse some people, as it's not intended as a replacement
+for Angular's built-in routing functionality; rather, consider it as a convenient
+"parses the current URL state for me" helper utility.
+
+Usage is extremely simple, the `sodocanRouter` factory has a `route` object that is
+the same format as the reference objects you probably encountered with the API helper:
+
+```js
+{
+  ref : current_functionName_if_any,
+  context : {
+              tips: [#ofEntries,#ofComments],
+              descriptions: [#ofEntries,#ofComments],
+              examples: [#ofEntires,#ofComments],
+              ref: [#topLevelEntries,#topLevelComments]
+            }
+}
+```
+
+The router automatically converts prettyURL-style '-1's to 'all's - the URL specification
+calls for only numbers to avoid an ambiguous all reference, no such problem for the
+server API. You can watch for changes with this line:
+
+    $scope.$watch('sodocanRoute()',respondToUrlChangeFunc);
+
+Add that to any relevant controller that needs to adjust with the URL, you can see an
+example of this in action in `angular-plain/content/contentCode.js`. The controller
+adds reference cards as the URL changes, not actually in response to the user clicks.
+*_Note:_ this has not been tested in non-HTML5-friendly browsers.* This means directly
+linking to the pretty URL (eg: `projectName/myFunc/2/1`) will directly display the
+appropriate reference. The actual demo  code is for in-order display and to avoid duplication
+(which will throw an error due to the use of ng-repeat anyway!).
+
+To enable this behavior, the generated sidebar -- in addition to providing the correct
+href -- has an additional `ng-click` directive which updates the URL using Angular's
+built-in $location. This behavior will work correctly because the options are set
+in the sodocan module, and the index page has a dynamically generated BASE href tag
+that pulls the project name from the URL.
+
+If there's interest in a sodocanRouter wrapper or an option to have it enable this
+behavior on all A links that can be added, but is not currently a priority.

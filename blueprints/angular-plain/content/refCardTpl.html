@@ -1,16 +1,32 @@
 <div id="{{item}}" ng-controller="refCardCtrl" ng-repeat="item in contentRefs">
   <h3>{{item}}</h3>
-  <div id="{{item}}_desc">
-    <p>{{(docs[item].explanations.descriptions[0])?
-          docs[item].explanations.descriptions[0].text:'No entry found'}}</p>
-    <label>New Entry Text: <input type="text" name="{{item+'NewEntry'}}" ng-model="NewEntry[item]"></label>
-    <label><input type="radio" name="{{item+'NewEntryType'}}" ng-model="NewEntryType[item]" value="description"> Description</label>
-    <label><input type="radio" name="{{item+'NewEntryType'}}" ng-model="NewEntryType[item]" value="example"> Example</label>
-    <label><input type="radio" name="{{item+'NewEntryType'}}" ng-model="NewEntryType[item]" value="tip"> Tip</label>
-    <br />
-    <input type="button" value="Add Entry" ng-click="addEntry(item)">
+  <!-- exercise left to reader, you would ng-repeat the below tag
+        to allow for multiple entry displays -->
+  <div id="{{item}}_entry" style="background:{{refCardBg[EntryType]}}">
+    <div>
+      <h4>Top Entry:
+        <span ng-click="upvote(item)">{{docs[item].explanations[EntryType][0].upvotes}} (click to upvote)</span>
+      </h4>
+
+      <span>{{(docs[item].explanations[EntryType][0])?
+            docs[item].explanations[EntryType][0].text:'No entry found'}}</span>
+      <div style="float:right">
+        <p ng-click="changeCard('desc',item)" style="background:{{refCardBg.descriptions}}">Desc</p>
+        <p ng-click="changeCard('exam',item)" style="background:{{refCardBg.examples}}">Examp</p>
+        <p ng-click="changeCard('tips',item)" style="background:{{refCardBg.tips}}">Tips</p>
+      </div>
+    </div>
+    <form style="clear:both">
+      <label>New {{comment || EntryType}} Text: <input type="text" name="{{item+'NewEntry'}}" ng-model="NewEntry[item]"></label>
+      <br />
+      <input type="button" value="Add Entry" ng-click="addEntry(item)">
+    </form>
   </div>
-    <a ng-click="loadEntryData('descriptions',item)" href="{{item+'/'+-1}}">Load Descriptions</a>
-    <a ng-click="loadEntryData('examples',item)" href="{{item+'/'+-1}}">Load Examples</a>
-    <a ng-click="loadEntryData('tips',item)" href="{{item+'/'+-1}}">Load Tips</a>
+  <div style="background:#ccc">
+    <div style="border-top: 2px solid #eee;padding: 5px" ng-repeat="comment in docs[item].explanations[EntryType][0].additions">
+      {{comment.text}}
+    </div>
+  </div>
+  <a ng-click="changeCard('comments',item)" href="{{item}}/1/-1">Load Comments</a>
+  <a ng-click="comment = 'comments'" href="">Add Comment</a>
 </div>

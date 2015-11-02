@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html x-ng-controller="sodocanCtrl">
+  <!-- above controller necessary for some scope convenience setup -->
+  <!-- NOTE: don't include an ng-app, bootstrapping is handled manually -->
   <head>
     <title x-ng-bind="pageTitle"></title>
+    <!-- sets the page title to the project name (this could be configured) -->
     <script type="text/javascript">
+      // BASE tag necessary for Angular fancy routing & $location changes,
+      // as we want to reuse this code for any project name, pull it dynamically
+      // from the URL and write it into the page (DOM addition doesn't work reliably)
+      // as with sodocanRouter, assumes starting from root; first dir is project
       var project = window.location.pathname.split('/')[1];
       document.write('<base href="/'+project+'/">');
     </script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- build step not yet included -->
+    <!-- build step not yet included, also this file doesn't exist ;-) -->
     <link rel="stylesheet" type="text/css" href="/angular-plain/styles.css">
 
-    <!-- build step not yet included -->
+    <!-- build step not yet included, have to add files manually here -->
+    <!-- link to angular CDN also hardcoded for convenience -->
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.js"></script>
     <script type="text/javascript" src="/angular-common/sodocan.js"></script>
     <script type="text/javascript" src="/angular-plain/app.js"></script>
@@ -24,6 +32,10 @@
 
   </head>
   <body>
+
+    <!-- These are placeholder divs, all of them get replaced by the given directives -->
+    <!-- You could easily place a 'Loading' screen or whatever here to display til the -->
+    <!-- data preloads and the app gets bootstrapped -->
 
     <div class="header" x-sodocan-header></div>
     

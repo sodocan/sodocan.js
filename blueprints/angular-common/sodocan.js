@@ -37,12 +37,12 @@ angular.module( 'sodocan', [])
         cb = toConvert[1];
       } else if (typeof toConvert[2] === 'function') {
         ref = 'ref/'+toConvert[0]+'/';
-        entryNum = toConvert[1]+'/';
+        entryNum = toConvert[1];
         commentNum = false;
         cb = toConvert[2];
       } else if (toConvert.length===4) {
         ref = 'ref/'+toConvert[0]+'/';
-        entryNum = toConvert[1]+'/';
+        entryNum = toConvert[1];
         commentNum = toConvert[2];
         cb = toConvert[3];
       } else {
@@ -52,7 +52,7 @@ angular.module( 'sodocan', [])
       if (entryNum===-1) entryNum = 'all';
       if (commentNum===-1) commentNum = 'all';
       built = ref;
-      built += (entryNum!==false)?entryNum:'';
+      built += (entryNum!==false)?entryNum+'/':'';
       built += (commentNum!==false)?commentNum:'';
 
     // reference object
@@ -136,7 +136,10 @@ angular.module( 'sodocan', [])
     }
     
     getFromAPI(parsed.url,function(err,data) {
-      if (err) cb(err);
+      if (err) {
+        cb(err);
+        return;
+      }
       if (parsed.ref) {
         ret = obj.docs[parsed.ref].explanations = data[0].explanations;
       } else {
@@ -155,7 +158,10 @@ angular.module( 'sodocan', [])
     var parsed = parseRefObj(Array.prototype.slice.call(arguments));
     // see Tips for specific query
     obj.getReference(parsed,function(err,data) {
-      if (err) parsed.cb(err);
+      if (err) {
+        parsed.cb(err);
+        return;
+      }
       if (parsed.ref) {
         parsed.cb(null,data.descriptions);
       } else {
@@ -168,7 +174,10 @@ angular.module( 'sodocan', [])
     var parsed = parseRefObj(Array.prototype.slice.call(arguments));
     // see Tips for specific query
     obj.getReference(parsed,function(err,data) {
-      if (err) parsed.cb(err);
+      if (err) {
+        parsed.cb(err);
+        return;
+      }
       if (parsed.ref) {
         parsed.cb(null,data.examples);
       } else {
@@ -186,7 +195,10 @@ angular.module( 'sodocan', [])
     parsed.url=parsed.url.join('/');
     // </optional>
     obj.getReference(parsed,function(err,data) {
-      if (err) parsed.cb(err);
+      if (err) {
+        parsed.cb(err);
+        return;
+      }
       if (parsed.ref) {
         parsed.cb(null,data.tips);
       } else {
@@ -197,12 +209,17 @@ angular.module( 'sodocan', [])
 
   // additions TODO: needs everything passed, this format needs to be rethought
   // no easy way to update larger docs object from an entryID
-  obj.getComments = function(context,entryID,commentNum,cb) {
+  obj.getComments = function(ref,context,entryID,commentNum,cb) {
     
-    getFromAPI(context+'/'+entryID+'/'+commentNum,function(err,data) {
-      if (err) cb(err);
+    if (commentNum===-1) commentNum='all';
+    getFromAPI('ref/'+ref+'/'+context+'/'+entryID+'/'+commentNum,function(err,data) {
+      if (err) {
+        cb(err);
+        return;
+      }
 
-      cb(null,data[0]);
+      obj.docs[ref] = data[0];
+      cb(null,obj.docs[ref]);
     });
 
   };
@@ -271,7 +288,10 @@ angular.module( 'sodocan', [])
                 text:text
               },
               function(err,data) {
-                if (err) cb(err);
+                if (err) {
+                  cb(err);
+                  return;
+                }
                 cb(null,data);
               }
              );
@@ -291,14 +311,17 @@ angular.module( 'sodocan', [])
                 text:text
               },
               function(err,data) {
-                if (err) cb(err);
+                if (err) {
+                  cb(err);
+                  return;
+                }
                 cb(null,data);
               }
              );
   };
 
   obj.editExample = function() {
-    
+
   };
 
   obj.newExample = function(ref,text,cb) {
@@ -311,7 +334,10 @@ angular.module( 'sodocan', [])
                 text:text
               },
               function(err,data) {
-                if (err) cb(err);
+                if (err) {
+                  cb(err);
+                  return;
+                }
                 cb(null,data);
               }
              );
@@ -333,7 +359,10 @@ angular.module( 'sodocan', [])
                 text:text
               },
               function(err,data) {
-                if (err) cb(err);
+                if (err) {
+                  cb(err);
+                  return;
+                }
                 cb(null,data);
               }
              );
@@ -350,7 +379,10 @@ angular.module( 'sodocan', [])
                   context:context
                 },
                 function(err,data) {
-                  if (err) cb(err);
+                  if (err) {
+                    cb(err);
+                    return;
+                  }
                   cb(null,data);
                 }
                );
@@ -364,7 +396,10 @@ angular.module( 'sodocan', [])
                   additionID:addID
                 },
                 function(err,data) {
-                  if(err) cb(err);
+                  if (err) {
+                    cb(err);
+                    return;
+                  }
                   cb(null,data);
                 }
                );
