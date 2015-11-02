@@ -210,7 +210,7 @@
    PARSER SECTION      
 ============================== -->
 
-<section class="focus" id="focus">
+<section class="parser" id="parser">
 <div class="container">
   
   <!-- SECTION HEADER -->
@@ -228,49 +228,73 @@
   
   <!-- 4 FOCUS BOXES -->
   <div class="row">
-    
-    <!-- FIRST FOCUS BOXES -->
-    <div class="col-lg-6 col-sm-6 focus-box red wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
-      <div class="service-icon">
-        <i class="pixeden pd-icon-monitor"></i> <!-- FOCUS ICON-->
+    <div class="parser-box-outer">
+      <div class="col-lg-12 col-sm-12 parser-command blue wow fadeInRight animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
+        <div class="service-icon long">
+        <div class="outer">
+        <div class="middle">
+          <div class="code-block inner lightgrey-text">
+            <p><span class="grey-text">~ $</span> npm install -g sodocan-parser <span class="grey-text">// prefer global</span></p>
+            <p><span class="grey-text">~ $</span> parse myProj results <span class="grey-text">// parse [dir, filepath(s) or github url] [outputDir]</span></p>
+          </div>
+        </div>
+        </div>
+        </div>
       </div>
-      <h5 class="red-border-bottom">stuff</h5> <!-- FOCUS HEADING -->
-      <p> <!-- FOCUS DESCRIPTION -->
-         stuff stuff stuff
-      </p>
+
+      <!-- FIRST FOCUS BOXES -->
+      <div class="col-lg-6 col-sm-6 parser-box red wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
+        <div class="service-icon">
+          <div class="outer">
+          <div class="middle">
+          <div class="code-block inner lightgrey-text">
+            <p>/**</p>
+            <p>&nbsp;&nbsp;@functionName: _.pluck</p>
+            <p>&nbsp;&nbsp;@returns: [{type: array}] */</p>
+            <div class="lightgrey-text">
+              <p><span style="color:#f7c400">_.pluck</span> = <span style="color:#88d8b0">function</span>(<span style="color:#f7c400">obj, key</span>) <span style="color:#88d8b0">{</span> </p>
+              <p>&nbsp;&nbsp;<span style="color:#ff6f69">return</span> _.map(obj, _.property(key));</p>
+              <p><span style="color:#88d8b0">}</span>;</p>
+            </div>
+          </div>
+          </div>
+          </div>
+        </div>
+        <h5 class="red-border-bottom">Source Code</h5> <!-- FOCUS HEADING -->
+      </div>
+      <!-- / END FIRST FOCUS BOX. Other boxes has same format -->
+      
+      <div class="col-lg-6 col-sm-6 parser-box green wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
+        <div class="service-icon">
+          <div class="outer">
+          <div class="middle">
+          <div class="code-block lightgrey-text inner" style="width:70%">
+            <p>{&nbsp;functionName: _.pluck,</p>
+            <p>&nbsp;&nbsp;params: [ </p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;{ name: "obj" },  </p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;{ name: "key" }], </p>
+            <p>&nbsp;&nbsp;returns: [{type: "array"}] } </p>
+          </div>
+          </div>
+          </div>
+        </div>
+        <h5 class="green-border-bottom">Output</h5>
+      </div>
     </div>
-    <!-- / END FIRST FOCUS BOX. Other boxes has same format -->
-    
-    <div class="col-lg-6 col-sm-6 focus-box green wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
+
+<!--     <div class="col-lg-4 col-sm-4 parser-box green wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
       <div class="service-icon">
-        <span class="pixeden pd-icon-camera"></span>
+        <div class="middle">
+          <div class="code-block">
+            <p>npm install -g sodocan-parser</p>
+            <p>$ parse [dir or filepath(s)] [outputDir]</p>
+            <p>$ parse [github filepath] [outputDir]</p>
+          </div>
+        </div>
       </div>
-      <h5 class="green-border-bottom">stuff stuff</h5>
-      <p>
-         stuff stuff stuff
-      </p>
+      <h5 class="green-border-bottom">Output</h5>
     </div>
-    
-<!--     <div class="col-lg-3 col-sm-3 focus-box blue wow fadeInRight animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
-      <div class="service-icon">
-        <i class="pixeden pd-icon-email-marketing"></i>
-      </div>
-      <h5 class="blue-border-bottom">stuff stuff</h5>
-      <p>
-         stuff stuff stuff
-      </p>
-    </div>
-    
-    <div class="col-lg-3 col-sm-3 focus-box yellow wow fadeInRight animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
-      <div class="service-icon">
-        <i class="pixeden pd-icon-check"></i>
-      </div>
-      <h5 class="yellow-border-bottom">Stuff Stuff</h5>
-      <p>
-         stuff stuff stuff
-      </p>
-    </div> -->
-  </div>
+  </div> -->
   <!-- / END 4 FOCUS BOXES -->
   
   <!-- OTHER FOCUSES -->
