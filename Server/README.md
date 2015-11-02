@@ -114,12 +114,16 @@ The server serves as the central hub for all the data that populates the bluepri
   -Get requests do not require authentication (anyone can view docs without logging in)
 
   -all content modifying post requests (/upvote, /addEntry) and  /logout require auth
+
   -upon logging in, the server will send back a JSON object with the property access_token.  The value
   of this property is an encrypted JSON web token.  this should be placed in localStorage, and must be placed in the body of all the authenticated requests listed above, with the property name access_token.
   Example:
-  req.body = { access_token : [token string received on login] }
-  -tokens will expire after 24hrs.  Requesting an authenticated route with an expired token, will result in a 
-  401: Unauthorized response.  The user must log in again to receive a fresh token.
+  ```
+  req.body = { access_token : [token string received on login] };
+  ```
+
+  -tokens will expire after 24hrs (this can be changed in authenticationConfig.js).  Requesting an authenticated route with an expired token, will result in a '401: Unauthorized' response.  The user must log in again to receive a fresh token.
+
   -logging out will require a post request to the /logout path, and should also remove the token from localStorage.
   Once a user has logged out, the token they were using will no longer work.
 
