@@ -34,6 +34,10 @@ exports.addEntry = function(req, res) {
   helpers.addEntry(req.body, res);
 };
 
+exports.editEntry = function(req, res) {
+  helpers.editEntry(req.body, res);
+}
+
 
 exports.registerPostHandler = function(req, res, next) {
   if (req.body.username.substring(req.body.username.length - 4) === '.git') {

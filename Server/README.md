@@ -34,14 +34,14 @@ The server serves as the central hub for all the data that populates the bluepri
 
 
   **/api/** - All get requests involving methods, will go through api
-  **/api/project** - will request every method in the project, and default to requesting top rated entry, with no additions <br>
-  **/api/project/2/all** - will request every method of a project, the top 2 entries for each method, and every addition, for every method <br>
-  **/api/project/1/0/tips/0/0/description/all/all** - will request every method in a project. Explicitly stating you want no entries or additions for tips, and every entry and every addition for description. <br>
-  **/api/project/ref/methodName** - Will send the top entry and no additions for the entry (for every context) <br>
-  **/api/project/ref/methodName/10/5** - Will send the top 10 entries for the specific method, and the top 5 additions (for every context) <br>
-  **/api/project/ref/methodName/all/description/5/1** - Will send all entries for for every context that isn’t description, with no additions, will send the top 5 entries and top addition for each of those entries, for description. <br>
-  **/api/get/project/ref/methodName/context/'entryID-'entryID/10** - will send the top 10 additions for a specific entry <br>
-  **/api/project/ref/methodName/context/'entryID-'entryID/additionID** - will send specific addition <br>
+  **/api/project** - will request every method in the project, and default to requesting top rated entry, with no comments <br>
+  **/api/project/2/all** - will request every method of a project, the top 2 entries for each method, and every comment, for every method <br>
+  **/api/project/1/0/tips/0/0/description/all/all** - will request every method in a project. Explicitly stating you want no entries or comments for tips, and every entry and every comment for description. <br>
+  **/api/project/ref/methodName** - Will send the top entry and no comments for the entry (for every context) <br>
+  **/api/project/ref/methodName/10/5** - Will send the top 10 entries for the specific method, and the top 5 comments (for every context) <br>
+  **/api/project/ref/methodName/all/description/5/1** - Will send all entries for for every context that isn’t description, with no comments, will send the top 5 entries and top comment for each of those entries, for description. <br>
+  **/api/get/project/ref/methodName/context/'entryID-'entryID/10** - will send the top 10 comments for a specific entry <br>
+  **/api/project/ref/methodName/context/'entryID-'entryID/commentID** - will send specific comment <br>
 
   ```
   [
@@ -59,7 +59,7 @@ The server serves as the central hub for all the data that populates the bluepri
         {
           "text": "descriptionblahblah",
           "upvotes": 0,
-          "additions": [],
+          "comments": [],
           "entryID": 1294058334
         }
       ],
@@ -67,7 +67,7 @@ The server serves as the central hub for all the data that populates the bluepri
         {
           "text": "examplesblahblah",
           "upvotes": 0,
-          "additions": [],
+          "comments": [],
           "entryID": 719765163
         }
       ],
@@ -75,7 +75,7 @@ The server serves as the central hub for all the data that populates the bluepri
         {
           "text": "tipsblahblah",
           "upvotes": 0,
-          "additions": [],
+          "comments": [],
           "entryID": 907176294
         }
       ]
@@ -90,7 +90,7 @@ The server serves as the central hub for all the data that populates the bluepri
       functionName:
       context:
       entryID:
-      [additionID:] -- if omitted, we assume we are upvoting an entry
+      [commentID:] -- if omitted, we assume we are upvoting an entry
       [username/ip:] -- not sure what we are doing with this yet, but we probably need a way to stop Lain from just clicking upvote 1,000 times
     }
 
@@ -104,7 +104,7 @@ The server serves as the central hub for all the data that populates the bluepri
     functionName:
     context:
     text:
-    [entryID:] -- if omitted, we assume we are posting an entry. If included, we will be adding an addition to that entry
+    [entryID:] -- if omitted, we assume we are posting an entry. If included, we will be adding an comment to that entry
     [username/ip:] -- not needed yet, but will probably want this
   }
   ```

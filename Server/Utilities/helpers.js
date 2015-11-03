@@ -77,13 +77,13 @@ var parseApiPath = exports.parseApiPath = function(path) {
     if (!nextPath
       || nextPath === 'all'
       || nextPath.slice(0,7) === 'entryID'
-      || nextPath.slice(0,10) === 'additionID'
+      || nextPath.slice(0,9) === 'commentID'
       || !isNaN(+nextPath)) {
       //the first time through, this will put an empty array into context
       //ex (contexts[description] = [])
       contexts[context] = contexts[context] || [];
       if (nextPath) { // not necessary, since will just push undefined to array
-        //pushes the depth, addition, all, or entry ID into context
+        //pushes the depth, comment, all, or entry ID into context
         //{example:[1,all]}
         contexts[context].push(nextPath);
       }
@@ -109,7 +109,7 @@ var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj){
       explanations[context].push({
         text: skeleObj.explanations[context],
         upvotes: 0,
-        additions: [],
+        comments: [],
         entryID: hashCode(skeleObj.explanations[context])
       });
     }
@@ -211,26 +211,26 @@ var getReferences = exports.getReferences = function(path, res) {
             //so we get the n (depth) amount of entries
             contextArray = entriesObj[context] = entriesObj[context].slice(0, +entryDepth);
           }
-          //checking to see if we want a specific addition
+          //checking to see if we want a specific comment
           //very similar to what we did for entries
           for (var i = 0; i < contextArray.length; i++) {
-            if (addDepth.slice(0,10) === 'additionID') {
-              id = +addDepth.slice(11);
-              var additionsArray = contextArray[i].additions;
+            if (addDepth.slice(0,9) === 'commentID') {
+              id = +addDepth.slice(10);
+              var commentsArray = contextArray[i].comments;
               var foundAdd = false;
-              for (var j = 0; i < additionsArray.length; j++) {
-                if (additionsArray[j].additionID === id) {
-                  contextArray[i].additions = [additionsArray[j]];
+              for (var j = 0; i < commentsArray.length; j++) {
+                if (commentsArray[j].commentID === id) {
+                  contextArray[i].comments = [commentsArray[j]];
                   foundAdd = true;
                   break;
                 }
               }
               if (!foundAdd) {
-                contextArray[i].additions = [];
+                contextArray[i].comments = [];
               }
 
             } else if(addDepth !== 'all'){
-              contextArray[i].additions = contextArray[i].additions.slice(0, +addDepth);
+              contextArray[i].comments = contextArray[i].comments.slice(0, +addDepth);
             }
           }
         } else {//if there was no depth, that means we don't want it. delete.
@@ -253,7 +253,7 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
     functionName:
     context:
     entryID:
-    [additionID:]
+    [commentID:]
     [username/ip:]
   }
   */
@@ -272,11 +272,11 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
     var context = upvoteInfo.context;
     var entryID = upvoteInfo.entryID;
 
-    var addition = false;
+    var comment = false;
 
-    var additionID = upvoteInfo.additionID;
-    if (additionID) {
-      addition = true;
+    var commentID = upvoteInfo.commentID;
+    if (commentID) {
+      comment = true;
     }
 
     var entryFound = false;
@@ -288,7 +288,7 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
     for (var i = 0; i < contextArray.length; i++) {
       if (contextArray[i].entryID === entryID) {
         entryFound = true;
-        if(!additionID){
+        if(!commentID){
           contextArray[i].upvotes++;
 
           while (i > 0 && contextArray[i].upvotes > contextArray[i-1].upvotes) {
@@ -298,23 +298,23 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
             i--;
           }
         } else {
-          var additionFound = false;
-          var additions = contextArray[i].additions;
-          for (var j = 0; j < additions.length; j++) {
-            if (additions[j].additionID === additionID) {
-              additionFound = true;
-              additions[j].upvotes++;
-              while (j > 0 && additions[j].upvotes > additions[j-1].upvotes) {
-                var temp = additions[j];
-                additions[j] = additions[j-1];
-                additions[j-1] = temp;
+          var commentFound = false;
+          var comments = contextArray[i].comments;
+          for (var j = 0; j < comments.length; j++) {
+            if (comments[j].commentID === commentID) {
+              commentFound = true;
+              comments[j].upvotes++;
+              while (j > 0 && comments[j].upvotes > comments[j-1].upvotes) {
+                var temp = comments[j];
+                comments[j] = comments[j-1];
+                comments[j-1] = temp;
                 j--;
               }
               break;
             }
           }
-          if (!additionFound) {
-            send404(res, 'additionID not found');
+          if (!commentFound) {
+            send404(res, 'commentID not found');
             return;
           }
         }
@@ -374,19 +374,19 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
       for (var i = 0; i < contextArray.length; i++) {
         if (contextArray[i].entryID === entryID) {
           entryFound = true;
-          for (var j = 0; j < contextArray[i].additions.length; j++) {
-            if (contextArray[i].additions[j].additionID === id) {
+          for (var j = 0; j < contextArray[i].comments.length; j++) {
+            if (contextArray[i].comments[j].commentID === id) {
               send404(res, 'duplicate entry');
               return;
             }
           }
-          var addition = {
-            additionID: id,
+          var comment = {
+            commentID: id,
             timestamp: new Date(),
             text: addEntryInfo.text,
             upvotes: 0,
           };
-          contextArray[i].additions.push(addition);
+          contextArray[i].comments.push(comment);
           break;
         }
       }
@@ -406,7 +406,7 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
         timestamp: new Date(),
         text: addEntryInfo.text,
         upvotes: 0,
-        additions: []
+        comments: []
       };
       contextArray.push(entry);
     }
@@ -420,6 +420,10 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
       }
     });
   });
+};
+
+var editEntry = exports.editEntry = function() {
+  //
 };
 
 
@@ -452,7 +456,7 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
             var newEntry = {
               text: newEntryText,
               upvotes: 0,
-              additions: [],
+              comments: [],
               entryID: hashCode(newEntryText)
             };
             existingEntries.push(newEntry);
