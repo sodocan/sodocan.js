@@ -27,12 +27,17 @@ exports.postSkeleton = function(req, res) {
 };
 
 exports.upvote = function(req, res) {
+  console.log('upvote req body', req.body);
   helpers.upvote(req.body, res);
 };
 
 exports.addEntry = function(req, res) {
   helpers.addEntry(req.body, res);
 };
+
+exports.editEntry = function(req, res) {
+  helpers.editEntry(req.body, res);
+}
 
 
 exports.registerPostHandler = function(req, res, next) {
@@ -80,6 +85,17 @@ exports.loginPostHandler = function(req, res, next) {
 exports.githubLoginPostHandler = function(req, res, next) {
   helpers.createToken(req, res, next, 'github');
 };
+
+exports.checkTokenHandler = function(req, res, next) {
+  passport.authenticate('bearer', {session: false}, function(err, user) {
+    if (user) {
+      req.body.username = user.username;
+      next();
+    } else {
+      res.sendStatus(401);
+    }
+  })(req, res, next);
+}
 
 /* Used for our testing pages only
 

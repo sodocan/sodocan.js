@@ -259,12 +259,12 @@ describe("Server", function() {
             var ref = body[0];
             delete ref['_id'];
             var tips = ref.explanations.tips;
-            var additions;
+            var comments;
             for (var i = 0; i < tips.length; i++) {
               delete tips[i].timestamp;
-              additions = tips[i].additions;
-              for (var j = 0; j < additions.length; j++) {
-                delete additions[j].timestamp;
+              comments = tips[i].comments;
+              for (var j = 0; j < comments.length; j++) {
+                delete comments[j].timestamp;
               }
             }
             log('expectNum', ++expectNum);
@@ -310,12 +310,12 @@ describe("Server", function() {
             var ref = body[0];
             delete ref['_id'];
             var tips = ref.explanations.tips;
-            var additions;
+            var comments;
             for (var i = 0; i < tips.length; i++) {
               delete tips[i].timestamp;
-              additions = tips[i].additions;
-              for (var j = 0; j < additions.length; j++) {
-                delete additions[j].timestamp;
+              comments = tips[i].comments;
+              for (var j = 0; j < comments.length; j++) {
+                delete comments[j].timestamp;
               }
             }
             log('ref', JSON.stringify(ref));

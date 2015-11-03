@@ -68,8 +68,9 @@ app.use(function(err, req, res, next) {
 
 app.get('/api/*', handlers.getApi);
 app.post('/create', handlers.postSkeleton);
-app.post('/upvote', passport.authenticate('bearer', {session: false}), handlers.upvote);
-app.post('/addEntry', passport.authenticate('bearer', {session: false}), handlers.addEntry);
+app.post('/upvote', handlers.checkTokenHandler, handlers.upvote);
+app.post('/addEntry', handlers.checkTokenHandler, handlers.addEntry);
+app.post('/editEntry', handlers.checkTokenHandler, handlers.editEntry);
 
 //NOTE: figure out best practices for above route
 
