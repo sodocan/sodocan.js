@@ -5,7 +5,7 @@ var passport = require('passport');
 
 exports.getApi = function(req, res){
   var apiPath = req.url;
-  helpers.getReferences(apiPath, helpers.sendReferences, res);
+  helpers.getReferences(apiPath, res);
 };
 
 //[{header: {}, body:[]},.. ] - body form
@@ -13,7 +13,7 @@ exports.postSkeleton = function(req, res) {
   var skeleton = req.body;
   var skull = skeleton.header; // :D
   var methodsArray = skeleton.body;
-  var completedMethodEntry = helpers.runAfterAsync(res, methodsArray.length, helpers.mongoUpdateSuccess, helpers.mongoUpdateFailure);
+  var completedMethodEntry = helpers.runAfterAsync(res, methodsArray.length);
   for(var i = 0; i < methodsArray.length; i++){
     var method = methodsArray[i];
     //check and see if this method exists already (match proj and method)
@@ -56,6 +56,11 @@ exports.logoutHandler = function(req, res, next) {
     if (err) {
       console.error(err);
       res.end('authentication error');
+      return;
+    }
+    if (!user) {
+      res.sendStatus(401);
+      return;
     }
     user.session++;
     user.save(function(err) {
