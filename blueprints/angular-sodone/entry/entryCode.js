@@ -20,7 +20,7 @@ angular.module('sodocan')
         entryID: $scope.entry.entryID
       };
       if(commentID){
-        upvoteJSON.additionID = commentID; 
+        upvoteJSON.commentID = commentID; 
       }
       sodocanAPI.sendToAPI('upvote', upvoteJSON, function(){});
     };
@@ -97,7 +97,7 @@ angular.module('sodocan')
         console.error(err);
       }
         else{
-          sodocanAPI.docs[ref].explanations[context][index].additions = data[0].explanations[context][0].additions; 
+          sodocanAPI.docs[ref].explanations[context][index].comments = data[0].explanations[context][0].comments; 
           console.log('loaded data',data); 
         }
       });
