@@ -3,7 +3,7 @@ var jwt = require('jwt-simple');
 
 var env = process.env;
 
-if (!env.tokenSecret) {
+if (!env.TOKEN_SECRET) {
   var authConfig = require('../authenticationConfig');
 }
 
