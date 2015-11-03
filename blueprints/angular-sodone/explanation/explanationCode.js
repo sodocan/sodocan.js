@@ -21,7 +21,7 @@ angular.module('sodocan')
     var entry = {
       text: $scope.entryText,
       upvotes: 0,
-      additions: []
+      comments: []
     };
     $scope.localEntries.push(entry); 
   };
