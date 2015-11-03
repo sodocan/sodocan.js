@@ -31,5 +31,8 @@ public/dist/sodocan.js
 parser/node_modules
 parser/results
 
+# auth secrets
+Server/authenticationConfig.js
+
 *.vim
 .*

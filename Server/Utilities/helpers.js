@@ -2,6 +2,7 @@ var methodsDB = require('../Databases/Models/methods.js');
 var passport = require('passport');
 var jwt = require('jwt-simple');
 var authConfig = require('../authenticationConfig');
+
 /* Server Response Actions */
 
 var send404 = exports.send404 = function(res, errorMessageOrObj) {
@@ -620,12 +621,16 @@ var createToken = exports.createToken = function(req, res, next, authenticateTyp
     log('user', user);
     var token = jwt.encode({
       username: user.username,
-      expiration: authConfig.calculateTokenExpiration(),
+      expiration: calculateTokenExpiration(),
       session: user.session
     }, process.env.tokenSecret || authConfig.tokenSecret);
-    // log('token', token);
-    // log('decoded', jwt.decode(token, 'superSecret'));
     log('token contents: ',jwt.decode(token, process.env.tokenSecret || authConfig.tokenSecret));
     res.json({access_token: token});
   })(req, res, next);
+};
+
+var calculateTokenExpiration = exports.calculateTokenExpiration = function() {
+  var timeInHours = 24;
+  var timeInMilliseconds = timeInHours * 3600000;
+  return Date.now() + timeInMilliseconds;
 };
