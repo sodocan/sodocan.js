@@ -514,7 +514,7 @@ var createToken = exports.createToken = function(req, res, next, authenticateTyp
       username: user.username,
       expiration: calculateTokenExpiration(),
       session: user.session
-    }, process.env.tokenSecret || authConfig.tokenSecret);
+    }, process.env.TOKEN_SECRET || authConfig.tokenSecret);
     res.json({access_token: token});
   })(req, res, next);
 };

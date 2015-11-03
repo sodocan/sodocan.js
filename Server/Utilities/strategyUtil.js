@@ -42,7 +42,7 @@ exports.githubStrategyCallback = function(accessToken, refreshToken, profile, do
 
 exports.bearerStrategyCallback = function(token, done) {
   try {
-    var decoded = jwt.decode(token, env.tokenSecret || authConfig.tokenSecret);
+    var decoded = jwt.decode(token, env.TOKEN_SECRET || authConfig.tokenSecret);
     log('decoded',decoded);
     if (decoded.expiration < Date.now()) {
       return done(null, false);
