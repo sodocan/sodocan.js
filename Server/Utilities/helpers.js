@@ -1,7 +1,6 @@
 var methodsDB = require('../Databases/Models/methods.js');
 var passport = require('passport');
 var jwt = require('jwt-simple');
-var authConfig = require('../authenticationConfig');
 
 /* Server Response Actions */
 
