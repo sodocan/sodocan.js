@@ -1,3 +1,8 @@
+/*
+  Top level controller
+  Handles watching the router for changes
+  Hub for most emit / broadcast functions
+*/
 
 var app = angular.module('sodocan')
 .directive('sodocanApp', function() {
@@ -14,9 +19,18 @@ var app = angular.module('sodocan')
     console.log('path', path); 
     $scope.contentDisp = path;
   };
-  $scope.$on('globalContextButton', function(event, context,state){
+  $scope.$on('navContextButton', function(event, context,state){
     $scope.$broadcast('localContextButton', context, state); 
-    console.log('app listened');
+  });
+  $scope.$on('clickedShowModal',function(event, settings){
+    $scope.$broadcast('displayModal', event, settings); 
+  }); 
+  $scope.$on('navLoadEntries', function(event, num, context){
+    console.log('in app', arguments);
+    $scope.$broadcast('loadEntries', num, context);
+  });
+  $scope.$on('navLoadComments', function(event, num, context){
+    $scope.$broadcast('loadComments', num, context); 
   });
   $scope.$watch('sodocanRoute()',update);
 }]);

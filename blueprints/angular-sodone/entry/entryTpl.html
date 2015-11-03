@@ -7,7 +7,7 @@
       {{entry.text}}
     </div>
     <div>
-      <div ng-repeat="comment in entry.additions">
+      <div ng-repeat="comment in entry.additions | limitTo: displayedComments">
         <div sodocan-comment>
         </div>
       </div>

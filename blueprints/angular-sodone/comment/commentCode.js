@@ -10,5 +10,6 @@ angular.module('sodocan')
   function($scope, sodocanAPI, sodocanRouter){
     $scope.upvote = function(){
       $scope.comment.upvotes++;
+      $scope.sendUpvote($scope.comment.additionID); 
     };
 }]);

@@ -113,7 +113,8 @@ angular.module( 'sodocan', [])
 
   var obj = {};
   obj.projectName = projectName;
-
+  obj.getFromAPI = getFromAPI; 
+  obj.sendToAPI = sendToAPI; 
   /* Request methods
    *
    */
@@ -347,8 +348,8 @@ angular.module( 'sodocan', [])
 
   };
 
-  // TODO: does this really need proj,funcName, context, and ID?
-  obj.newComment = function(entryID,ref,context,text,cb) {
+  // untested, does this really need proj,funcName, context, and ID?
+  obj.newComment = function(entryID,ref,text,context,cb) {
     cb = cb || function(){};
     sendToAPI('addEntry',
               {

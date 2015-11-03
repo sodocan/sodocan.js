@@ -40,8 +40,8 @@ The server serves as the central hub for all the data that populates the bluepri
   **/api/project/ref/methodName** - Will send the top entry and no additions for the entry (for every context) <br>
   **/api/project/ref/methodName/10/5** - Will send the top 10 entries for the specific method, and the top 5 additions (for every context) <br>
   **/api/project/ref/methodName/all/description/5/1** - Will send all entries for for every context that isn’t description, with no additions, will send the top 5 entries and top addition for each of those entries, for description. <br>
-  **/api/get/project/ref/methodName/context/entryID/10** - will send the top 10 additions for a specific entry <br>
-  **/api/project/ref/methodName/context/entryID/additionID** - will send specific addition <br>
+  **/api/get/project/ref/methodName/context/'entryID-'entryID/10** - will send the top 10 additions for a specific entry <br>
+  **/api/project/ref/methodName/context/'entryID-'entryID/additionID** - will send specific addition <br>
 
   ```
   [
@@ -133,4 +133,3 @@ The server serves as the central hub for all the data that populates the bluepri
 
   -logging out will require a post request to the /logout path, and should also remove the token from localStorage.
   Once a user has logged out, the token they were using will no longer work.
-
