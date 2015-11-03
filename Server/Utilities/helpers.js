@@ -2,9 +2,9 @@ var methodsDB = require('../Databases/Models/methods.js');
 var passport = require('passport');
 var jwt = require('jwt-simple');
 
-if (!process.env.tokenSecret) {
-  var authConfig = require('../authenticationConfig');
-}
+// if (!process.env.tokenSecret) {
+//   var authConfig = require('../authenticationConfig');
+// }
 
 /* Server Response Actions */
 
