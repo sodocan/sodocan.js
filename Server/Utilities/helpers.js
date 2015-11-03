@@ -107,6 +107,7 @@ var parseApiPath = exports.parseApiPath = function(path) {
     }
     nextPath = next();
   } while (nextPath);
+  console.log(searchObject);
   return {
     searchObject: searchObject,
     contexts: contexts

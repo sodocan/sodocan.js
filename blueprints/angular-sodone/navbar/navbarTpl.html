@@ -1,26 +1,5 @@
 <nav ng-controller="sodocanNavbarController" class="fixed-navbar">
 
-<!-- dropdown options -->
-      <ul id="entryDropDown" class="dropdown-content">
-        <li><a href="#!">One</a></li>
-        <li><a href="#!">Two</a></li>
-        <li><a href="#!">Three</a></li>
-        <li><a href="#!">Five</a></li>
-        <li><a href="#!">Ten</a></li>
-        <li class="divider"></li>
-        <li><a href="#!">All</a></li>
-      </ul>
-      <ul id="commentDropDown" class="dropdown-content">
-        <li><a href="#!">One</a></li>
-        <li><a href="#!">Two</a></li>
-        <li><a href="#!">Three</a></li>
-        <li><a href="#!">Five</a></li>
-        <li><a href="#!">Ten</a></li>
-        <li class="divider"></li>
-        <li><a href="#!">All</a></li>
-      </ul>
-
-
       <!-- navbar -->
       <div class="navbar-fixed">
         <nav>
@@ -28,9 +7,7 @@
             <span class=""> Sodocan</span>
             <a href="#!" class="brand-logo">Underscore</a>
             <ul class="right hide-on-med-and-down">
-              <li><a href="#">Noramlize</a></li>
-              <li><a class="dropdown-button" href="#!" data-activates="entryDropDown">Entries<i class="material-icons right">arrow_drop_down</i></a></li>
-              <li><a class="dropdown-button" href="#!" data-activates="commentDropDown">Comments<i class="material-icons right">arrow_drop_down</i></a></li>
+              <li><a href="" ng-click="showModal($event)"><i class="material-icons">settings</i></a></li>
               <li><form>
                 <div class="input-field">
                   <input id="search" type="search" required>

@@ -2,8 +2,7 @@
   <div class="modal-bg" ng-click="hideModal()" ng-style="bgStyle">
   </div>
   <div class="modal-window" ng-style="windowStyle">
-    <div {{innerTemplate}}>
-    {{innerTemplate}}
+    <div ng-include="innerTemplate">
     </div>
   </div>
 </div>
