@@ -1,6 +1,6 @@
 var express = require('express');
 var path = require('path');
-// var favicon = require('serve-favicon'); // currently not used
+var favicon = require('serve-favicon'); // currently not used
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -37,20 +37,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 // app.use(express.static(path.join(__dirname, 'StaticPages'))); // will this be used?
 app.use(express.static(path.join(__dirname, '../public')));
-
-// stores github id/secret
-var id, secret, callbackURL;
-
-if (process.env.CLIENT_ID && process.env.CLIENT_SECRET && process.env.CALLBACK_URL) {
-  id = process.env.CLIENT_ID;
-  secret = process.env.CLIENT_SECRET;
-  callbackURL = process.env.CALLBACK_URL;
-} else {
-  var authConfig = require('./authenticationConfig');
-  id = authConfig.github.clientID;
-  secret = authConfig.github.clientSecret;
-  callbackURL = authConfig.github.callbackURL;
-}
 
 var User = require('./Databases/Models/users.js');
 passport.use(new LocalStrategy(strategyUtil.localStrategyCallback));

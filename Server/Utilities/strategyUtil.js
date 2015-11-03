@@ -10,9 +10,9 @@ if (!env.tokenSecret) {
 exports.localStrategyCallback = User.authenticate();
 
 exports.githubStrategyConfig = {
-  clientID: env.githubClientID || authConfig.github.clientID,
-  clientSecret: env.githubClientSecret || authConfig.github.clientSecret,
-  callbackURL: env.githubCallbackURl || authConfig.github.callbackURL
+  clientID: env.CLIENT_ID || authConfig.github.clientID,
+  clientSecret: env.CLIENT_SECRET || authConfig.github.clientSecret,
+  callbackURL: env.CALLBACK_URL || authConfig.github.callbackURL
 };
 
 exports.githubStrategyCallback = function(accessToken, refreshToken, profile, done) {
