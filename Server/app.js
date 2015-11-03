@@ -1,21 +1,18 @@
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon'); // currently not used
+// var favicon = require('serve-favicon'); // currently not used
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var GitHubStrategy = require('passport-github').Strategy;
-var expressSession = require('express-session');
-// var everyauth = require('everyauth');
+var expressSession = require('express-session'); // still needed?
 var BearerStrategy = require('passport-http-bearer').Strategy;
-var jwt = require('jwt-simple');
 
-//var crowdsourceRouter = require('./Routes/crowdsource');
 var usersRouter = require('./Routes/users');
-//var createRouter = require('./Routes/create');
 var handlers = require('./Utilities/requestHandlers');
+var strategyUtil = require('./Utilities/strategyUtil');
 
 var app = express();
 
@@ -28,13 +25,13 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-// app.use(express.methodOverride());
+
+// not needed anymore?
 app.use(expressSession({
   secret: 'secret',
   resave: false,
   saveUninitialized: false
 }));
-//app.use(everyauth.middleware(app));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -56,10 +53,8 @@ if (process.env.CLIENT_ID && process.env.CLIENT_SECRET && process.env.CALLBACK_U
 }
 
 var User = require('./Databases/Models/users.js');
-passport.use(new LocalStrategy(User.authenticate()));
+passport.use(new LocalStrategy(strategyUtil.localStrategyCallback));
 
-//passport.serializeUser(User.serializeUser());
-//passport.deserializeUser(User.deserializeUser());
 passport.serializeUser(function(user, done) {
   done(null, user);
 });
@@ -68,77 +63,13 @@ passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
 
-passport.use(new GitHubStrategy({
-  clientID: id,
-  clientSecret: secret,
-  callbackURL: callbackURL
-// }, function(accessToken, refreshToken, profile, done) {
-//   console.log('done(): ', done);
-//   // process.nextTick(function() {
-//   //   return done(null, profile);
-//   // });
-//   User.findOrCreate({githubId: profile.id}, function(error, user) {
-//     console.log('error', error);
+passport.use(new GitHubStrategy(
+  strategyUtil.githubStrategyConfig,
+  strategyUtil.githubStrategyCallback
+));
 
-//     return done(error, user);
-//   });
-// }
-}, function(accessToken, refreshToken, profile, done) {
-    // asynchronous verification, for effect...
+passport.use(new BearerStrategy(strategyUtil.bearerStrategyCallback));
 
-    User.findOne({
-      username: profile.username + '.git'
-    },
-    function(err, user) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      if (user) {
-          console.log('user already found in database');
-          done(null, user);
-      } else {
-        var user = new User({
-          username: profile.username + '.git',
-        });
-        user.save(function(err) {
-          if (err) {
-            console.error(err);
-          } else {
-            console.log('saving user...');
-            done(null, user);
-          }
-        });
-      }
-    });
-}));
-
-passport.use(new BearerStrategy(function(token, done) {
-  try {
-    var decoded = jwt.decode(token, process.env.tokenSecret || authConfig.tokenSecret);
-    log('decoded',decoded);
-    if (decoded.expiration < Date.now()) {
-      return done(null, false);
-    }
-    User.findOne({username: decoded.username, session: decoded.session}, function(err, user) {
-      if (err) {
-        console.error(err);
-        return done(err);
-      }
-
-      if (!user) {
-        return done(null, false);
-      } else {
-        return done(null, user);
-      }
-    });
-  }
-  catch(err) {
-    return done(null, false);
-  }
-}));
-
-// app.use('/users', usersRouter); // might change later to not use router
 app.use('/auth', usersRouter);
 
 app.use(function(err, req, res, next) {

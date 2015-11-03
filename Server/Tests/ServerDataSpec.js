@@ -6,6 +6,7 @@ var helpers = require('./../Utilities/helpers.js');
 var testCases = require('./testCases.js');
 var db = require('../Databases/dbconnection.js');
 var methodsDB = require('../Databases/Models/methods.js');
+var User = require('../Databases/Models/users.js');
 
 // Need this log function because test environment has different
 // global scope as the one the server is running on
@@ -35,6 +36,7 @@ global.log = function() {
 };
 
 var expectNum = 0;
+var access_token;
 
 // Begin tests
 describe("Server", function() {
@@ -42,22 +44,39 @@ describe("Server", function() {
   // removes test data
   before(function (done) {
 
-    var removeTestData = function() {
+    var reinitiateTestData = function() {
       methodsDB.remove({project: 'testProj'}, function(err) {
         if (err) {
           log('Mongo remove testProj error', err);
         } else {
-          done();
+          User.remove({username: 'testUser'}, function(err) {
+            if (err) {
+              log('Mongo remove testUser error', err);
+            } else {
+              reqprom({
+                method: 'POST',
+                uri: 'http://localhost:3000/auth/register',
+                json: {
+                  username: 'testUser',
+                  password: 'test'
+                }
+              })
+              .then(function(data) {
+                access_token = data.access_token;
+                done();
+              });
+            }
+          });
         }
       });
     };
 
     if (!mongoose.connection.db) {
       db.on('connected', function() {
-        removeTestData();
+        reinitiateTestData();
       });
     } else {
-      removeTestData();
+      reinitiateTestData();
     }
   });
 
@@ -226,6 +245,7 @@ describe("Server", function() {
         var addEntryCase = addEntryCases[ind];
         postOptions.uri = 'http://localhost:3000/addEntry';
         postOptions.json = addEntryCase.postJson;
+        postOptions.json.access_token = access_token;
         getOptions.resolveWithFullResponse = false;
         getOptions.uri = addEntryCase.getUri;
         reqprom(postOptions)
@@ -268,6 +288,7 @@ describe("Server", function() {
         var upvoteCase = upvoteCases[ind];
         postOptions.uri = 'http://localhost:3000/addEntry';
         postOptions.json = upvoteCase.addEntryJson;
+        postOptions.json.access_token = access_token;
         getOptions.resolveWithFullResponse = false;
         getOptions.uri = upvoteCase.getUri;
         reqprom(postOptions)
@@ -276,6 +297,7 @@ describe("Server", function() {
             expect(res.statusCode).to.equal(202);
             postOptions.uri = 'http://localhost:3000/upvote'
             postOptions.json = upvoteCase.upvoteJson;
+            postOptions.json.access_token = access_token;
             return reqprom(postOptions);
           })
           .then(function(res) {
@@ -318,6 +340,7 @@ describe("Server", function() {
         var duplicateEntryCase = duplicateEntryCases[ind];
         postOptions.uri = 'http://localhost:3000/addEntry';
         postOptions.json = duplicateEntryCase.postJson;
+        postOptions.json.access_token = access_token;
         reqprom(postOptions)
           .then(function() {
             log('Test Fail', 'Did not send 404 for duplicate ' + duplicateEntryCase.type);

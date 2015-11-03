@@ -56,6 +56,11 @@ exports.logoutHandler = function(req, res, next) {
     if (err) {
       console.error(err);
       res.end('authentication error');
+      return;
+    }
+    if (!user) {
+      res.sendStatus(401);
+      return;
     }
     user.session++;
     user.save(function(err) {
