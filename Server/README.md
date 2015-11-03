@@ -104,7 +104,7 @@ The server serves as the central hub for all the data that populates the bluepri
     functionName:
     context:
     text:
-    [entryID:] -- if omitted, we assume we are posting an entry. If       included, we will be adding an addition to that entry
+    [entryID:] -- if omitted, we assume we are posting an entry. If included, we will be adding an addition to that entry
     [username/ip:] -- not needed yet, but will probably want this
   }
   ```
@@ -113,13 +113,20 @@ The server serves as the central hub for all the data that populates the bluepri
 
   -Get requests do not require authentication (anyone can view docs without logging in)
 
-  -all content modifying post requests (/upvote, /addEntry) and  /logout require auth
+  -POST /auth/register and POST /auth/login are routes for creating an account/logging in. Requests to these
+  must have properties called 'username' and 'password' on the body.
+  ```
+  req.body = { username: "Harold" password: "lept0n"}
+  ```
+  - GET /auth/github is the route to trigger logging in with Github OAuth.
+
+  -all content modifying post requests (POST /upvote, POST /addEntry) and POST /logout require auth
 
   -upon logging in, the server will send back a JSON object with the property access_token.  The value
   of this property is an encrypted JSON web token.  this should be placed in localStorage, and must be placed in the body of all the authenticated requests listed above, with the property name access_token.
   Example:
   ```
-  req.body = { access_token : [token string received on login] };
+  req.body = { access_token : 'TOKEN_VALUE' };
   ```
 
   -tokens will expire after 24hrs (this can be changed in authenticationConfig.js).  Requesting an authenticated route with an expired token, will result in a '401: Unauthorized' response.  The user must log in again to receive a fresh token.
