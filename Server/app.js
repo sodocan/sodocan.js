@@ -59,7 +59,6 @@ passport.use(new BearerStrategy(strategyUtil.bearerStrategyCallback));
 app.use('/auth', usersRouter);
 
 app.use(function(err, req, res, next) {
-  // console.log(err);
   console.error(err);
   console.error(new Error('404').stack);
   console.log('next: ', next);
