@@ -29,10 +29,10 @@ var mongoFind = function(res, searchObj, sortObj, successC, notFoundC, errorC) {
   errorC = errorC || function(err) {send404(res, err);};
 
   var finder = sortObj
-    ? methodsDB.find(searchObj).sort(sortObj)
+    ? methodsDB.find(searchObj).sort(sortObj).lean()
     : methodsDB.findOne(searchObj);
 
-  finder.lean().exec(function(error, references) {
+  finder.exec(function(error, references) {
     if (error) {
       errorC(error);
     } else if (sortObj ? !references.length : !references) {
@@ -101,20 +101,7 @@ var parseApiPath = exports.parseApiPath = function(path) {
   };
 };
 
-var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj){
-  var explanations = {};
-  for(var context in skeleObj.explanations){
-    explanations[context] = [];
-    if(skeleObj.explanations[context]){
-      explanations[context].push({
-        text: skeleObj.explanations[context],
-        upvotes: 0,
-        comments: [],
-        entryID: hashCode(skeleObj.explanations[context])
-      });
-    }
-  }
-
+var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj) {
   var dbForm = {
     project: projectName,
     functionName: skeleObj.functionName,
@@ -123,12 +110,12 @@ var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj){
       params: skeleObj.params,
       returns: skeleObj.returns
     },
-    explanations: explanations
+    explanations: {descriptions: [], examples: [], tips:[]}
   };
   return dbForm;
 };
 
-var runAfterAsync = exports.runAfterAsync = function(res, numOfCallbacks){
+var runAfterAsync = exports.runAfterAsync = function(res, numOfCallbacks) {
   var finished = 0;
   var failed = false;
   return function(err){
@@ -266,6 +253,8 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
     return;
   }
 
+  var username = upvoteInfo.username;
+
   // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
   mongoFind(res, searchObject, null, function(reference) {
     var context = upvoteInfo.context;
@@ -274,7 +263,8 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
     var commentID = upvoteInfo.commentID;
 
     var entryFound = false;
-    var contextArray = reference.explanations[context];
+    var explanations = JSON.parse(JSON.stringify(reference.explanations));
+    var contextArray = explanations[context];
     if (!contextArray) {
       send404(res, 'context not found');
       return;
@@ -284,8 +274,9 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
         entryFound = true;
         if (!commentID) {
           var entry = contextArray[i];
-          if (upvoteInfo.username !== entry.username) {
+          if (!entry.upvoters.hasOwnProperty(username) && username !== entry.username) {
             entry.upvotes++;
+            entry.upvoters[username] = 1;
 
             while (i > 0 && entry.upvotes > contextArray[i-1].upvotes) {
               contextArray[i] = contextArray[i-1];
@@ -300,8 +291,9 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
             var comment = comments[j];
             if (comment.commentID === commentID) {
               commentFound = true;
-              if (upvoteInfo.username !== comment.username) {
+              if (!comment.upvoters.hasOwnProperty(username) && username !== comment.username) {
                 comment.upvotes++;
+                comment.upvoters[username] = 1;
                 while (j > 0 && comment.upvotes > comments[j-1].upvotes) {
                   comments[j] = comments[j-1];
                   comments[j-1] = comment;
@@ -324,9 +316,13 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
       return;
     }
 
-    methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
-      if (error) {
-        send404(res, error);
+    // Mongoose will not save the modifications to the explanations object
+    // unless you reassign its value to a different object
+    reference.explanations = explanations;
+
+    reference.save(function(err) {
+      if (err) {
+        send404(res, err);
       } else {
         res.setHeader('Access-Control-Allow-Origin','*');
         res.sendStatus(202);
@@ -359,7 +355,8 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
   // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
   mongoFind(res, searchObject, null, function(reference) {
     var context = addEntryInfo.context;
-    var contextArray = reference.explanations[context];
+    var explanations = JSON.parse(JSON.stringify(reference.explanations));
+    var contextArray = explanations[context];
     if (!contextArray) {
       send404(res, 'context not found');
       return;
@@ -391,6 +388,7 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
             timestamp: new Date(),
             text: addEntryInfo.text,
             upvotes: 0,
+            upvoters: {}
           };
           comments.push(comment);
           break;
@@ -419,14 +417,19 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
         timestamp: new Date(),
         text: addEntryInfo.text,
         upvotes: 0,
+        upvoters: {},
         comments: []
       };
       contextArray.push(entry);
     }
 
-    methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
-      if (error) {
-        send404(res, error);
+    // Mongoose will not save the modifications to the explanations object
+    // unless you reassign its value to a different object
+    reference.explanations = explanations;
+
+    reference.save(function(err) {
+      if (err) {
+        send404(res, err);
       } else {
         res.setHeader('Access-Control-Allow-Origin','*');
         res.sendStatus(202);
@@ -466,7 +469,8 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
     var commentID = editEntryInfo.commentID;
 
     var entryFound = false;
-    var contextArray = reference.explanations[context];
+    var explanations = JSON.parse(JSON.stringify(reference.explanations));
+    var contextArray = explanations[context];
     if (!contextArray) {
       send404(res, 'context not found');
       return;
@@ -520,9 +524,14 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
       send404(res, 'not a valid edit');
       return;
     }
-    methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
-      if (error) {
-        send404(res, error);
+
+    // Mongoose will not save the modifications to the explanations object
+    // unless you reassign its value to a different object
+    reference.explanations = explanations;
+
+    reference.save(function(err) {
+      if (err) {
+        send404(res, err);
       } else {
         res.setHeader('Access-Control-Allow-Origin','*');
         res.sendStatus(202);
@@ -561,6 +570,7 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
             var newEntry = {
               text: newEntryText,
               upvotes: 0,
+              upvoters: {},
               comments: [],
               entryID: hashCode(newEntryText)
             };
@@ -588,11 +598,11 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
     notFound: function() {
       // convertToDBForm and then insert
       // res.statusCode(202).end() inside callback of database upsert
-      (new methodsDB(convertToDBForm(skull.project, method))).save(function(err){
+      (new methodsDB(convertToDBForm(skull.project, method))).save(function(err, newMethod){
         if(err){
           completedMethodEntry(err);
         } else {
-          completedMethodEntry();
+          cb.success(newMethod);
         }
       });
     },
