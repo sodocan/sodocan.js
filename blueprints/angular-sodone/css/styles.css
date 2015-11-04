@@ -16,11 +16,6 @@ body {
   overflow-x: hidden !important;
   line-height: 25px;
   background-color: white;
-  box-shadow: none !important;
-}
-
-* {
-  box-shadow: none !important;
 }
 
 ::-moz-selection { /* Code for Firefox */
@@ -74,6 +69,11 @@ NAV BAR STYLES
   margin-left: 30px;
 }
 
+.nav-thin-top {
+  background: #063F84;
+  height: 5px;
+}
+
 /*.navbar-fixed form {
   background: pink;
 }*/
@@ -120,22 +120,79 @@ MAIN BODY STYLES
 }
 
 .contextBtn{
-  padding: 0 2px;
-  height: 20px;
-  line-height: 20px;
-  vertical-align: top;
+  padding: 2px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: 1px;
+  font-size: 15px;
+  background: #26A69A;
+  color: white;
+  border-radius: 2px;
+  vertical-align: middle;
 }
+
+.contextBtn div {
+  display:inline-block; 
+  vertical-align: middle;
+}
+
+/*=========================================
+CARD STYLES
+=========================================*/
+
 .card {
   margin-bottom: 20px;
-  box-shadow: none
+  padding: 5px;
+  padding-left: 10px;
+  box-shadow: 2px red;
 }
+
+.card-inner {
+  padding: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-shadow: 2px #ff0000 !important;
+/*  border: 1px solid black;*/
+  width: 100%;
+}
+
+.entry {
+  margin-top: 5px;
+  padding: 10px !important;
+  padding-left: 25px !important;
+  font-size: 18px;
+}
+
+.vote-count {
+  font-size: 20px;
+}
+
+.card-header {
+  padding-left: 10px;
+  padding-right: 30px;
+}
+
 .card h3{
   margin-top: 0;
   font-size: 25px;
   margin-right: 10px;
 }
+
+.card span {
+
+}
+
 .card .params{
   font-size: 20px;
+}
+
+.entry-icons {
+  margin-top: 5px;
+  margin-right: 10px;
+}
+
+.entry-icons i {
+  margin: 5px;
 }
 
 .tint{
@@ -158,9 +215,6 @@ MAIN BODY STYLES
 }
 .upvote i, .upvoteComments i{
   cursor: pointer;
-}
-.explanation-text{
-  padding-left: 15px;
 }
 .comments{
   padding-left: 10px;

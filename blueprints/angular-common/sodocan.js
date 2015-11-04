@@ -179,6 +179,7 @@ angular.module( 'sodocan', [])
   obj.getReference = function(refObj,cb) {
     
     var parsed;
+    var ret;
 
     // Making convenience functions more, well, convenient means you can pass parsed
     // object in as well. ES6 version will hopefully be neater
@@ -195,15 +196,22 @@ angular.module( 'sodocan', [])
     getFromAPI(parsed.url,function(err,data) {
       if (err) {
         cb(err);
+        console.log('error', err);
         return;
       }
       if (parsed.ref) {
-        ret = obj.docs[parsed.ref].explanations = data[0].explanations;
+        var explanations = data[0].explanations;
+        for (var prop in explanations) {
+          obj.docs[parsed.ref].explanations[prop] = explanations[prop];
+        }
+        ret = obj.docs[parsed.ref].explanations;
+        console.log('ret is', ret);
       } else {
         data.map(function(method) {
           obj.docs[method.functionName] = method;
         });
         ret = obj.docs;
+        console.log('ret in else is', ret);
       }
 
       cb(null,ret);
@@ -212,6 +220,7 @@ angular.module( 'sodocan', [])
   };
 
   obj.getDescriptions = function() {
+    console.log('get descriptions is called');
     var parsed = parseRefObj(Array.prototype.slice.call(arguments));
     // see Tips for specific query
     obj.getReference(parsed,function(err,data) {
@@ -269,13 +278,21 @@ angular.module( 'sodocan', [])
   obj.getComments = function(ref,context,entryID,commentNum,cb) {
     
     if (commentNum===-1) commentNum='all';
-    getFromAPI('ref/'+ref+'/'+context+'/'+entryID+'/'+commentNum,function(err,data) {
+    getFromAPI('ref/'+ref+'/'+context+'/entryID-'+entryID+'/'+commentNum,function(err,data) {
       if (err) {
         cb(err);
         return;
       }
-
-      obj.docs[ref] = data[0];
+      var returnedEntry = data[0].explanations[context][0];
+      var entryArray = obj.docs[ref].explanations[context]; 
+      console.log('returnedEntry', returnedEntry); 
+      console.log('entryArray', entryArray); 
+      for(var i = 0; i < entryArray.length; i++){
+        if(entryArray[i].entryID === returnedEntry.entryID){
+          entryArray[i].comments = returnedEntry.comments; 
+        }
+      }
+      //obj.docs[ref] = data[0];
       cb(null,obj.docs[ref]);
     });
 

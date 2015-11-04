@@ -9,7 +9,7 @@ var app = angular.module('sodocan')
   return {
     restrict: 'A',
     replace: true,
-    templateUrl: 'angular-sodone/app/appTpl.html'
+    templateUrl: '../angular-sodone/app/appTpl.html'
   };
 })
 .controller('sodocanAppCtrl',

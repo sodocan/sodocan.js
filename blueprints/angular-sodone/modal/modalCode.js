@@ -2,7 +2,7 @@ angular.module('sodocan')
 .directive('sodocanModal',function(){
   return {
     replace: true,
-    templateUrl: 'angular-sodone/modal/modalTpl.html'
+    templateUrl: '../angular-sodone/modal/modalTpl.html'
   };
 })
 .factory('modalSettings', function(){

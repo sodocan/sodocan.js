@@ -1,36 +1,32 @@
 
-<div ng-controller='sodocanMethodCtrl' class="card grey lighten-4">
-  <div class="card-content" id="{{method.functionName}}">
-      <!-- <form>
-    <span class="col s1"> 
-      without browser default, 'select' will not render. Angular doesn't play nicely with jQuery (which materialize depends on) 
-      <select class="browser-default" ng-change="changedEntrySelection()" ng-model="selectedEntryOption" ng-options="option.text for option in entryOptions">
-      </select>
-    </form>
-      <div class="grey-text text-lighten-1"><a href="#">Entries</a></div>
-      <div class="grey-text text-lighten-1">Comments</div> 
-    </span>-->
-    <span class="col s10">
-      <h3 class="inline">{{method.functionName}}</h3>
-      <span class="params">({{printReference('params')}}) {{printReference('returns')}} </span>
-      <div ng-repeat='(explanationType, entryArray) in method.explanations'>
-        <div sodocan-explanation>
-        </div>
+<div ng-controller='sodocanMethodCtrl' class="card grey lighten-5">
+  <div id="{{method.functionName}}">
+
+    <div class="card-header">
+      <span class="col s10">
+        <h3 class="inline">{{method.functionName}}</h3>
+        <span class="params">({{printReference('params')}}) {{printReference('returns')}} </span>
+      </span>
+
+      <span>
+        <ul>
+          <li class="right">
+            <a ng-class="styles.descriptions.style" ng-click="clickedContext('descriptions')" class="waves-effect waves-light contextBtn"><div>DE</div></a>
+          </li>
+          <li class="right">
+            <a ng-class="styles.examples.style" ng-click="clickedContext('examples')" class="waves-effect waves-light contextBtn"><div>EX</div></a>
+          </li>
+          <li class="right">
+            <a ng-class="styles.tips.style" ng-click="clickedContext('tips')" class="waves-effect waves-light contextBtn"><div>TP</div></a>
+          </li>
+        </ul>
+      </span>
+    </div>
+
+    <div class="col s12" ng-repeat='(explanationType, entryArray) in method.explanations'>
+      <div sodocan-explanation>
       </div>
-    </span>
+    </div>
+
   </div>
-</span>
-  <span>
-    <ul>
-      <li class="right">
-        <a ng-class="styles.descriptions.style" ng-click="clickedContext('descriptions')" class="waves-effect waves-light btn contextBtn">DE</a>
-      </li>
-      <li class="right">
-        <a ng-class="styles.examples.style" ng-click="clickedContext('examples')" class="waves-effect waves-light btn contextBtn">EX</a>
-      </li>
-      <li class="right">
-        <a ng-class="styles.tips.style" ng-click="clickedContext('tips')" class="waves-effect waves-light btn contextBtn">TI</a>
-      </li>
-    </ul>
-  </span>
 </div>

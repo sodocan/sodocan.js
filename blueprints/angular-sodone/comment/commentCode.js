@@ -3,7 +3,7 @@ angular.module('sodocan')
   return{
     retrict: 'A',
     replace: true,
-    templateUrl: 'angular-sodone/comment/commentTpl.html'
+    templateUrl: '../angular-sodone/comment/commentTpl.html'
   };
 })
 .controller('sodocanCommentCtrl',['$scope','sodocanAPI','sodocanRouter',

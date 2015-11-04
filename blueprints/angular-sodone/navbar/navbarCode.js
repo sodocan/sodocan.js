@@ -3,7 +3,7 @@ angular.module('sodocan')
   return{
     restrict: 'A',
     replace: true,
-    templateUrl: 'angular-sodone/navbar/navbarTpl.html'
+    templateUrl: '../angular-sodone/navbar/navbarTpl.html'
   };
 })
 .controller('sodocanNavbarController', ['$scope', 'sodocanAPI', 'sodocanRouter',
@@ -51,7 +51,49 @@ angular.module('sodocan')
       bgStyle: {
         opacity: 0.2
       },
-      templateUrl: 'angular-sodone/expGlobalModal/expGlobalModalTpl.html'
+      templateUrl: '../angular-sodone/expGlobalModal/expGlobalModalTpl.html'
+    };
+    $scope.$emit('clickedShowModal', modalSettings); 
+  };
+
+  $scope.showLoginModal = function(event){
+    //The modal takes in this json as properties for the window
+    //there is an example of a centered modal in modalCode
+    var width = 600; 
+    var modalSettings = {
+      windowStyle: {
+        top:0,
+        left:0,
+        right:0,
+        bottom:0,
+        margin:'auto',
+        width: '400px',
+      },
+      bgStyle: {
+        opacity: 0.9
+      },
+      templateUrl: '../angular-sodone/authModal/loginModalTpl.html'
+    };
+    $scope.$emit('clickedShowModal', modalSettings); 
+  };
+
+  $scope.showSignupModal = function(event){
+    //The modal takes in this json as properties for the window
+    //there is an example of a centered modal in modalCode
+    var width = 600; 
+    var modalSettings = {
+      windowStyle: {
+        top:0,
+        left:0,
+        right:0,
+        bottom:0,
+        margin:'auto',
+        width: '400px',
+      },
+      bgStyle: {
+        opacity: 0.9
+      },
+      templateUrl: '../angular-sodone/authModal/signupModalTpl.html'
     };
     $scope.$emit('clickedShowModal', modalSettings); 
   };

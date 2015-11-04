@@ -3,6 +3,7 @@
       <!-- navbar -->
       <div class="navbar-fixed">
         <nav>
+          <div class="nav-thin-top"></div>
           <div class="nav-wrapper z-depth-1 blue-bg">
             <a href="#!" class="logo-img"><img src="../angular-sodone/images/logo-white.png"></a>
             <ul class="right hide-on-med-and-down">
@@ -14,8 +15,8 @@
                 </div>
               </form></li>
               <li><i ng-click="showModal($event)" class="material-icons">settings</i></li>
-              <li><a href="">Sign In</a></li>
-              <li>Sign Up</li>
+              <li ng-click="showLoginModal($event)">Log In</li>
+              <li ng-click="showSignupModal($event)" style="margin-right: 50px" ng-click="">Sign Up</li>
              </ul>
           </div>
           <!-- sub header -->
