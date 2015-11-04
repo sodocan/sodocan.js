@@ -54,11 +54,12 @@ exports.convertFormCase = {
       "examples":"",
       "tips":""
     }
-  }],
+  }, "aUser"],
   expectedOutput: {
     "project":"fishProj",
     "functionName":"goldfish",
     "group":"happySaturday",
+    "username":"aUser",
     "reference": {
       "params": [{"name":"stuff","type":"Boolean"}],
       "returns":[{"type":"stuff"},{"type":"num"},{"type":"bool"}]
@@ -151,6 +152,7 @@ exports.parserPostExpectedReturns = [
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -158,6 +160,7 @@ exports.parserPostExpectedReturns = [
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -167,6 +170,7 @@ exports.parserPostExpectedReturns = [
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -176,6 +180,7 @@ exports.parserPostExpectedReturns = [
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -191,6 +196,7 @@ exports.parserPostExpectedReturns = [
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -198,6 +204,7 @@ exports.parserPostExpectedReturns = [
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -207,6 +214,7 @@ exports.parserPostExpectedReturns = [
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -216,6 +224,7 @@ exports.parserPostExpectedReturns = [
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah2",
             "upvotes": 0,
             "upvoters": {},

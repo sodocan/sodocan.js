@@ -114,6 +114,7 @@ describe("Server", function() {
     it("should convert parser output objects to the DB form", function(done) {
       var convertFormCase = testCases.convertFormCase;
       var actualForm = helpers.convertToDBForm.apply(null, convertFormCase.inputs);
+      delete actualForm.timestamp;
       log('expectNum', ++expectNum);
       expect(actualForm).to.deep.equal(convertFormCase.expectedOutput);
       done();
@@ -134,6 +135,8 @@ describe("Server", function() {
           'uri': 'http://localhost:3000/create',
           'json': parserPostCases[i]
         };
+
+        options.json.access_token = access_token;
 
         request(options, function(error, res, body) {
           log('expectNum', ++expectNum);

@@ -13,13 +13,14 @@ exports.postSkeleton = function(req, res) {
   var skeleton = req.body;
   var skull = skeleton.header; // :D
   var methodsArray = skeleton.body;
+  var username = skeleton.username;
   var completedMethodEntry = helpers.runAfterAsync(res, methodsArray.length);
   for(var i = 0; i < methodsArray.length; i++){
     var method = methodsArray[i];
     //check and see if this method exists already (match proj and method)
       //if it doesn't, convert it to proper mongoForm, then insert
 
-    helpers.findAndUpdateMethod(method, completedMethodEntry, skull);
+    helpers.findAndUpdateMethod(method, completedMethodEntry, skull, username);
 
     //else, check and see if content matches any existing method content
       //if it doesn't match, insert

@@ -101,11 +101,13 @@ var parseApiPath = exports.parseApiPath = function(path) {
   };
 };
 
-var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj) {
+var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj, username) {
   var dbForm = {
     project: projectName,
     functionName: skeleObj.functionName,
     group: skeleObj.group,
+    username: username,
+    timestamp: new Date(),
     reference: {
       params: skeleObj.params,
       returns: skeleObj.returns
@@ -543,7 +545,7 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
 
 
 
-var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, completedMethodEntry, skull) {
+var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, completedMethodEntry, skull, username) {
   var searchObj = {
     project: skull.project,
     functionName: method.functionName
@@ -568,11 +570,13 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
           }
           if (!match) {
             var newEntry = {
+              username: username,
               text: newEntryText,
               upvotes: 0,
               upvoters: {},
               comments: [],
-              entryID: hashCode(newEntryText)
+              entryID: hashCode(newEntryText),
+              timestamp: new Date()
             };
             existingEntries.push(newEntry);
           }
@@ -598,7 +602,7 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
     notFound: function() {
       // convertToDBForm and then insert
       // res.statusCode(202).end() inside callback of database upsert
-      (new methodsDB(convertToDBForm(skull.project, method))).save(function(err, newMethod){
+      (new methodsDB(convertToDBForm(skull.project, method, username))).save(function(err, newMethod){
         if(err){
           completedMethodEntry(err);
         } else {
