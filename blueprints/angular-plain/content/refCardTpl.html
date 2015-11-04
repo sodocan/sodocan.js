@@ -23,8 +23,9 @@
     </form>
   </div>
   <div style="background:#ccc">
-    <div style="border-top: 2px solid #eee;padding: 5px" ng-repeat="comment in docs[item].explanations[EntryType][0].additions">
+    <div style="border-top: 2px solid #eee;padding: 5px" ng-repeat="comment in docs[item].explanations[EntryType][0].comments">
       {{comment.text}}
+      <span ng-click="upvote(item,comment)" style="float:right">Upvote: {{comment.upvotes}}</span>
     </div>
   </div>
   <a ng-click="changeCard('comments',item)" href="{{item}}/1/-1">Load Comments</a>

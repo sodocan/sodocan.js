@@ -73,6 +73,7 @@ exports.logoutHandler = function(req, res, next) {
         console.error(err);
         return;
       }
+      res.setHeader('Access-Control-Allow-Origin','*');
       res.sendStatus(200);
     });
   })(req, res, next);

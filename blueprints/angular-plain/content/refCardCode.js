@@ -131,10 +131,23 @@ angular.module('sodocan')
   };
 
   // we only work with top entries, so only need the functionName
-  $scope.upvote = function(item) {
-    sodocanAPI.upvote(sodocanAPI.docs[item].explanations[$scope.EntryType][0].entryID,item,$scope.EntryType,postResp);
-    // cheat to update number
-    sodocanAPI.docs[item].explanations[$scope.EntryType][0].upvotes++;
+  $scope.upvote = function(item,comment) {
+    if (!comment) {
+      sodocanAPI.upvote(sodocanAPI.docs[item].explanations[$scope.EntryType][0].entryID,
+                        item,
+                        $scope.EntryType,
+                        postResp);
+      // cheat to update number
+      sodocanAPI.docs[item].explanations[$scope.EntryType][0].upvotes++;
+    } else {
+      sodocanAPI.upvote(sodocanAPI.docs[item].explanations[$scope.EntryType][0].entryID,
+                        item,
+                        $scope.EntryType,
+                        comment.commentID,
+                        postResp);
+      // optimistic cheating here too
+      comment.upvotes++;
+    }
   };
 
 }]);

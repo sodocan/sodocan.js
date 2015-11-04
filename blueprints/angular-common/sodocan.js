@@ -104,7 +104,10 @@ angular.module( 'sodocan', [])
   // Handle HTTP POST to API here; needs URL string and body JSON
   var sendToAPI = function(url,json,cb) {
     var success = function(data) { cb(null,data.data); };
-    $http.post(API_HOME.slice(0,-4)+url,json,{headers:{'Content-Type':'application/json'}}).then(success,cb);
+    $http.post(API_HOME.slice(0,-4)+url,
+               json,
+               {headers:{'Content-Type':'application/json'}}
+              ).then(success,cb);
   };
 
   /* Object to expose
@@ -113,8 +116,59 @@ angular.module( 'sodocan', [])
 
   var obj = {};
   obj.projectName = projectName;
-  obj.getFromAPI = getFromAPI; 
-  obj.sendToAPI = sendToAPI; 
+  obj.authToken = window.localStorage.getItem('sodocanToken');
+
+  /* Auth (login/logout)
+   *
+   */
+
+  // TODO: Error handling, Github?
+  obj.login = function(user,pass,cb) {
+    var success = function(data) {
+      window.localStorage.setItem('sodocanToken',data.data.access_token);
+      obj.authToken = data.data.access_token;
+      cb(null,true);
+    };
+
+    $http.post(API_HOME.slice(0,-4)+'auth/login',
+               {
+                 username:user,
+                 password:pass
+               },
+               {headers:{'Content-Type':'application/json'}}
+              ).then(success,cb);
+  };
+
+  obj.register = function(user,pass,cb) {
+    var success = function(data) {
+      obj.authToken = data.data.access_token;
+      window.localStorage.setItem('sodocanToken',data.data.access_token);
+      cb(null,true);
+    };
+
+    $http.post(API_HOME.slice(0,-4)+'auth/register',
+               {
+                 username:user,
+                 password:pass
+               },
+               {headers:{'Content-Type':'application/json'}}
+              ).then(success,cb);
+  };
+
+  obj.logout = function(cb) {
+    var success = function(data) {
+      obj.authToken = '';
+      window.localStorage.setItem('sodocanToken','');
+      cb(null,data.data);
+    };
+    $http.post(API_HOME.slice(0,-4)+'auth/logout',
+               {
+                 access_token: obj.authToken
+               },
+               {headers:{'Content-Type':'application/json'}}
+              ).then(success,cb);
+  };
+
   /* Request methods
    *
    */
@@ -208,7 +262,7 @@ angular.module( 'sodocan', [])
     });
   };
 
-  // additions TODO: needs everything passed, this format needs to be rethought
+  // comments TODO: needs everything passed, this format needs to be rethought
   // no easy way to update larger docs object from an entryID
   obj.getComments = function(ref,context,entryID,commentNum,cb) {
     
@@ -271,8 +325,24 @@ angular.module( 'sodocan', [])
 
   // No support for multiple context updates at once,
   // currently only generic alias for helper functions below
-  obj.newReference = function() {
-
+  obj.newReference = function(ref,context,text,cb) {
+    cb = cb || function(){};
+    sendToAPI('addEntry',
+              {
+                project: projectName,
+                functionName:ref,
+                context:context,
+                text:text,
+                access_token:obj.authToken
+              },
+              function(err,data) {
+                if (err) {
+                  cb(err);
+                  return;
+                }
+                cb(null,data);
+              }
+             );
   };
 
   obj.editDescription = function() {
@@ -280,22 +350,7 @@ angular.module( 'sodocan', [])
   };
 
   obj.newDescription = function(ref,text,cb) {
-    cb = cb || function(){};
-    sendToAPI('addEntry',
-              {
-                project: projectName,
-                functionName:ref,
-                context:'descriptions',
-                text:text
-              },
-              function(err,data) {
-                if (err) {
-                  cb(err);
-                  return;
-                }
-                cb(null,data);
-              }
-             );
+    obj.newReference(ref,'descriptions',text,cb);
   };
 
   obj.editTip = function() {
@@ -303,22 +358,7 @@ angular.module( 'sodocan', [])
   };
 
   obj.newTip = function(ref,text,cb) {
-    cb = cb || function(){};
-    sendToAPI('addEntry',
-              {
-                project: projectName,
-                functionName:ref,
-                context:'tips',
-                text:text
-              },
-              function(err,data) {
-                if (err) {
-                  cb(err);
-                  return;
-                }
-                cb(null,data);
-              }
-             );
+    obj.newReference(ref,'tips',text,cb);
   };
 
   obj.editExample = function() {
@@ -326,30 +366,15 @@ angular.module( 'sodocan', [])
   };
 
   obj.newExample = function(ref,text,cb) {
-    cb = cb || function(){};
-    sendToAPI('addEntry',
-              {
-                project: projectName,
-                functionName:ref,
-                context:'examples',
-                text:text
-              },
-              function(err,data) {
-                if (err) {
-                  cb(err);
-                  return;
-                }
-                cb(null,data);
-              }
-             );
+    obj.newReference(ref,'examples',text,cb);
   };
 
   obj.editComment = function() {
 
   };
 
-  // untested, does this really need proj,funcName, context, and ID?
-  obj.newComment = function(entryID,ref,text,context,cb) {
+  // TODO: does this really need proj,funcName, context, and ID?
+  obj.newComment = function(entryID,ref,context,text,cb) {
     cb = cb || function(){};
     sendToAPI('addEntry',
               {
@@ -357,7 +382,8 @@ angular.module( 'sodocan', [])
                 project: projectName,
                 functionName:ref,
                 context:context,
-                text:text
+                text:text,
+                access_token:obj.authToken
               },
               function(err,data) {
                 if (err) {
@@ -377,7 +403,8 @@ angular.module( 'sodocan', [])
                   entryID:entryID,
                   project:projectName,
                   functionName:ref,
-                  context:context
+                  context:context,
+                  access_token:obj.authToken
                 },
                 function(err,data) {
                   if (err) {
@@ -394,7 +421,8 @@ angular.module( 'sodocan', [])
                   project:projectName,
                   functionName:ref,
                   context:context,
-                  additionID:addID
+                  commentID:addID,
+                  access_token:obj.authToken
                 },
                 function(err,data) {
                   if (err) {
