@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-console.log(!!global);
 // I added this. This is not part of the express generator
 global.log = function() {
   var start;

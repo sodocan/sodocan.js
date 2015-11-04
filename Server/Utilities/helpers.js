@@ -94,7 +94,7 @@ var parseApiPath = exports.parseApiPath = function(path) {
     }
     nextPath = next();
   } while (nextPath);
-  console.log(searchObject);
+
   return {
     searchObject: searchObject,
     contexts: contexts
@@ -165,7 +165,6 @@ sodocan.com/api/*:projectName/ref/:functionName/:explanationType/:numEntriesOrEn
 api/:projectName/1/all
 */
 var getReferences = exports.getReferences = function(path, res) {
-  console.log('getReferences got run');
 
   var parsedPath = parseApiPath(path);
   if (!parsedPath) {
@@ -249,12 +248,12 @@ var getReferences = exports.getReferences = function(path, res) {
 var upvote = exports.upvote = function(upvoteInfo, res) {
   /*
   {
+    username:
     project:
     functionName:
     context:
     entryID:
     [commentID:]
-    [username/ip:]
   }
   */
   var searchObject = {
@@ -272,12 +271,7 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
     var context = upvoteInfo.context;
     var entryID = upvoteInfo.entryID;
 
-    var comment = false;
-
     var commentID = upvoteInfo.commentID;
-    if (commentID) {
-      comment = true;
-    }
 
     var entryFound = false;
     var contextArray = reference.explanations[context];
@@ -288,27 +282,31 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
     for (var i = 0; i < contextArray.length; i++) {
       if (contextArray[i].entryID === entryID) {
         entryFound = true;
-        if(!commentID){
-          contextArray[i].upvotes++;
+        if (!commentID) {
+          var entry = contextArray[i];
+          if (upvoteInfo.username !== entry.username) {
+            entry.upvotes++;
 
-          while (i > 0 && contextArray[i].upvotes > contextArray[i-1].upvotes) {
-            var temp = contextArray[i];
-            contextArray[i] = contextArray[i-1];
-            contextArray[i-1] = temp;
-            i--;
+            while (i > 0 && entry.upvotes > contextArray[i-1].upvotes) {
+              contextArray[i] = contextArray[i-1];
+              contextArray[i-1] = entry;
+              i--;
+            }
           }
         } else {
           var commentFound = false;
           var comments = contextArray[i].comments;
           for (var j = 0; j < comments.length; j++) {
-            if (comments[j].commentID === commentID) {
+            var comment = comments[j];
+            if (comment.commentID === commentID) {
               commentFound = true;
-              comments[j].upvotes++;
-              while (j > 0 && comments[j].upvotes > comments[j-1].upvotes) {
-                var temp = comments[j];
-                comments[j] = comments[j-1];
-                comments[j-1] = temp;
-                j--;
+              if (upvoteInfo.username !== comment.username) {
+                comment.upvotes++;
+                while (j > 0 && comment.upvotes > comments[j-1].upvotes) {
+                  comments[j] = comments[j-1];
+                  comments[j-1] = comment;
+                  j--;
+                }
               }
               break;
             }
@@ -340,12 +338,12 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
 var addEntry = exports.addEntry = function(addEntryInfo, res) {
   /*
   {
+    username:
     project:
     functionName:
     context:
     text:
     [entryID:]
-    [username/ip:]
   }
   */
   var searchObject = {
@@ -372,21 +370,29 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
     if (entryID) {
       var entryFound = false;
       for (var i = 0; i < contextArray.length; i++) {
-        if (contextArray[i].entryID === entryID) {
+        var entry = contextArray[i];
+        if (entry.entryID === entryID) {
           entryFound = true;
-          for (var j = 0; j < contextArray[i].comments.length; j++) {
-            if (contextArray[i].comments[j].commentID === id) {
+          var comments = entry.comments;
+          var ids = [];
+          for (var j = 0; j < comments.length; j++) {
+            if (comments[j].text === addEntryInfo.text) {
               send404(res, 'duplicate entry');
               return;
             }
+            ids.push(comments[j].commentID);
+          }
+          while (ids.indexOf(id) !== -1) {
+            id++;
           }
           var comment = {
+            username: addEntryInfo.username,
             commentID: id,
             timestamp: new Date(),
             text: addEntryInfo.text,
             upvotes: 0,
           };
-          contextArray[i].comments.push(comment);
+          comments.push(comment);
           break;
         }
       }
@@ -396,12 +402,19 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
       }
     } else {
       for (var i = 0; i < contextArray.length; i++) {
-        if (contextArray[i].entryID === id) {
+        var currEntry = contextArray[i];
+        var ids = [];
+        if (currEntry.text === addEntryInfo.text) {
           send404(res, 'duplicate entry');
           return;
         }
+        ids.push(currEntry.entryID);
+      }
+      while (ids.indexOf(id) !== -1) {
+        id++;
       }
       var entry = {
+        username: addEntryInfo.username,
         entryID: id,
         timestamp: new Date(),
         text: addEntryInfo.text,
@@ -422,8 +435,101 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
   });
 };
 
-var editEntry = exports.editEntry = function() {
-  //
+var editEntry = exports.editEntry = function(editEntryInfo, res) {
+  /*
+  {
+    username:
+    project:
+    functionName:
+    context:
+    entryID:
+    delete:
+    [commentID:]
+  }
+  */
+  var searchObject = {
+    project: editEntryInfo.project,
+    functionName: editEntryInfo.functionName
+  };
+
+  if (!searchObject.project || !searchObject.functionName) {
+    send404(res, 'project or functionName not provided');
+    return;
+  }
+
+  // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
+  mongoFind(res, searchObject, null, function(reference) {
+    var validUpdate;
+    var context = editEntryInfo.context;
+    var entryID = editEntryInfo.entryID;
+
+    var commentID = editEntryInfo.commentID;
+
+    var entryFound = false;
+    var contextArray = reference.explanations[context];
+    if (!contextArray) {
+      send404(res, 'context not found');
+      return;
+    }
+    for (var i = 0; i < contextArray.length; i++) {
+      if (contextArray[i].entryID === entryID) {
+        entryFound = true;
+        if (!commentID) {
+          var entry = contextArray[i];
+          if (editEntryInfo.username === entry.username) {
+            if (editEntryInfo.delete) {
+              contextArray.splice(i, 1);
+              validUpdate = true;
+            } else if (['', entry.text].indexOf(editEntryInfo.text) === -1) {
+              entry.text = editEntryInfo.text;
+              validUpdate = true;
+            }
+          }
+        } else {
+          var commentFound = false;
+          var comments = contextArray[i].comments;
+          for (var j = 0; j < comments.length; j++) {
+            var comment = comments[j];
+            if (comment.commentID === commentID) {
+              commentFound = true;
+              if (editEntryInfo.username === comment.username) {
+                if (editEntryInfo.delete) {
+                  comments.splice(j, 1);
+                  validUpdate = true;
+                } else if (['', comment.text].indexOf(editEntryInfo.text) === -1) {
+                  comment.text = editEntryInfo.text;
+                  validUpdate = true;
+                }
+              }
+              break;
+            }
+          }
+          if (!commentFound) {
+            send404(res, 'commentID not found');
+            return;
+          }
+        }
+        break;
+      }
+    }
+    if (!entryFound) {
+      send404(res, 'entryID not found');
+      return;
+    }
+    if (!validUpdate) {
+      send404(res, 'not a valid edit');
+      return;
+    }
+    methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
+      if (error) {
+        send404(res, error);
+      } else {
+        res.setHeader('Access-Control-Allow-Origin','*');
+        res.sendStatus(202);
+      }
+    });
+  });
+
 };
 
 
@@ -438,7 +544,6 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
   var cb = {
 
     success: function(foundMethod) {
-      log('postSkeleton mongoFindOne success');
       var explanations = method.explanations;
       for (var context in explanations) { //should be changed to explanations
         var newEntryText = explanations[context]; // this is a string
@@ -481,7 +586,6 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
     },
 
     notFound: function() {
-      log('postSkeleton mongoFindOne notFound');
       // convertToDBForm and then insert
       // res.statusCode(202).end() inside callback of database upsert
       (new methodsDB(convertToDBForm(skull.project, method))).save(function(err){
@@ -494,7 +598,6 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
     },
 
     error: function(err) {
-      log('postSkeleton mongoFindOne error');
       console.error(err);
       completedMethodEntry(err);
     }
@@ -508,12 +611,10 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
 
 var createToken = exports.createToken = function(req, res, next, authenticateType) {
   passport.authenticate(authenticateType, {session: false}, function(err, user) {
-    log('callback in passport authenticate got run');
     if (err) { console.log('error loggin'); }
     if (!user) {
       return res.json(401, { error: 'message'} );
     }
-    log('user', user);
     var token = jwt.encode({
       username: user.username,
       expiration: calculateTokenExpiration(),

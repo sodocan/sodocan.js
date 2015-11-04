@@ -1,5 +1,3 @@
-// var db = require('../dbconnection.js');
-console.log('methodsDB getting created');
 var mongoose = require('mongoose');
 var testObjs = require('./dummyData').methodsData;
 
@@ -10,7 +8,6 @@ var MethodSchema = new mongoose.Schema({
   reference: mongoose.Schema.Types.Mixed,
   explanations: mongoose.Schema.Types.Mixed,
 });
-console.log('schema got created');
 MethodSchema.index({project: 1, functionName: 1});
 var methodsModel =  mongoose.model('Method', MethodSchema);
 

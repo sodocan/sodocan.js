@@ -921,6 +921,7 @@ exports.addEntryCases = [
       group: 'testGroup',
       reference: {returns:[], params: []},
       explanations: {tips: [{
+        username: 'testUser',
         entryID: 346578302,
         text: 'Adding a test entry',
         upvotes: 0,
@@ -945,10 +946,12 @@ exports.addEntryCases = [
       group: 'testGroup',
       reference: {returns:[], params: []},
       explanations: {tips: [{
+        username: 'testUser',
         entryID: 346578302,
         text: 'Adding a test entry',
         upvotes: 0,
         comments: [{
+          username: 'testUser',
           commentID: 192693359,
           text: 'Adding a test comment',
           upvotes: 0,
@@ -982,6 +985,7 @@ exports.upvoteCases = [
       reference: {returns:[], params: []},
       explanations: {tips: [
         {
+          username: 'testUser',
           entryID: 415745888,
           text: 'Adding another test entry',
           upvotes: 1,
@@ -994,6 +998,7 @@ exports.upvoteCases = [
           text: 'tipsblahblah'
         },
         {
+          username: 'testUser',
           entryID: 346578302,
           text: 'Adding a test entry',
           upvotes: 0,
@@ -1026,10 +1031,12 @@ exports.upvoteCases = [
       group: 'testGroup',
       reference: {returns:[], params: []},
       explanations: {tips: [{
+        username: 'testUser',
         entryID: 346578302,
         text: 'Adding a test entry',
         upvotes: 0,
         comments: [{
+          username: 'testUser',
           commentID: 1653167667,
           text: 'Adding another test comment',
           upvotes: 1,
@@ -1062,3 +1069,139 @@ exports.duplicateEntryCases = [
   }
 ];
 
+exports.editEntryCases = [
+  { // case 1
+    should: 'should edit an entry and get the new version',
+    postJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      entryID: 415745888,
+      text: 'The entry has been edited!'
+    },
+    getUri: 'http://localhost:3000/api/testProj/ref/method1/tips/2',
+    expectedRef: {
+      project: 'testProj',
+      functionName: 'method1',
+      group: 'testGroup',
+      reference: {returns:[], params: []},
+      explanations: {tips: [
+        {
+          username: 'testUser',
+          entryID: 415745888,
+          text: 'The entry has been edited!',
+          upvotes: 1,
+          comments: []
+        },
+        {
+          entryID: 907176294,
+          comments: [],
+          upvotes: 0,
+          text: 'tipsblahblah'
+        },
+        // {
+        //   username: 'testUser',
+        //   entryID: 346578302,
+        //   text: 'Adding a test entry',
+        //   upvotes: 0,
+        //   comments: []
+        // }
+      ]},
+      "__v": 0
+    }
+  },
+  { // case 2
+    should: 'should edit a comment and get the new version',
+    postJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      entryID: 346578302,
+      commentID: 192693359,
+      text: 'The comment has been edited!'
+    },
+    getUri: 'http://localhost:3000/api/testProj/ref/method1/tips/entryID-346578302/all',
+    expectedRef: {
+      project: 'testProj',
+      functionName: 'method1',
+      group: 'testGroup',
+      reference: {returns:[], params: []},
+      explanations: {tips: [
+        {
+          username: 'testUser',
+          entryID: 346578302,
+          text: 'Adding a test entry',
+          upvotes: 0,
+          comments: [{
+            username: 'testUser',
+            commentID: 1653167667,
+            text: 'Adding another test comment',
+            upvotes: 1,
+          },
+          {
+            username: 'testUser',
+            commentID: 192693359,
+            text: 'The comment has been edited!',
+            upvotes: 0,
+          }]
+        }
+      ]},
+      "__v": 0
+    }
+  },
+  { // case 3
+    should: 'should delete a comment',
+    postJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      entryID: 346578302,
+      commentID: 1653167667,
+      delete: true
+    },
+    getUri: 'http://localhost:3000/api/testProj/ref/method1/tips/entryID-346578302/all',
+    expectedRef: {
+      project: 'testProj',
+      functionName: 'method1',
+      group: 'testGroup',
+      reference: {returns:[], params: []},
+      explanations: {tips: [{
+        username: 'testUser',
+        entryID: 346578302,
+        text: 'Adding a test entry',
+        upvotes: 0,
+        comments: [{
+          username: 'testUser',
+          commentID: 192693359,
+          text: 'The comment has been edited!',
+          upvotes: 0,
+        }]
+      }]},
+      "__v": 0
+    }
+  },
+  { // case 4
+    should: 'should delete an entry',
+    postJson: {
+      project: 'testProj',
+      functionName: 'method1',
+      context: 'tips',
+      entryID: 415745888,
+      delete: true
+    },
+    getUri: 'http://localhost:3000/api/testProj/ref/method1/tips',
+    expectedRef: {
+      project: 'testProj',
+      functionName: 'method1',
+      group: 'testGroup',
+      reference: {returns:[], params: []},
+      explanations: {tips: [{
+        entryID: 907176294,
+        comments: [],
+        upvotes: 0,
+        text: 'tipsblahblah'
+      }]},
+      "__v": 0
+    }
+  }
+];

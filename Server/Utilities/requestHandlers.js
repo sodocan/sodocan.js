@@ -27,7 +27,6 @@ exports.postSkeleton = function(req, res) {
 };
 
 exports.upvote = function(req, res) {
-  console.log('upvote req body', req.body);
   helpers.upvote(req.body, res);
 };
 
@@ -51,7 +50,6 @@ exports.registerPostHandler = function(req, res, next) {
       res.end();
       return;
     }
-    log('user', user);
     helpers.createToken(req, res, next, 'local');
   });
 };

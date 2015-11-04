@@ -36,20 +36,21 @@ global.log = function() {
 };
 
 var expectNum = 0;
-var access_token;
+var access_token, access_token2;
 
 // Begin tests
 describe("Server", function() {
 
   // removes test data
   before(function (done) {
+    this.timeout(5000);
 
     var reinitiateTestData = function() {
       methodsDB.remove({project: 'testProj'}, function(err) {
         if (err) {
           log('Mongo remove testProj error', err);
         } else {
-          User.remove({username: 'testUser'}, function(err) {
+          User.remove({username: {$in: ['testUser','testUser2']}}, function(err) {
             if (err) {
               log('Mongo remove testUser error', err);
             } else {
@@ -63,6 +64,17 @@ describe("Server", function() {
               })
               .then(function(data) {
                 access_token = data.access_token;
+                return reqprom({
+                  method: 'POST',
+                  uri: 'http://localhost:3000/auth/register',
+                  json: {
+                    username: 'testUser2',
+                    password: 'test2'
+                  }
+                });
+              })
+              .then(function(data) {
+                access_token2 = data.access_token;
                 done();
               });
             }
@@ -117,7 +129,6 @@ describe("Server", function() {
     // must put 'it' in wrapper function because of asynchonicity
     var postACase = function(i) {
       it("should post skeleton json #" + i, function(done) {
-        //log('parserPostCase ' + i, parserPostCases[i]);
         var options = {
           'method': 'POST',
           'uri': 'http://localhost:3000/create',
@@ -199,9 +210,7 @@ describe("Server", function() {
           expect(i).to.equal('should send 404');
           return;
         }
-        //log('i', i);
         var path = getInvalidCases[i];
-        //log('path', path);
         getOptions.uri = 'http://localhost:3000' + path;
         var promise = reqprom(getOptions)
           .then(function(res) {
@@ -211,7 +220,6 @@ describe("Server", function() {
           })
           .catch(function(res) {
             if (res.statusCode) {
-              //log('successfully errored');
               log('expectNum', ++expectNum);
               expect(res.statusCode).to.equal(404);
               return i + 1;
@@ -297,7 +305,7 @@ describe("Server", function() {
             expect(res.statusCode).to.equal(202);
             postOptions.uri = 'http://localhost:3000/upvote'
             postOptions.json = upvoteCase.upvoteJson;
-            postOptions.json.access_token = access_token;
+            postOptions.json.access_token = access_token2;
             return reqprom(postOptions);
           })
           .then(function(res) {
@@ -318,7 +326,6 @@ describe("Server", function() {
                 delete comments[j].timestamp;
               }
             }
-            log('ref', JSON.stringify(ref));
             log('expectNum', ++expectNum);
             expect(ref).to.deep.equal(upvoteCase.expectedRef);
           })
@@ -355,6 +362,49 @@ describe("Server", function() {
 
     for (var ind = 0; ind < duplicateEntryCases.length; ind++) {
       postADuplicateEntry(ind);
+    }
+
+    var editEntryCases = testCases.editEntryCases;
+
+    var editOrDeleteEntry = function(ind) {
+      it(editEntryCases[ind].should, function(done) {
+        var editEntryCase = editEntryCases[ind];
+        postOptions.uri = 'http://localhost:3000/editEntry';
+        postOptions.json = editEntryCase.postJson;
+        postOptions.json.access_token = access_token;
+        getOptions.resolveWithFullResponse = false;
+        getOptions.uri = editEntryCase.getUri;
+        reqprom(postOptions)
+          .then(function(res) {
+            log('expectNum', ++expectNum);
+            expect(res.statusCode).to.equal(202);
+            return reqprom(getOptions);
+          })
+          .then(function(body) {
+            body = JSON.parse(body);
+            var ref = body[0];
+            delete ref['_id'];
+            var tips = ref.explanations.tips;
+            var comments;
+            for (var i = 0; i < tips.length; i++) {
+              delete tips[i].timestamp;
+              comments = tips[i].comments;
+              for (var j = 0; j < comments.length; j++) {
+                delete comments[j].timestamp;
+              }
+            }
+            log('expectNum', ++expectNum);
+            expect(ref).to.deep.equal(editEntryCase.expectedRef);
+          })
+          .then(done)
+          .catch(function(err) {
+            console.error(err);
+          });
+      });
+    }
+
+    for (var ind = 0; ind < editEntryCases.length; ind++) {
+      editOrDeleteEntry(ind);
     }
 
   });
