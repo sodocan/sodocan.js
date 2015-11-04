@@ -1,21 +1,124 @@
+/* --------------------------------------
+=========================================
+GLOBAL STYLES
+=========================================
+-----------------------------------------*/
+
+html {
+    font-size: 100%;        
+}
+
+body {
+  font-family: 'Raleway', sans-serif !important;
+  font-size: 14px;  
+  color: #808080;
+  font-weight: normal;
+  overflow-x: hidden !important;
+  line-height: 25px;
+  background-color: white;
+  box-shadow: none !important;
+}
+
+* {
+  box-shadow: none !important;
+}
+
+::-moz-selection { /* Code for Firefox */
+  color: white;
+  background: red;
+}
+
+::selection {
+  color: white; 
+  background: red;
+}
+
+/*li a:hover {
+  background: #26A69A;
+}*/
+
+/* --------------------------------------
+=========================================
+SIDE BAR STYLES
+=========================================
+-----------------------------------------*/
+
 .side-nav {
   padding-top: 110px;
   z-index: 0;
 }
 .side-nav li{
-  height: 30px;
+  position: relative;
+  height: 50px;
+  border-color: white;
+  border-bottom: 1px dotted rgb(60, 60, 60);
 }
 .side-nav a{
-  line-height: 30px;
+  position: relative;
+  line-height: 50px;
+  height: 50px;
 }
-.thin{
-  height: 20px !important;
-  line-height: 20px;
+
+.side-nav a:hover{
+  color: black !important;
 }
+
+/* --------------------------------------
+=========================================
+NAV BAR STYLES
+=========================================
+-----------------------------------------*/
+.logo-img img {
+  height: 45%;
+  vertical-align: middle;
+  margin-left: 30px;
+}
+
+/*.navbar-fixed form {
+  background: pink;
+}*/
+.navbar-fixed form:hover {
+  background: rgba(255, 0, 0, 0.7);
+}
+
+.input-field {
+}
+
+.input-field:hover {
+
+}
+
+.right li {
+  height: ;
+  margin: 0px;
+  padding-left: 20px;
+  padding-right: 20px;
+  cursor: pointer;
+}
+
+#search {
+  cursor: default;
+}
+
+.right a i {
+  font-size: 20px;
+}
+
+/* --------------------------------------
+=========================================
+MAIN BODY STYLES
+=========================================
+-----------------------------------------*/
+
 .main{
   padding-left: 260px;
+  padding-right: 20px;
   padding-top: 30px;
 }
+
+.main .s12 {
+}
+
 .contextBtn{
   padding: 0 2px;
   height: 20px;
@@ -23,11 +126,18 @@
   vertical-align: top;
 }
 .card {
-  margin: 0.2rem 0 0.2rem 0;
+  margin-bottom: 20px;
+  box-shadow: none
 }
 .card h3{
   margin-top: 0;
+  font-size: 25px;
+  margin-right: 10px;
 }
+.card .params{
+  font-size: 20px;
+}
+
 .tint{
   opacity: 0.3;
   cursor: pointer;
@@ -110,4 +220,36 @@
   opacity: 1;
   z-index: 1000;
   background-color: white; 
+}
+
+/* --------------------------------------
+=========================================
+TEXT COLOR
+=========================================
+-----------------------------------------*/
+
+.white-text {
+  color: #FFFFFF !important;
+}
+
+.lightgrey-text {
+  color: #DDDDDD !important;
+}
+
+/* --------------------------------------
+=========================================
+BACKGROUND COLOR
+=========================================
+-----------------------------------------*/
+
+.darkgrey-bg {
+  background-color: rgba(40, 40, 40, 1) !important;
+}
+
+.lightgrey-bg {
+  background-color: rgba();
+}
+
+.blue-bg {
+  background-color: rgba(20, 100, 150, 1) !important;
 }

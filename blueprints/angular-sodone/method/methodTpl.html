@@ -12,7 +12,7 @@
     </span>-->
     <span class="col s10">
       <h3 class="inline">{{method.functionName}}</h3>
-      <span>({{printReference('params')}}) {{printReference('returns')}} </span>
+      <span class="params">({{printReference('params')}}) {{printReference('returns')}} </span>
       <div ng-repeat='(explanationType, entryArray) in method.explanations'>
         <div sodocan-explanation>
         </div>
