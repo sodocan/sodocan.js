@@ -11,7 +11,6 @@ var properties = {
   author: '',
   version: '',
   includeByDefault: '',
-  contains: '',
   omit: '',
   include: '',
   class: ''
