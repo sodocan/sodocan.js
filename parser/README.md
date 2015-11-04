@@ -61,9 +61,13 @@ You can only use one header block per project.  Place it at the top of one of yo
 The following keywords can be used in a header.  Use as many or as few as you like (except for @header at the start of the block text, which is required to indicate that it is a header block).
 
 **@header**: indicate a header block.
+
 **@project** : the name of the project.
+
 **@author**: The author(s) of the project.
-**@version**: Current ersion number.
+
+**@version**: Current version number.
+
 **@includeByDefault**: Set to either 'true' or 'false'.  (if you don't include this keyword, the default value is true). This determines which functions will be included in the doc.  If true,  all functions will be included except for ones which have a comment block above them containing the '@omit' keyword.  If this is false, only functions with a comment block containing '@include' will be included.
 
 Example header:
@@ -83,23 +87,33 @@ The following keywords are available.  All are optional (note that if you leave 
 and @params, these will be automatically added from the code below).
 
 **@functionName**: name of the function. 
+
 **@params**: parameters for the function.  Should be represented as a JS object (for a single param) 
 or an array of JS objects (multiple params). 
 Each param object should have a 'name' property and a 'type' property.
+
 **@returns**: a JS object with a 'type' property.  Can be an
 array of objects if there are multiple possible return 
 types.
+
 **@group**: Name of a group you want this function to be displayed in. 
 Multiple functions with the same @group value will be grouped together
 in the doc.
+
 **@description**: a description of the function; tell us what it does!
+
 **@example**: an example of its usage.
+
 **@tips**: any miscellaneous comments/advice.
+
 **@classContext**: the parent class (if the function is a method).
+
 **@include**: include this function in the doc (only has an effect if includeByDefault is set to 
 'false' in the header).
+
 **@omit**: omit this function from the doc (only has an effect if icludeByDefault is set to 'true'
 in the header).
+
 **@class**: indicates a function that is a constructor for a class.  If other functions are 
 on declared on the prototype for this constructor, this constructor's name will automatically be
 assigned as their classContext value.  Otherwise, you can manually link other functions to this class
