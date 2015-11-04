@@ -399,9 +399,9 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
         return;
       }
     } else {
+      var ids = [];
       for (var i = 0; i < contextArray.length; i++) {
         var currEntry = contextArray[i];
-        var ids = [];
         if (currEntry.text === addEntryInfo.text) {
           send404(res, 'duplicate entry');
           return;
