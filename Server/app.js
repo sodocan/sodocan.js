@@ -16,6 +16,15 @@ var strategyUtil = require('./Utilities/strategyUtil');
 
 var app = express();
 
+// TODO: fit this in better, CORS for POSTing
+app.options('/*', function(req,res) {
+  res.set({
+    'Access-Control-Allow-Headers':'Content-Type',
+    'Access-Control-Allow-Origin':'*',
+  });
+  res.end();
+});
+
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
@@ -73,14 +82,6 @@ app.post('/editEntry', handlers.checkTokenHandler, handlers.editEntry);
 
 //NOTE: figure out best practices for above route
 
-// TODO: fit this in better, CORS for POSTing
-app.options('/*', function(req,res) {
-  res.set({
-    'Access-Control-Allow-Headers':'Content-Type',
-    'Access-Control-Allow-Origin':'*',
-  });
-  res.end();
-});
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

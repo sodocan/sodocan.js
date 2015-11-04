@@ -620,6 +620,7 @@ var createToken = exports.createToken = function(req, res, next, authenticateTyp
       expiration: calculateTokenExpiration(),
       session: user.session
     }, process.env.TOKEN_SECRET || authConfig.tokenSecret);
+    res.setHeader('Access-Control-Allow-Origin','*');
     res.json({access_token: token});
   })(req, res, next);
 };

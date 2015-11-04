@@ -97,9 +97,9 @@ function handleRequest(req,res) {
   }
   var filePath = DIR+req.url;
   
-  var pos = filePath.search(/underscore/);
+  var pos = filePath.search(/fakeUnderscore/);
   if (pos>-1) {
-    var path = filePath.substr(pos+10);
+    var path = filePath.substr(pos+14);
     filePath = DIR+'/'+path;
   };
 
