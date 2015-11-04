@@ -14,11 +14,13 @@ exports.methodsData = [
         {
           text:'efa',
           upvotes: 10,
+          upvoters: {},
           entryID: 123,
           comments: [
             {
               text: 'asdfsds',
               upvotes: 3,
+              upvoters: {},
               commentID: 12
             }
           ]
@@ -26,11 +28,13 @@ exports.methodsData = [
          {
           text:'asdfds',
           upvotes: 12,
+          upvoters: {},
           entryID: 124,
           comments: [
             {
               text: 'asdf',
               upvotes: 3,
+              upvoters: {},
               commentID: 11
             }
           ]
@@ -40,11 +44,13 @@ exports.methodsData = [
         {
           text:'asdfds',
           upvotes: 12,
+          upvoters: {},
           entryID: 125,
           comments: [
             {
               text: 'asdf',
               upvotes: 3,
+              upvoters: {},
               commentID: 10
             }
           ]
@@ -54,11 +60,13 @@ exports.methodsData = [
         {
           text:'asgsrdgdrgsdgdfds',
           upvotes: 12,
+          upvoters: {},
           entryID: 104,
           comments: [
             {
               text: 'rere',
               upvotes: 3,
+              upvoters: {},
               commentID: 129
             }
           ]
@@ -81,11 +89,13 @@ exports.methodsData = [
         {
           text:'efa',
           upvotes: 14,
+          upvoters: {},
           entryID: 1223,
           comments: [
             {
               text: 'asdf',
               upvotes: 3,
+              upvoters: {},
               commentID: 13
             }
           ]
@@ -93,11 +103,13 @@ exports.methodsData = [
          {
           text:'bvb',
           upvotes: 12,
+          upvoters: {},
           entryID: 128,
           comments: [
             {
               text: 'asdf',
               upvotes: 3,
+              upvoters: {},
               commentID: 14
             }
           ]
@@ -107,11 +119,13 @@ exports.methodsData = [
         {
           text:'asdfds',
           upvotes: 12,
+          upvoters: {},
           entryID: 115,
           comments: [
             {
               text: 'asdf',
               upvotes: 3,
+              upvoters: {},
               commentID: 11
             }
           ]
@@ -121,11 +135,13 @@ exports.methodsData = [
         {
           text:'asgsrdgdrgsdgdfds',
           upvotes: 12,
+          upvoters: {},
           entryID: 154,
           comments: [
             {
               text: 'rere',
               upvotes: 3,
+              upvoters: {},
               commentID: 125
             }
           ]

@@ -64,27 +64,12 @@ exports.convertFormCase = {
       "returns":[{"type":"stuff"},{"type":"num"},{"type":"bool"}]
     },
     "explanations": {
-      "descriptions": [{
-        "text": "xtra cheddar",
-        "upvotes": 0,
-        "comments": [],
-        "entryID": 837662812
-      }],
+      "descriptions": [],
       "examples": [],
       "tips": []
     }
   }
 };
-// {
-//     project: projectName,
-//     functionName: skeleObj.functionName,
-//     group: skeleObj.group,
-//     reference: {
-//       params: skeleObj.params,
-//       returns: skeleObj.returns
-//     },
-//     explanations: explanations
-//   };
 
 exports.parserPostCases = [
   {
@@ -175,6 +160,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "descriptionblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1294058334
           }
@@ -183,6 +169,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "examplesblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 719765163
           }
@@ -191,6 +178,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "tipsblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 907176294
           }
@@ -212,6 +200,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "descriptionblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1461102740
           }
@@ -220,6 +209,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "examplesblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 837883623
           }
@@ -228,6 +218,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "tipsblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1942306008
           }
@@ -251,6 +242,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "descriptionblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1294058334
           }
@@ -259,6 +251,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "examplesblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 719765163
           }
@@ -267,6 +260,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "tipsblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 907176294
           }
@@ -288,6 +282,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "descriptionblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1461102740
           }
@@ -296,6 +291,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "examplesblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 837883623
           },
@@ -303,6 +299,7 @@ exports.parserPostExpectedReturns = [
             "entryID": 199356705,
             "comments": [],
             "upvotes": 0,
+            "upvoters": {},
             "text": "examplesblahblah2_modified"
           }
         ],
@@ -310,6 +307,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "tipsblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1942306008
           }
@@ -333,6 +331,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "descriptionblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1294058334
           }
@@ -341,6 +340,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "examplesblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 719765163
           }
@@ -349,6 +349,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "tipsblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 907176294
           }
@@ -370,6 +371,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "descriptionblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1461102740
           }
@@ -378,6 +380,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "examplesblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 837883623
           },
@@ -385,6 +388,7 @@ exports.parserPostExpectedReturns = [
             "entryID": 199356705,
             "comments": [],
             "upvotes": 0,
+            "upvoters": {},
             "text": "examplesblahblah2_modified"
           }
         ],
@@ -392,6 +396,7 @@ exports.parserPostExpectedReturns = [
           {
             "text": "tipsblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1942306008
           }
@@ -437,6 +442,7 @@ exports.getValidCases = {
           {
             "text": "descriptionblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1294058334
           }
@@ -445,6 +451,7 @@ exports.getValidCases = {
           {
             "text": "examplesblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 719765163
           }
@@ -453,6 +460,7 @@ exports.getValidCases = {
           {
             "text": "tipsblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 907176294
           }
@@ -474,6 +482,7 @@ exports.getValidCases = {
           {
             "text": "descriptionblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1461102740
           }
@@ -482,6 +491,7 @@ exports.getValidCases = {
           {
             "text": "examplesblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 837883623
           },
@@ -489,6 +499,7 @@ exports.getValidCases = {
             "entryID": 199356705,
             "comments": [],
             "upvotes": 0,
+            "upvoters": {},
             "text": "examplesblahblah2_modified"
           }
         ],
@@ -496,6 +507,7 @@ exports.getValidCases = {
           {
             "text": "tipsblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1942306008
           }
@@ -536,6 +548,7 @@ exports.getValidCases = {
           {
             "text": "descriptionblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1294058334
           }
@@ -544,6 +557,7 @@ exports.getValidCases = {
           {
             "text": "examplesblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 719765163
           }
@@ -552,6 +566,7 @@ exports.getValidCases = {
           {
             "text": "tipsblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 907176294
           }
@@ -573,6 +588,7 @@ exports.getValidCases = {
           {
             "text": "descriptionblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1461102740
           }
@@ -581,6 +597,7 @@ exports.getValidCases = {
           {
             "text": "examplesblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 837883623
           }
@@ -589,6 +606,7 @@ exports.getValidCases = {
           {
             "text": "tipsblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1942306008
           }
@@ -629,6 +647,7 @@ exports.getValidCases = {
           {
             "text": "descriptionblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1294058334
           }
@@ -637,6 +656,7 @@ exports.getValidCases = {
           {
             "text": "examplesblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 719765163
           }
@@ -645,6 +665,7 @@ exports.getValidCases = {
           {
             "text": "tipsblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 907176294
           }
@@ -669,6 +690,7 @@ exports.getValidCases = {
           {
             "text": "examplesblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 719765163
           }
@@ -690,6 +712,7 @@ exports.getValidCases = {
           {
             "text": "examplesblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 837883623
           }
@@ -728,6 +751,7 @@ exports.getValidCases = {
           {
             "text": "descriptionblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1294058334
           }
@@ -736,6 +760,7 @@ exports.getValidCases = {
           {
             "text": "tipsblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 907176294
           }
@@ -757,6 +782,7 @@ exports.getValidCases = {
           {
             "text": "descriptionblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1461102740
           }
@@ -765,6 +791,7 @@ exports.getValidCases = {
           {
             "text": "tipsblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1942306008
           }
@@ -804,6 +831,7 @@ exports.getValidCases = {
           {
             "text": "descriptionblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1294058334
           }
@@ -812,6 +840,7 @@ exports.getValidCases = {
           {
             "text": "examplesblahblah",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 719765163
           }
@@ -834,6 +863,7 @@ exports.getValidCases = {
           {
             "text": "descriptionblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 1461102740
           }
@@ -842,6 +872,7 @@ exports.getValidCases = {
           {
             "text": "examplesblahblah2",
             "upvotes": 0,
+            "upvoters": {},
             "comments": [],
             "entryID": 837883623
           },
@@ -849,6 +880,7 @@ exports.getValidCases = {
             "entryID": 199356705,
             "comments": [],
             "upvotes": 0,
+            "upvoters": {},
             "text": "examplesblahblah2_modified"
           }
         ],
@@ -890,6 +922,7 @@ exports.getValidCases = {
             "entryID": 199356705,
             "comments": [],
             "upvotes": 0,
+            "upvoters": {},
             "text": "examplesblahblah2_modified"
           }
         ]
@@ -925,6 +958,7 @@ exports.addEntryCases = [
         entryID: 346578302,
         text: 'Adding a test entry',
         upvotes: 0,
+        upvoters: {},
         comments: []
       }]},
       "__v": 0
@@ -950,11 +984,13 @@ exports.addEntryCases = [
         entryID: 346578302,
         text: 'Adding a test entry',
         upvotes: 0,
+        upvoters: {},
         comments: [{
           username: 'testUser',
           commentID: 192693359,
           text: 'Adding a test comment',
           upvotes: 0,
+          upvoters: {},
         }]
       }]},
       "__v": 0
@@ -989,12 +1025,14 @@ exports.upvoteCases = [
           entryID: 415745888,
           text: 'Adding another test entry',
           upvotes: 1,
+          upvoters: {'testUser2': 1},
           comments: []
         },
         {
           entryID: 907176294,
           comments: [],
           upvotes: 0,
+          upvoters: {},
           text: 'tipsblahblah'
         },
         {
@@ -1002,6 +1040,7 @@ exports.upvoteCases = [
           entryID: 346578302,
           text: 'Adding a test entry',
           upvotes: 0,
+          upvoters: {},
           comments: []
         }
       ]},
@@ -1035,11 +1074,13 @@ exports.upvoteCases = [
         entryID: 346578302,
         text: 'Adding a test entry',
         upvotes: 0,
+        upvoters: {},
         comments: [{
           username: 'testUser',
           commentID: 1653167667,
           text: 'Adding another test comment',
           upvotes: 1,
+          upvoters: {'testUser2': 1},
         }]
       }]},
       "__v": 0
@@ -1091,21 +1132,16 @@ exports.editEntryCases = [
           entryID: 415745888,
           text: 'The entry has been edited!',
           upvotes: 1,
+          upvoters: {'testUser2': 1},
           comments: []
         },
         {
           entryID: 907176294,
           comments: [],
           upvotes: 0,
+          upvoters: {},
           text: 'tipsblahblah'
         },
-        // {
-        //   username: 'testUser',
-        //   entryID: 346578302,
-        //   text: 'Adding a test entry',
-        //   upvotes: 0,
-        //   comments: []
-        // }
       ]},
       "__v": 0
     }
@@ -1132,17 +1168,20 @@ exports.editEntryCases = [
           entryID: 346578302,
           text: 'Adding a test entry',
           upvotes: 0,
+          upvoters: {},
           comments: [{
             username: 'testUser',
             commentID: 1653167667,
             text: 'Adding another test comment',
             upvotes: 1,
+            upvoters: {'testUser2': 1},
           },
           {
             username: 'testUser',
             commentID: 192693359,
             text: 'The comment has been edited!',
             upvotes: 0,
+            upvoters: {},
           }]
         }
       ]},
@@ -1170,11 +1209,13 @@ exports.editEntryCases = [
         entryID: 346578302,
         text: 'Adding a test entry',
         upvotes: 0,
+        upvoters: {},
         comments: [{
           username: 'testUser',
           commentID: 192693359,
           text: 'The comment has been edited!',
           upvotes: 0,
+          upvoters: {},
         }]
       }]},
       "__v": 0
@@ -1199,6 +1240,7 @@ exports.editEntryCases = [
         entryID: 907176294,
         comments: [],
         upvotes: 0,
+        upvoters: {},
         text: 'tipsblahblah'
       }]},
       "__v": 0
