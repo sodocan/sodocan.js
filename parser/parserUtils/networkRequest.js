@@ -2,6 +2,9 @@ var https = require('https');
 var http = require('http');
 var fs = require('fs');
 var URL = require('url');
+//var host = 'localhost';
+//var host = 'sodocan.herokuapp.com';
+var host = 'sodocan-staging.herokuapp.com';
 
 var githubAPICallForFile = function(fileInfo, cb) {
   //       github.com/username/repo/(always)/branch/folders.../filename
@@ -53,9 +56,8 @@ var parseUrl = function(url) {
 
 var sendParsedToServer = function(string, tokenQueryString, cb) {
   var options = {
-    host:'localhost',
-    //host: 'http://sodocan.herokuapp.com',
-    port: '3000',
+    host: host,
+    //port: '3000',
     headers: {
       "content-type": "application/json",
     },
@@ -66,6 +68,7 @@ var sendParsedToServer = function(string, tokenQueryString, cb) {
     console.log('sending to server.');
     console.log("statusCode after sending: ", res.statusCode);
     //console.log("headers: ", res.headers);
+    console.log('HOST: ', options.host);
     cb();  
   });
 
@@ -78,9 +81,8 @@ var sendParsedToServer = function(string, tokenQueryString, cb) {
 
 var makeAuthRequest = function(hasAccount, username, password, cb) {
   var options = {
-    host: 'localhost',
-    //host: 'http://sodocan.herokuapp.com',
-    port: '3000',
+    host: host,
+    //port: '3000',
     headers: {
       'content-type': 'application/json',
     },
@@ -108,9 +110,8 @@ var makeAuthRequest = function(hasAccount, username, password, cb) {
 
 var logout = function(tokenQueryString, cb) {
   var options = {
-    host: 'localhost',
-    //host: 'http://sodocan.herokuapp.com',
-    port: '3000',
+    host: host,
+    //port: '3000',
     headers: {
       'content-type': 'application/json',
     },
