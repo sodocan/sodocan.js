@@ -1,5 +1,7 @@
 //temporary config var here
 var API_HOME = 'http://localhost:3000/api/';
+//underscore below
+//var API_HOME = 'http://sodocan.herokuapp.com/api/';
 angular.module( 'sodocan', [])
 
 .config(function($locationProvider){
@@ -319,8 +321,25 @@ angular.module( 'sodocan', [])
    * All edit methods are placeholders, do not use
    */
 
-  obj.editReference = function() {
-
+  obj.editReference = function(ref,context,text,entryID,cb) {
+    cb = cb || function(){};
+    sendToAPI('editEntry',
+              {
+                project: projectName,
+                functionName:ref,
+                context:context,
+                text:text,
+                entryID:entryID,
+                access_token:obj.authToken
+              },
+              function(err,data) {
+                if (err) {
+                  cb(err);
+                  return;
+                }
+                cb(null,data);
+              }
+             );
   };
 
   // No support for multiple context updates at once,
@@ -345,32 +364,50 @@ angular.module( 'sodocan', [])
              );
   };
 
-  obj.editDescription = function() {
-
+  obj.editDescription = function(ref,text,entryID,cb) {
+    obj.editReference(ref,'descriptions',text,entryID,cb);
   };
 
   obj.newDescription = function(ref,text,cb) {
     obj.newReference(ref,'descriptions',text,cb);
   };
 
-  obj.editTip = function() {
-
+  obj.editTip = function(ref,text,entryID,cb) {
+    obj.editReference(ref,'tips',text,entryID,cb);
   };
 
   obj.newTip = function(ref,text,cb) {
     obj.newReference(ref,'tips',text,cb);
   };
 
-  obj.editExample = function() {
-
+  obj.editExample = function(ref,text,entryID,cb) {
+    obj.editReference(ref,'examples',text,entryID,cb);
   };
 
   obj.newExample = function(ref,text,cb) {
     obj.newReference(ref,'examples',text,cb);
   };
 
-  obj.editComment = function() {
-
+  obj.editComment = function(entryID,ref,context,text,commentID,cb) {
+    cb = cb || function(){};
+    sendToAPI('editEntry',
+              {
+                entryID:entryID,
+                project: projectName,
+                functionName:ref,
+                context:context,
+                text:text,
+                commentID:commentID,
+                access_token:obj.authToken
+              },
+              function(err,data) {
+                if (err) {
+                  cb(err);
+                  return;
+                }
+                cb(null,data);
+              }
+             );
   };
 
   // TODO: does this really need proj,funcName, context, and ID?
