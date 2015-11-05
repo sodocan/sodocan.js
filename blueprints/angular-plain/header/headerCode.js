@@ -14,6 +14,12 @@ angular.module('sodocan')
   $scope.display = sodocanAPI.projectName;
 
   $scope.test = function() {
+    
+    /* also H4rold for testing
+    sodocanAPI.register('Harold','lept0n',function(err,resp) {
+      if (!err) console.log('registered');
+    });
+    */
 
     if (window.localStorage.getItem('sodocanToken')) {
       sodocanAPI.logout(function(err,resp) {
