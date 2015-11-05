@@ -1,0 +1,11 @@
+<div class="auth" ng-controller="authCtrl">
+  <form name="signupForm" ng-submit='signup()'>
+    <div class="input-field col s6">
+      <input type='text' name='username' ng-model='username' required placeholder="Username or Email">
+      <p ng-show='signinForm.username.$invalid && !signupForm.username.$pristine'>Please enter a valid username.</p>
+      <input type="password" name='password' ng-model='password' required placeholder="Password">
+      <p ng-show='signupForm.password.$invalid && !signupForm.password.$pristine'>Please enter a valid password.</p>
+      <button class="btn waves-effect waves-light" ng-disabled='signinForm.$invalid'>Sign Up</button>
+    </div>
+  </form>
+</div>

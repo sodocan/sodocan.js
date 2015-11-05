@@ -3,7 +3,7 @@ angular.module('sodocan')
   return{
     restrict: 'A',
     replace: true,
-    templateUrl: 'angular-sodone/explanation/explanationTpl.html'
+    templateUrl: '../angular-sodone/explanation/explanationTpl.html'
   };
 })
 .controller('sodocanExplanationCtrl',
@@ -30,7 +30,7 @@ angular.module('sodocan')
   $scope.submitEntry = function(){ 
     if($scope.entryText){
       //the actual server request
-      submitType[$scope.explanationType]($scope.methodName, $scope.entryText);
+      submitType[$scope.explanationType]($scope.methodName, $scope.entryText, function(){console.log('posted');});
       //display it locally
       pushLocalEntry(); 
       //clear and close
@@ -67,7 +67,7 @@ angular.module('sodocan')
       bgStyle: {
         opacity: 0.2
       },
-      templateUrl: 'angular-sodone/expLocalModal/expLocalModalTpl.html'
+      templateUrl: '../angular-sodone/expLocalModal/expLocalModalTpl.html'
     };
     $scope.$emit('clickedShowModal', modalSettings); 
   };

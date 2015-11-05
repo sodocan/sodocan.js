@@ -20,6 +20,7 @@ db/
 public/js
 public/css
 public/dist/sodocan.js
+public/dist/purestyles.css
 public/images/process_files
 
 # Floobits

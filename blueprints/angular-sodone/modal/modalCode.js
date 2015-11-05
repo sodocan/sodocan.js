@@ -2,7 +2,7 @@ angular.module('sodocan')
 .directive('sodocanModal',function(){
   return {
     replace: true,
-    templateUrl: 'angular-sodone/modal/modalTpl.html'
+    templateUrl: '../angular-sodone/modal/modalTpl.html'
   };
 })
 .factory('modalSettings', function(){
@@ -18,7 +18,6 @@ angular.module('sodocan')
     $scope.show = false; 
     $scope.hideModal = function(){
       $scope.show = false; 
-      console.log('hiding modal');
     };
     $scope.$on('displayModal', function(event, originalEvent, settings){
       $scope.show = true; 
@@ -26,7 +25,6 @@ angular.module('sodocan')
       $scope.windowStyle = settings.windowStyle; 
       $scope.event = originalEvent; 
       $scope.innerTemplate = settings.templateUrl;
-      console.log($scope.event);
     });
     $scope.event = null; 
     $scope.bgStyle = {};

@@ -128,6 +128,7 @@ angular.module( 'sodocan', [])
   obj.login = function(user,pass,cb) {
     var success = function(data) {
       window.localStorage.setItem('sodocanToken',data.data.access_token);
+      window.localStorage.setItem('username',user);
       obj.authToken = data.data.access_token;
       cb(null,true);
     };
@@ -145,6 +146,7 @@ angular.module( 'sodocan', [])
     var success = function(data) {
       obj.authToken = data.data.access_token;
       window.localStorage.setItem('sodocanToken',data.data.access_token);
+      window.localStorage.setItem('username',user);
       cb(null,true);
     };
 
@@ -179,6 +181,7 @@ angular.module( 'sodocan', [])
   obj.getReference = function(refObj,cb) {
     
     var parsed;
+    var ret;
 
     // Making convenience functions more, well, convenient means you can pass parsed
     // object in as well. ES6 version will hopefully be neater
@@ -198,7 +201,11 @@ angular.module( 'sodocan', [])
         return;
       }
       if (parsed.ref) {
-        ret = obj.docs[parsed.ref].explanations = data[0].explanations;
+        var explanations = data[0].explanations;
+        for (var prop in explanations) {
+          obj.docs[parsed.ref].explanations[prop] = explanations[prop];
+        }
+        ret = obj.docs[parsed.ref].explanations;
       } else {
         data.map(function(method) {
           obj.docs[method.functionName] = method;
@@ -269,13 +276,21 @@ angular.module( 'sodocan', [])
   obj.getComments = function(ref,context,entryID,commentNum,cb) {
     
     if (commentNum===-1) commentNum='all';
-    getFromAPI('ref/'+ref+'/'+context+'/'+entryID+'/'+commentNum,function(err,data) {
+    getFromAPI('ref/'+ref+'/'+context+'/entryID-'+entryID+'/'+commentNum,function(err,data) {
       if (err) {
         cb(err);
         return;
       }
-
-      obj.docs[ref] = data[0];
+      var returnedEntry = data[0].explanations[context][0];
+      var entryArray = obj.docs[ref].explanations[context]; 
+      console.log('returnedEntry', returnedEntry); 
+      console.log('entryArray', entryArray); 
+      for(var i = 0; i < entryArray.length; i++){
+        if(entryArray[i].entryID === returnedEntry.entryID){
+          entryArray[i].comments = returnedEntry.comments; 
+        }
+      }
+      //obj.docs[ref] = data[0];
       cb(null,obj.docs[ref]);
     });
 
