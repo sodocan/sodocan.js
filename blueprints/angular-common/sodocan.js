@@ -128,15 +128,15 @@ angular.module( 'sodocan', [])
   obj.login = function(user,pass,cb) {
     var success = function(data) {
       window.localStorage.setItem('sodocanToken',data.data.access_token);
-      window.localStorage.setItem('username',user);
+      window.localStorage.setItem('username',user.trim());
       obj.authToken = data.data.access_token;
       cb(null,true);
     };
 
     $http.post(API_HOME.slice(0,-4)+'auth/login',
                {
-                 username:user,
-                 password:pass
+                 username:user.trim(),
+                 password:pass.trim()
                },
                {headers:{'Content-Type':'application/json'}}
               ).then(success,cb);
@@ -146,14 +146,14 @@ angular.module( 'sodocan', [])
     var success = function(data) {
       obj.authToken = data.data.access_token;
       window.localStorage.setItem('sodocanToken',data.data.access_token);
-      window.localStorage.setItem('username',user);
+      window.localStorage.setItem('username',user.trim());
       cb(null,true);
     };
 
     $http.post(API_HOME.slice(0,-4)+'auth/register',
                {
-                 username:user,
-                 password:pass
+                 username:user.trim(),
+                 password:pass.trim()
                },
                {headers:{'Content-Type':'application/json'}}
               ).then(success,cb);

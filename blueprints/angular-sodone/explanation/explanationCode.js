@@ -59,10 +59,17 @@ angular.module('sodocan')
     var width = 450; 
     var modalSettings = {
       windowStyle: {
-        left: event.x - (width/2) + 'px',
-        top: event.y + 'px',
-        width: width +'px',
-        height: 100 + 'px'
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        margin: 'auto',
+        width: '600px',
+        height: '130px'
+        // left: event.x - (width/2) + 'px',
+        // top: event.y + 'px',
+        // width: width +'px',
+        // height: 100 + 'px'
       },
       bgStyle: {
         opacity: 0.2

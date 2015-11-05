@@ -1,9 +1,9 @@
-<div class="col s11 comments card-inner grey lighten-2" ng-controller="sodocanCommentCtrl">
-  <div class="post">
+<div class="col s11 comments card-inner grey lighten-2" ng-controller="sodocanCommentCtrl" style="vertical-align:middle">
+  <div class="post inline" style="vertical-align:middle">
       {{comment.text}}
   </div>
-  <div class="upvoteComments">
-    {{comment.upvotes}}
-    <i ng-click="upvote()" class="fa fa-thumbs-o-up "></i>
+  <div class="right entry-icons inline" stlye="vertical-align:middle">
+    <span class="vote-count">{{comment.upvotes}}</span>
+    <i class="fa fa-thumbs-o-up" ng-click="upvote()"></i>
   </div>
 </div>
