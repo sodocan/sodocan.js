@@ -78,7 +78,7 @@ NAV BAR STYLES
   background: pink;
 }*/
 .navbar-fixed form:hover {
-  background: rgba(255, 0, 0, 0.7);
+  background: #022E49;
 }
 
 .input-field {
@@ -259,6 +259,12 @@ CARD STYLES
   cursor: pointer;
 }
 
+/* --------------------------------------
+=========================================
+MODAL STYLES
+=========================================
+-----------------------------------------*/
+
 .modal-bg{
   position: fixed;
   width: 100%;
@@ -274,6 +280,35 @@ CARD STYLES
   opacity: 1;
   z-index: 1000;
   background-color: white; 
+}
+
+.auth {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 60%;
+  text-align: center;
+}
+
+.modal-container {
+  padding: 20px;
+  height: 300px;
+}
+
+.modal-setting {
+  vertical-align: middle;
+  padding: 0px;
+}
+
+.setting-entry {
+  margin: 5px;
+}
+
+.setting-entry-title {
+  width: 20%;
+  font-size: 20px;
 }
 
 /* --------------------------------------

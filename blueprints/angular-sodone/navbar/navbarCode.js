@@ -6,10 +6,15 @@ angular.module('sodocan')
     templateUrl: '../angular-sodone/navbar/navbarTpl.html'
   };
 })
-.controller('sodocanNavbarController', ['$scope', 'sodocanAPI', 'sodocanRouter',
-  function($scope, sodocanAPI, sodocanRouter){
+.controller('sodocanNavbarController', ['$scope', 'sodocanAPI', 'sodocanRouter', '$window',
+  function($scope, sodocanAPI, sodocanRouter, $window){
     $scope.projectName = sodocanAPI.projectName;
-    
+    $scope.authToken = sodocanAPI.authToken;
+    $scope.signOut = function(){
+      sodocanAPI.logout(function(){
+        $window.location.reload();
+      });
+    };
 
     $scope.styles = {
     'descriptions':{
@@ -43,13 +48,16 @@ angular.module('sodocan')
     var width = 600; 
     var modalSettings = {
       windowStyle: {
-        left: event.x - (width/2) + 'px',
-        top: event.y + 40 + 'px',
-        width: width +'px',
-        height: 300 + 'px'
+        top:0,
+        left:0,
+        right:0,
+        bottom:0,
+        margin:'auto',
+        width: '600px',
+        height: '440px'
       },
       bgStyle: {
-        opacity: 0.2
+        opacity: 0.9
       },
       templateUrl: '../angular-sodone/expGlobalModal/expGlobalModalTpl.html'
     };
@@ -67,7 +75,8 @@ angular.module('sodocan')
         right:0,
         bottom:0,
         margin:'auto',
-        width: '400px',
+        width: '350px',
+        height: '250px'
       },
       bgStyle: {
         opacity: 0.9
@@ -88,7 +97,8 @@ angular.module('sodocan')
         right:0,
         bottom:0,
         margin:'auto',
-        width: '400px',
+        width: '350px',
+        height: '250px'
       },
       bgStyle: {
         opacity: 0.9

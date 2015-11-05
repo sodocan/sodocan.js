@@ -8,6 +8,5 @@ angular.module('sodocan')
 })
 .controller('sodocanSidebarCtrl',['$scope', 'sodocanAPI', 'sodocanRouter',
   function($scope, sodocanAPI, sodocanRouter){
-    console.log(sodocanAPI.docs);
     $scope.allMethods = Object.keys(sodocanAPI.docs); 
 }]);

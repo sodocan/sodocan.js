@@ -16,7 +16,6 @@ var app = angular.module('sodocan')
             ['$scope','sodocanAPI','sodocanRouter',
               function($scope,sodocanAPI,sodocanRouter) {
   var update = function(path) {
-    console.log('path', path); 
     $scope.contentDisp = path;
   };
   $scope.$on('navContextButton', function(event, context,state){

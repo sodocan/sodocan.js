@@ -9,14 +9,21 @@
             <ul class="right hide-on-med-and-down">
               <li><form>
                 <div class="input-field">
-                  <label for="search"><i class="material-icons right">search</i></label>
+                  <label for="search"><i class="fa fa-search right" style="font-size:23px"></i></label>
                   <input id="search" type="search" required>
                   <i class="material-icons">close</i>
                 </div>
               </form></li>
-              <li><i ng-click="showModal($event)" class="material-icons">settings</i></li>
-              <li ng-click="showLoginModal($event)">Log In</li>
-              <li ng-click="showSignupModal($event)" style="margin-right: 50px" ng-click="">Sign Up</li>
+              <li><i ng-click="showModal($event)" style="font-size:25px" class="fa fa-gear"></i></li>
+
+              <li>
+                <span ng-click="showLoginModal($event)" ng-show="!authToken">Log In</span>
+                <span ng-show="authToken">stff</span>
+              </li>
+
+              <li style="margin-right: 50px">
+                <span ng-click="showSignupModal()" ng-show="!authToken">Sign Up</span>
+                <span ng-show="authToken" ng-click="signOut()">Sign Out</span>
              </ul>
           </div>
           <!-- sub header -->

@@ -128,6 +128,7 @@ angular.module( 'sodocan', [])
   obj.login = function(user,pass,cb) {
     var success = function(data) {
       window.localStorage.setItem('sodocanToken',data.data.access_token);
+      window.localStorage.setItem('username',user);
       obj.authToken = data.data.access_token;
       cb(null,true);
     };
@@ -145,6 +146,7 @@ angular.module( 'sodocan', [])
     var success = function(data) {
       obj.authToken = data.data.access_token;
       window.localStorage.setItem('sodocanToken',data.data.access_token);
+      window.localStorage.setItem('username',user);
       cb(null,true);
     };
 
@@ -196,7 +198,6 @@ angular.module( 'sodocan', [])
     getFromAPI(parsed.url,function(err,data) {
       if (err) {
         cb(err);
-        console.log('error', err);
         return;
       }
       if (parsed.ref) {
@@ -205,13 +206,11 @@ angular.module( 'sodocan', [])
           obj.docs[parsed.ref].explanations[prop] = explanations[prop];
         }
         ret = obj.docs[parsed.ref].explanations;
-        console.log('ret is', ret);
       } else {
         data.map(function(method) {
           obj.docs[method.functionName] = method;
         });
         ret = obj.docs;
-        console.log('ret in else is', ret);
       }
 
       cb(null,ret);
@@ -220,7 +219,6 @@ angular.module( 'sodocan', [])
   };
 
   obj.getDescriptions = function() {
-    console.log('get descriptions is called');
     var parsed = parseRefObj(Array.prototype.slice.call(arguments));
     // see Tips for specific query
     obj.getReference(parsed,function(err,data) {
