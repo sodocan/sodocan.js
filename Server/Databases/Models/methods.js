@@ -14,17 +14,17 @@ MethodSchema.index({project: 1, functionName: 1});
 var methodsModel =  mongoose.model('Method', MethodSchema);
 
 
-var insertObjs = function(objs){ //inserts dummy data
-  for(var i = 0; i < objs.length; i++){
-    methodsModel.findOneAndUpdate({
-      project: objs[i].project,
-      functionName: objs[i].functionName
-    }, objs[i], {upsert: true},
-    function(){
-    });
-  }
-};
-insertObjs(testObjs);
+// var insertObjs = function(objs){ //inserts dummy data
+//   for(var i = 0; i < objs.length; i++){
+//     methodsModel.findOneAndUpdate({
+//       project: objs[i].project,
+//       functionName: objs[i].functionName
+//     }, objs[i], {upsert: true},
+//     function(){
+//     });
+//   }
+// };
+// insertObjs(testObjs);
 
 /*
 Test cases:
