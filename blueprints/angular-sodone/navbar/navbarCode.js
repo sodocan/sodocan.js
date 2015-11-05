@@ -86,6 +86,8 @@ angular.module('sodocan')
     $scope.$emit('clickedShowModal', modalSettings); 
   };
 
+  $scope.username = window.localStorage.getItem('username');
+  
   $scope.showSignupModal = function(event){
     //The modal takes in this json as properties for the window
     //there is an example of a centered modal in modalCode

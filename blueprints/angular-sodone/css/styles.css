@@ -161,6 +161,9 @@ CARD STYLES
   padding: 10px !important;
   padding-left: 25px !important;
   font-size: 18px;
+  -webkit-transition: top 0.5s ease-in-out !important;
+  -moz-transition: top 0.5s ease-in-out !important;
+  transition: top 0.5s ease-in-out !important;
 }
 
 .vote-count {
@@ -220,6 +223,11 @@ CARD STYLES
   padding: 10px;
   margin-top: 5px;
   margin-bottom: 5px;
+}
+.item {
+  -webkit-transition:  top 1s ease-out !important;
+  -moz-transition:  top 1s ease-out !important;
+  transition:  top 1s ease-out !important;
 }
 .post{
   width: 80%;

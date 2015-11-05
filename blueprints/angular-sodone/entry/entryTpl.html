@@ -9,7 +9,7 @@
 
     <div>
       <div>
-        <div ng-repeat="comment in entry.comments | limitTo: displayedComments | orderBy: '-upvotes'">
+        <div class="item" ng-repeat="comment in entry.comments | limitTo: displayedComments | orderBy: '-upvotes'" ng-animate="'animate'">
           <div sodocan-comment>
           </div>
         </div>
