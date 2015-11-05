@@ -72,14 +72,14 @@ var parseComments = function(string) {
 var parseFunctionInfo = function(string) {
   // checks for independent functions: var xyz = function() {}
   // (?!\/{2})
-  var functionPatternA = /[\n\r](?!\/{2})\s*(?:var)?\s*([a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  var functionPatternA = /[\n\r](?!\/{2})\s*(?:var)?\s*([a-zA-Z0-9_]+)\s*=\s*function\ {0,2}\(([a-zA-Z0-9_,\s]*)\)/g;
   // checks for independent functions: function xyz() = {}
   var functionPatternB = /[\n\r](?!\/{2})\s*function\s*([a-zA-Z0-9_]+)\s*\(([a-zA-Z0-9_,\s]*)\)/g;
   // checks for obj methods: a.xyz = function() {}
   //var functionPatternC = /[\n\r](?!\/{2})((?:[a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
-  var functionPatternC = /[\n\r](?!\/{2})[\t ]*((?:[a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+)\s*=\s*function\(([a-zA-Z0-9_,\s]*)\)/g;
+  var functionPatternC = /[\n\r](?!\/{2})[\t ]*((?:[a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+)\s*=\s*function\ {0,2}\(([a-zA-Z0-9_,\s]*)\)/g;
   // checks for obj methods: var d3 = {xyz: function(){}}
-  var functionPatternD = /[\n\r](?!\/{2})(?:(?:var)? *\w* *= *{?\w* *: *\w*, *)* *(\w*) *: *function\(([\w_, ]*)\)/g;
+  var functionPatternD = /[\n\r](?!\/{2})(?:(?:var)? *\w* *= *{?\w* *: *\w*, *)* *(\w*) *: *function\(([\w_, ]*)\)/g;;
   // and find the object name to be the context
 
   var functionInfoA = parseFunctionPatternA(string, functionPatternA);

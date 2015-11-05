@@ -51,19 +51,22 @@ var parseUrl = function(url) {
 };
 //parseUrl('https://github.com/lainjiang/Jupitr/blob/test/index.js');
 
-var sendParsedToServer = function(string) {
+var sendParsedToServer = function(string, tokenQueryString, cb) {
   var options = {
     host:'localhost',
+    //host: 'http://sodocan.herokuapp.com',
     port: '3000',
     headers: {
       "content-type": "application/json",
     },
-    path: '/create/',
+    path: '/create/' + tokenQueryString,
     method: 'POST'
   };
   var request = http.request(options, function(res) {
-    console.log("statusCode: ", res.statusCode);
-    console.log("headers: ", res.headers);
+    console.log('sending to server.');
+    console.log("statusCode after sending: ", res.statusCode);
+    //console.log("headers: ", res.headers);
+    cb();  
   });
 
   request.on('error', function(err) {
@@ -73,8 +76,61 @@ var sendParsedToServer = function(string) {
   request.end();
 };
 
+var makeAuthRequest = function(hasAccount, username, password, cb) {
+  var options = {
+    host: 'localhost',
+    //host: 'http://sodocan.herokuapp.com',
+    port: '3000',
+    headers: {
+      'content-type': 'application/json',
+    },
+    path: hasAccount ? '/auth/login' : '/auth/register',
+    method: 'POST'
+  };
+  var request = http.request(options, function(res) {
+    var responseBody = '';
+    res.on('data', function(chunk) {
+      responseBody += chunk;
+    });
+    res.on('end', function() {
+      console.log('response body:', responseBody);
+      cb(responseBody);  
+    });
+  });
+
+  request.write(JSON.stringify({
+    username: username,
+    password: password
+  }));
+  request.end();
+
+};
+
+var logout = function(tokenQueryString, cb) {
+  var options = {
+    host: 'localhost',
+    //host: 'http://sodocan.herokuapp.com',
+    port: '3000',
+    headers: {
+      'content-type': 'application/json',
+    },
+    path: '/auth/logout/' + tokenQueryString,
+    method: 'POST'
+  };
+
+  var request = http.request(options, function(res) {
+    console.log('status code response from logout: ', res.statusCode);
+    cb();  
+  });
+
+  request.end();
+};
+
+
 module.exports = {
   githubAPICallForFile: githubAPICallForFile,
   parseUrl: parseUrl,
-  sendParsedToServer: sendParsedToServer
+  sendParsedToServer: sendParsedToServer,
+  makeAuthRequest: makeAuthRequest,
+  logout: logout
 };  
