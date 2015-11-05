@@ -285,6 +285,9 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
               contextArray[i-1] = entry;
               i--;
             }
+          } else {
+            send404(res, 'cannot vote more than once or for your own entry');
+            return;
           }
         } else {
           var commentFound = false;
@@ -301,6 +304,9 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
                   comments[j-1] = comment;
                   j--;
                 }
+              } else {
+                send404(res, 'cannot vote more than once or for your own entry');
+                return;
               }
               break;
             }
@@ -344,15 +350,21 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
     [entryID:]
   }
   */
+
+  if (!addEntryInfo.text || !addEntryInfo.text.trim()) {
+    send404(res, 'no content in text');
+    return;
+  }
+
+  if (!addEntryInfo.project || !addEntryInfo.functionName) {
+    send404(res, 'project or functionName not provided');
+    return;
+  }
+
   var searchObject = {
     project: addEntryInfo.project,
     functionName: addEntryInfo.functionName
   };
-
-  if (!searchObject.project || !searchObject.functionName) {
-    send404(res, 'project or functionName not provided');
-    return;
-  }
 
   // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
   mongoFind(res, searchObject, null, function(reference) {
@@ -448,23 +460,30 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
     functionName:
     context:
     entryID:
+    text:
     delete:
     [commentID:]
   }
   */
+  var text = editEntryInfo.text;
+  if (!editEntryInfo.delete && (!text || !text.trim())) {
+    send404(res, 'no content in text');
+    return;
+  }
+
+  if (!editEntryInfo.project || !editEntryInfo.functionName) {
+    send404(res, 'project or functionName not provided');
+    return;
+  }
+
   var searchObject = {
     project: editEntryInfo.project,
     functionName: editEntryInfo.functionName
   };
 
-  if (!searchObject.project || !searchObject.functionName) {
-    send404(res, 'project or functionName not provided');
-    return;
-  }
-
   // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
   mongoFind(res, searchObject, null, function(reference) {
-    var validUpdate;
+    // var validUpdate;
     var context = editEntryInfo.context;
     var entryID = editEntryInfo.entryID;
 
@@ -485,11 +504,17 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
           if (editEntryInfo.username === entry.username) {
             if (editEntryInfo.delete) {
               contextArray.splice(i, 1);
-              validUpdate = true;
-            } else if (['', entry.text].indexOf(editEntryInfo.text) === -1) {
-              entry.text = editEntryInfo.text;
-              validUpdate = true;
+              // validUpdate = true;
+            } else if (entry.text !== text) {
+              entry.text = text;
+              // validUpdate = true;
+            } else {
+              send404(res, 'no change in content found');
+              return;
             }
+          } else {
+            send404(res, 'not authorized to edit this entry');
+            return;
           }
         } else {
           var commentFound = false;
@@ -501,11 +526,17 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
               if (editEntryInfo.username === comment.username) {
                 if (editEntryInfo.delete) {
                   comments.splice(j, 1);
-                  validUpdate = true;
-                } else if (['', comment.text].indexOf(editEntryInfo.text) === -1) {
-                  comment.text = editEntryInfo.text;
-                  validUpdate = true;
+                  // validUpdate = true;
+                } else if (comment.text !== text) {
+                  comment.text = text;
+                  // validUpdate = true;
+                } else {
+                  send404(res, 'no change in content found');
+                  return;
                 }
+              } else {
+                send404(res, 'not authorized to edit this entry');
+                return;
               }
               break;
             }
@@ -522,10 +553,10 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
       send404(res, 'entryID not found');
       return;
     }
-    if (!validUpdate) {
-      send404(res, 'not a valid edit');
-      return;
-    }
+    // if (!validUpdate) {
+    //   send404(res, 'not a valid edit');
+    //   return;
+    // }
 
     // Mongoose will not save the modifications to the explanations object
     // unless you reassign its value to a different object
