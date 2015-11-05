@@ -1,0 +1,1 @@
+{"header":{"project":"hashids.js","version":"","author":"","classList":[],"groupList":[]},"body":[{"functionName":"Hashids","params":[{"name":"salt"},{"name":"minHashLength"},{"name":"alphabet"}],"returns":[],"explanations":{"descriptions":"","examples":"","tips":""},"classContext":"","index":0}]}

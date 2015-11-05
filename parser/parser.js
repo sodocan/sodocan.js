@@ -9,7 +9,6 @@ var parseMain = parseAndCombine.parseMain;
 var constructGroupClassAndIndex = helper.constructGroupClassAndIndex;
 var githubAPICallForFile = networkRequest.githubAPICallForFile;
 var parseUrl = networkRequest.githubAPICallForFile;
-var sendParsedToServer = networkRequest.sendParsedToServer;
 
 //consider including more specific types of description: params description, returns description
 //maybe we don't need 'name' for the 'returns' array
@@ -44,13 +43,11 @@ var fileOperations = function(paths) {
     if (outputObj.header.project === '') {
       outputObj.header.project = defaultProjectName;
     }
-    
-    constructGroupClassAndIndex(outputObj);
-    // to write JSON and HTML files
-    //create the specified directory if is does not exist
-    writeIntoLocalFiles(outputObj, outputPath);
-    // make POST request to our server to send over the processed json file
-    sendParsedToServer(JSON.stringify(outputObj));
+    //duplicated
+    // constructGroupClassAndIndex(outputObj);
+    // writeIntoLocalFiles(outputObj, outputPath);
+    // // make POST request to our server to send over the processed json file
+    // sendParsedToServer(JSON.stringify(outputObj));
   } else {
     // for github API call - going to exist in some if block
     // check if https:// or http://
@@ -63,14 +60,78 @@ var fileOperations = function(paths) {
           outputObj.header.project = githubAPICallInfo[2];
         }
         outputObj.body = parsedFileContents.body;
-        constructGroupClassAndIndex(outputObj);
-        writeIntoLocalFiles(outputObj, outputPath);
-        // make POST request to our server to send over the processed json file
-        sendParsedToServer(JSON.stringify(outputObj));
+        //duplicated
+        // constructGroupClassAndIndex(outputObj);
+        // writeIntoLocalFiles(outputObj, outputPath);
+        // // make POST request to our server to send over the processed json file
+        // sendParsedToServer(JSON.stringify(outputObj));
       }); 
     }
   }
+  //all of these will be executed for either condition (local files or github files)
+  constructGroupClassAndIndex(outputObj);
+  // to write JSON and HTML files
+  //will create the specified directory if is does not exist
+  writeIntoLocalFiles(outputObj, outputPath);
+
+
+  //networkRequest.sendParsedToServer(JSON.stringify(outputObj));
+
+
+
+  cliAskQuestion('do you want to upload this doc to the server?', function(userInput) {
+    if (userInput) {
+    //handle registration/auth, then do sendParsedToServer
+    cliAskQuestion('do you have a sodocan.js account?', function(userInput) {
+      var usernameSentence = userInput ? 'Enter username:' : 'Registering now. Enter desired username:';
+      var passwordSentence = userInput ? 'Enter password:' : 'Enter desired password:';
+      process.stdout.write(usernameSentence);
+      process.stdin.once('data', function(username) {
+        username = username.trim();
+        process.stdout.write(passwordSentence);
+        process.stdin.once('data', function(password) {
+          password = password.trim();
+          networkRequest.makeAuthRequest(userInput, username, password, function(requestBody) {
+            var token = JSON.parse(requestBody).access_token;
+            var tokenQueryString = '?access_token=' + token;
+            
+            
+            
+            console.log('successfully ' + (userInput ? 'logged in' : 'registered'));
+            console.log('about to send parsed to server');
+            //DON"T KNOW IF THIS WORKS YET!
+            networkRequest.sendParsedToServer(JSON.stringify(outputObj), tokenQueryString);
+          });
+        });
+      });
+    }); 
+    } else {
+      process.stdout.write('Doc has not been sent.  Enjoy your local copy!');
+    }
+  });
+  make POST request to our server to send over the processed json file
+  
 };
+
+var cliAskQuestion = function(message, callback) {
+  var yesValues = ['y', 'yes'];
+  var noValues = ['n', 'no'];
+  process.stdout.write(message + ' (y/n)');
+  process.stdin.setEncoding('utf8');
+  process.stdin.once('data', function(answer) {
+    answer = answer.trim().toLowerCase();
+    if (yesValues.indexOf(answer) > - 1) {
+      callback(true);
+    } else if (noValues.indexOf(answer) > - 1) {
+      callback(false);
+    } else {
+      process.stdout.write('invalid response.');
+      cliAskQuestion(message, callback);
+    }
+  });
+};
+
+//var authAndSend = 
 
 var getAllFilePaths = function(paths, pathStart) {
   console.log('paths: ', paths);

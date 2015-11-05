@@ -51,17 +51,20 @@ var parseUrl = function(url) {
 };
 //parseUrl('https://github.com/lainjiang/Jupitr/blob/test/index.js');
 
-var sendParsedToServer = function(string) {
+var sendParsedToServer = function(string, tokenQueryString) {
   var options = {
-    host:'localhost',
-    port: '3000',
+     host:'localhost',
+     port: '3000',
+    //host: 'http://sodocan.herokuapp.com',
     headers: {
       "content-type": "application/json",
     },
-    path: '/create/',
+    path: '/create/' + tokenQueryString,
+    //path: '/api/create',
     method: 'POST'
   };
   var request = http.request(options, function(res) {
+    console.log('sent to server.');
     console.log("statusCode: ", res.statusCode);
     console.log("headers: ", res.headers);
   });
@@ -73,8 +76,39 @@ var sendParsedToServer = function(string) {
   request.end();
 };
 
+var makeAuthRequest = function(hasAccount, username, password, cb) {
+  var options = {
+    host: 'localhost',
+    port: '3000',
+    headers: {
+      'content-type': 'application/json',
+    },
+    path: hasAccount ? '/auth/login' : '/auth/register',
+    method: 'POST'
+  };
+  var request = http.request(options, function(res) {
+    var responseBody = '';
+    res.on('data', function(chunk) {
+      responseBody += chunk;
+    });
+    res.on('end', function() {
+      cb(responseBody);
+      console.log('response body:', responseBody);
+    });
+  });
+
+  request.write(JSON.stringify({
+    username: username,
+    password: password
+  }));
+  request.end();
+
+};
+
+
 module.exports = {
   githubAPICallForFile: githubAPICallForFile,
   parseUrl: parseUrl,
-  sendParsedToServer: sendParsedToServer
+  sendParsedToServer: sendParsedToServer,
+  makeAuthRequest: makeAuthRequest
 };  
