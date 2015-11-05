@@ -3,13 +3,18 @@ angular.module('sodocan')
   return{
     restrict: 'A',
     replace: true,
-    templateUrl: 'angular-sodone/navbar/navbarTpl.html'
+    templateUrl: '../angular-sodone/navbar/navbarTpl.html'
   };
 })
-.controller('sodocanNavbarController', ['$scope', 'sodocanAPI', 'sodocanRouter',
-  function($scope, sodocanAPI, sodocanRouter){
+.controller('sodocanNavbarController', ['$scope', 'sodocanAPI', 'sodocanRouter', '$window',
+  function($scope, sodocanAPI, sodocanRouter, $window){
     $scope.projectName = sodocanAPI.projectName;
-    
+    $scope.authToken = sodocanAPI.authToken;
+    $scope.signOut = function(){
+      sodocanAPI.logout(function(){
+        $window.location.reload();
+      });
+    };
 
     $scope.styles = {
     'descriptions':{
@@ -43,15 +48,64 @@ angular.module('sodocan')
     var width = 600; 
     var modalSettings = {
       windowStyle: {
-        left: event.x - (width/2) + 'px',
-        top: event.y + 40 + 'px',
-        width: width +'px',
-        height: 300 + 'px'
+        top:0,
+        left:0,
+        right:0,
+        bottom:0,
+        margin:'auto',
+        width: '600px',
+        height: '440px'
       },
       bgStyle: {
         opacity: 0.2
       },
-      templateUrl: 'angular-sodone/expGlobalModal/expGlobalModalTpl.html'
+      templateUrl: '../angular-sodone/expGlobalModal/expGlobalModalTpl.html'
+    };
+    $scope.$emit('clickedShowModal', modalSettings); 
+  };
+
+  $scope.showLoginModal = function(event){
+    //The modal takes in this json as properties for the window
+    //there is an example of a centered modal in modalCode
+    var width = 600; 
+    var modalSettings = {
+      windowStyle: {
+        top:0,
+        left:0,
+        right:0,
+        bottom:0,
+        margin:'auto',
+        width: '350px',
+        height: '250px'
+      },
+      bgStyle: {
+        opacity: 0.9
+      },
+      templateUrl: '../angular-sodone/authModal/loginModalTpl.html'
+    };
+    $scope.$emit('clickedShowModal', modalSettings); 
+  };
+
+  $scope.username = window.localStorage.getItem('username');
+  
+  $scope.showSignupModal = function(event){
+    //The modal takes in this json as properties for the window
+    //there is an example of a centered modal in modalCode
+    var width = 600; 
+    var modalSettings = {
+      windowStyle: {
+        top:0,
+        left:0,
+        right:0,
+        bottom:0,
+        margin:'auto',
+        width: '350px',
+        height: '250px'
+      },
+      bgStyle: {
+        opacity: 0.9
+      },
+      templateUrl: '../angular-sodone/authModal/signupModalTpl.html'
     };
     $scope.$emit('clickedShowModal', modalSettings); 
   };

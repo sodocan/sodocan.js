@@ -50,10 +50,19 @@ module.exports = function(grunt) {
       }
     },
 
+    purifycss: {
+      options: {},
+      target: {
+        src: ['public/index.html', 'public/js/*.js'],
+        css: ['public/css/*.css'],
+        dest: 'public/dist/purestyles.css'
+      },
+    },
+
     cssmin: {
       dist: {
         files: {
-          'public/dist/style.min.css': 'public/css/*.css'
+          'public/dist/style.min.css': 'public/dist/purestyles.css'
         }
       }
     },
@@ -70,7 +79,7 @@ module.exports = function(grunt) {
       },
       css: {
         files: 'public/css/*.css',
-        tasks: ['cssmin']
+        tasks: ['purifycss', 'cssmin']
       }
     },
   });
@@ -81,6 +90,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-cssmin'); 
   grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-purifycss');
 
   ////////////////////////////////////////////////////
   //              Main grunt tasks                  //
@@ -114,6 +124,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build', [
     'concat',
     'uglify',
+    'purifycss',
     'cssmin'
   ]);
   

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>docs</title>
+    <meta content="text/html"; charset="UTF-8">
+  </head>
+  <body>
+    <div class="header">
+      <h1 style="color:blue">Hashids.js</h1>
+        <div>
+          <h2>Author(s): ivanakimov</h2>
+        </div>
+    </div>
+
+    <div class="entry">
+      <h2 style="color:blue">Hashids</h2>
+        <div>
+          <h3>Parameters</h3>
+          <table border='1'>
+            <tr>
+              <th style='width:125px'>Name</th>
+              <th style='width:125px'>Type</th>
+            </tr>
+              <tr>
+                <td>salt</td>
+                <td>String</td>
+              </tr>    
+              <tr>
+                <td>minHashLength</td>
+                <td>Number</td>
+              </tr>    
+              <tr>
+                <td>alphabet</td>
+                <td>String</td>
+              </tr>    
+          </table>
+        </div>
+      <div>
+      </div>
+      <div>
+          <h3>Description: The hashids class contains all the methods for encoding. All parameters are optional</h3>
+          <h3>Tips: For encoding you can pass a unique salt value so your hashids differ from everyone else&#x27;s. I use &#x27;this is my salt&#x27; as an example.</h3>
+        </ul>
+      </div>
+    </div>
+    <div class="entry">
+      <h2 style="color:blue">Hashids.prototype.encode</h2>
+        <div>
+          <h3>Parameters</h3>
+          <table border='1'>
+            <tr>
+              <th style='width:125px'>Name</th>
+              <th style='width:125px'>Type</th>
+            </tr>
+              <tr>
+                <td>ID</td>
+                <td>Number || Numbers || Array[Numbers...]</td>
+              </tr>    
+          </table>
+        </div>
+      <div>
+      </div>
+      <div>
+          <h3>Description: Encodes the numbers passed in to look like youtube-style hashes</h3>
+          <h3>Tips: Make sure your salt is the same for both encoding and decoding</h3>
+        </ul>
+      </div>
+    </div>
+    <div class="entry">
+      <h2 style="color:blue">Hashids.prototype.decode</h2>
+        <div>
+          <h3>Parameters</h3>
+          <table border='1'>
+            <tr>
+              <th style='width:125px'>Name</th>
+              <th style='width:125px'>Type</th>
+            </tr>
+              <tr>
+                <td>hash</td>
+                <td>String</td>
+              </tr>    
+          </table>
+        </div>
+        <div>
+          <h3>Returns</h3>
+          <table border='1'>
+            <tr>
+              <th style='width:125px'>Type</th>
+            </tr>
+              <tr>
+                <td>Number</td>
+              </tr>    
+          </table>
+        </div>
+      <div>
+      </div>
+      <div>
+          <h3>Description: Decodes a hash created by the encode method</h3>
+      </div>
+    </div>
+    <div class="entry">
+      <h2 style="color:blue">Hashids.prototype.encodeHex</h2>
+        <div>
+          <h3>Parameters</h3>
+          <table border='1'>
+            <tr>
+              <th style='width:125px'>Name</th>
+              <th style='width:125px'>Type</th>
+            </tr>
+              <tr>
+                <td>hex</td>
+                <td>String</td>
+              </tr>    
+          </table>
+        </div>
+        <div>
+          <h3>Returns</h3>
+          <table border='1'>
+            <tr>
+              <th style='width:125px'>Type</th>
+            </tr>
+              <tr>
+                <td>String</td>
+              </tr>    
+          </table>
+        </div>
+      <div>
+      </div>
+      <div>
+          <h3>Description: Encodes a hexcode into a hashed string</h3>
+          <h3>Tips: The regular encode function doesn&#x27;t handle strings. encodeHx doesn&#x27;t work for all strings, however, only hex values</h3>
+        </ul>
+      </div>
+    </div>
+    <div class="entry">
+      <h2 style="color:blue">Hashids.prototype.decodeHex</h2>
+        <div>
+          <h3>Parameters</h3>
+          <table border='1'>
+            <tr>
+              <th style='width:125px'>Name</th>
+              <th style='width:125px'>Type</th>
+            </tr>
+              <tr>
+                <td>hash</td>
+                <td>String</td>
+              </tr>    
+          </table>
+        </div>
+        <div>
+          <h3>Returns</h3>
+          <table border='1'>
+            <tr>
+              <th style='width:125px'>Type</th>
+            </tr>
+              <tr>
+                <td>String</td>
+              </tr>    
+          </table>
+        </div>
+      <div>
+      </div>
+      <div>
+          <h3>Description: Decodes hashes of hexes</h3>
+          <h3>Tips: Make sure that this is used in conjuction with encode hex</h3>
+        </ul>
+      </div>
+    </div>
+
+  </body>
+</html>

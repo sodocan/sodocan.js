@@ -3,23 +3,32 @@
       <!-- navbar -->
       <div class="navbar-fixed">
         <nav>
-          <div class="nav-wrapper black z-depth-1">
-            <span class=""> Sodocan</span>
-            <a href="#!" class="brand-logo">Underscore</a>
-            <ul class="right hide-on-med-and-down">
-              <li><a href="" ng-click="showModal($event)"><i class="material-icons">settings</i></a></li>
-              <li><form>
-                <div class="input-field">
-                  <input id="search" type="search" required>
-                  <label for="search"><i class="material-icons right">search</i></label>
-                  <i class="material-icons">close</i>
-                </div>
-              </form></li>
-              <li>JestersWilde</li>
-             </ul>
+          <div class="nav-thin-top"></div>
+          <div class="nav-wrapper z-depth-1 blue-bg col s12">
+              <a href="#!" class="logo-img"><img src="../angular-sodone/images/logo-white.png"></a>
+              <span class="proj-title">underscore</span>
+              <ul class="right hide-on-med-and-down">
+                <li><form>
+                  <div class="input-field">
+                    <label for="search"><i class="fa fa-search right" style="font-size:23px"></i></label>
+                    <input id="search" type="search" required>
+                    <i class="material-icons">close</i>
+                  </div>
+                </form></li>
+                <li><i ng-click="showModal($event)" style="font-size:25px" class="fa fa-gear"></i></li>
+
+                <li>
+                  <span ng-click="showLoginModal($event)" ng-show="!authToken">Log In</span>
+                  <span ng-show="authToken">{{username}}</span>
+                </li>
+
+                <li style="margin-right: 50px">
+                  <span ng-click="showSignupModal($event)" ng-show="!authToken">Sign Up</span>
+                  <span ng-show="authToken" ng-click="signOut()">Sign Out</span>
+               </ul>
           </div>
           <!-- sub header -->
-          <div class="orange lighten-4 thin">
+  <!--         <div class="orange lighten-4 thin">
           <div style="right:0">
             
                 <ul>
@@ -34,7 +43,7 @@
                   </li>                
                 </ul>
           </div>
-          </div>
+          </div> -->
         </nav>
       </div>
 

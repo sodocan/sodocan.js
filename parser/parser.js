@@ -9,7 +9,6 @@ var parseMain = parseAndCombine.parseMain;
 var constructGroupClassAndIndex = helper.constructGroupClassAndIndex;
 var githubAPICallForFile = networkRequest.githubAPICallForFile;
 var parseUrl = networkRequest.githubAPICallForFile;
-var sendParsedToServer = networkRequest.sendParsedToServer;
 
 //consider including more specific types of description: params description, returns description
 //maybe we don't need 'name' for the 'returns' array
@@ -44,13 +43,11 @@ var fileOperations = function(paths) {
     if (outputObj.header.project === '') {
       outputObj.header.project = defaultProjectName;
     }
-    
-    constructGroupClassAndIndex(outputObj);
-    // to write JSON and HTML files
-    //create the specified directory if is does not exist
-    writeIntoLocalFiles(outputObj, outputPath);
-    // make POST request to our server to send over the processed json file
-    sendParsedToServer(JSON.stringify(outputObj));
+    //duplicated
+    // constructGroupClassAndIndex(outputObj);
+    // writeIntoLocalFiles(outputObj, outputPath);
+    // // make POST request to our server to send over the processed json file
+    // sendParsedToServer(JSON.stringify(outputObj));
   } else {
     // for github API call - going to exist in some if block
     // check if https:// or http://
@@ -63,13 +60,78 @@ var fileOperations = function(paths) {
           outputObj.header.project = githubAPICallInfo[2];
         }
         outputObj.body = parsedFileContents.body;
-        constructGroupClassAndIndex(outputObj);
-        writeIntoLocalFiles(outputObj, outputPath);
-        // make POST request to our server to send over the processed json file
-        sendParsedToServer(JSON.stringify(outputObj));
+        //duplicated
+        // constructGroupClassAndIndex(outputObj);
+        // writeIntoLocalFiles(outputObj, outputPath);
+        // // make POST request to our server to send over the processed json file
+        // sendParsedToServer(JSON.stringify(outputObj));
       }); 
     }
   }
+  //all of these will be executed for either condition (local files or github files)
+  constructGroupClassAndIndex(outputObj);
+  // to write JSON and HTML files
+  //will create the specified directory if is does not exist
+  writeIntoLocalFiles(outputObj, outputPath);
+
+  cliAskQuestion('do you want to upload this doc to the server?', function(userInput) {
+    if (userInput) {
+      authAndSend(outputObj);
+    } else {
+      process.stdout.write('Doc has not been sent.  Enjoy your local copy!\n');
+      process.exit();
+    }
+  });
+};
+
+var authAndSend = function(outputObjToSend) {
+  cliAskQuestion('do you have a sodocan.js account?', function(userInput) {
+    var usernameSentence = userInput ? 'Enter username:' : 'Registering now. Enter desired username:';
+    var passwordSentence = userInput ? 'Enter password:' : 'Enter desired password:';
+    process.stdout.write(usernameSentence);
+    process.stdin.once('data', function(username) {
+      username = username.trim();
+      process.stdout.write(passwordSentence);
+      process.stdin.once('data', function(password) {
+        password = password.trim();
+        //get the auth token, to use to create a new library in the DB
+        //TODO: enable Github OAuth login to get this token
+        networkRequest.makeAuthRequest(userInput, username, password, function(responseBody) {
+          var token = JSON.parse(responseBody).access_token;
+          //use token to create a query string we will add to our /create and /logout routes
+          var tokenQueryString = '?access_token=' + token;
+          console.log('successfully ' + (userInput ? 'logged in' : 'registered'));
+          console.log('about to send parsed JSON to server');
+          //actually send it to the server (/create route)
+          networkRequest.sendParsedToServer(JSON.stringify(outputObjToSend), tokenQueryString, function() {
+            //logout immediately after creating
+            networkRequest.logout(tokenQueryString, function() {
+              console.log('logged out');
+              process.exit();
+            });  
+          });
+        });
+      });
+    });
+  }); 
+};
+
+var cliAskQuestion = function(message, callback) {
+  var yesValues = ['y', 'yes'];
+  var noValues = ['n', 'no'];
+  process.stdout.write(message + ' (y/n)');
+  process.stdin.setEncoding('utf8');
+  process.stdin.once('data', function(answer) {
+    answer = answer.trim().toLowerCase();
+    if (yesValues.indexOf(answer) > - 1) {
+      callback(true);
+    } else if (noValues.indexOf(answer) > - 1) {
+      callback(false);
+    } else {
+      process.stdout.write('invalid response.\n');
+      cliAskQuestion(message, callback);
+    }
+  });
 };
 
 var getAllFilePaths = function(paths, pathStart) {
@@ -113,7 +175,7 @@ var writeIntoLocalFiles = function(outputObj, outputPath) {
       console.log(err + '(will be triggered by mocha tests)');
     }
     else {
-      console.log('Successfully parsed into JSON file.');
+      //console.log('Successfully parsed into JSON file.');
     }
   });
 
@@ -123,7 +185,7 @@ var writeIntoLocalFiles = function(outputObj, outputPath) {
       console.log(err + '(will be triggered by mocha tests)');
     }
     else {
-      console.log('Successfully generated HTML file.');
+      //console.log('Successfully generated HTML file.');
     }
   });
 };

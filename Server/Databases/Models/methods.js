@@ -1,5 +1,3 @@
-// var db = require('../dbconnection.js');
-console.log('methodsDB getting created');
 var mongoose = require('mongoose');
 var testObjs = require('./dummyData').methodsData;
 
@@ -7,25 +5,26 @@ var MethodSchema = new mongoose.Schema({
   project: {type: String, required: true, index: true},
   functionName: {type: String, required: true},
   group: {type: String},
+  username: {type: String},
+  timestamp: mongoose.Schema.Types.Mixed,
   reference: mongoose.Schema.Types.Mixed,
   explanations: mongoose.Schema.Types.Mixed,
 });
-console.log('schema got created');
 MethodSchema.index({project: 1, functionName: 1});
 var methodsModel =  mongoose.model('Method', MethodSchema);
 
 
-var insertObjs = function(objs){ //inserts dummy data
-  for(var i = 0; i < objs.length; i++){
-    methodsModel.findOneAndUpdate({
-      project: objs[i].project,
-      functionName: objs[i].functionName
-    }, objs[i], {upsert: true},
-    function(){
-    });
-  }
-};
-insertObjs(testObjs);
+// var insertObjs = function(objs){ //inserts dummy data
+//   for(var i = 0; i < objs.length; i++){
+//     methodsModel.findOneAndUpdate({
+//       project: objs[i].project,
+//       functionName: objs[i].functionName
+//     }, objs[i], {upsert: true},
+//     function(){
+//     });
+//   }
+// };
+// insertObjs(testObjs);
 
 /*
 Test cases:

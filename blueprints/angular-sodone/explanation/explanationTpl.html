@@ -1,11 +1,16 @@
-<div class="card grey lighten-3" ng-controller="sodocanExplanationCtrl" ng-hide="styles[explanationType].on" ng-mouseenter="mouseEnter()" ng-mouseleave="mouseLeave()">
-  <img ng-click="toggleTextArea()" src="../angular-sodone/images/respond.png" height=15 class="tint"> </img>
-  <h6>{{explanationType}}</h6>
+<div class="card-inner grey lighten-4" ng-controller="sodocanExplanationCtrl" ng-hide="styles[explanationType].on" ng-mouseenter="mouseEnter()" ng-mouseleave="mouseLeave()">
+  <h6 class=''>{{explanationType.toUpperCase()}}</h6>
   <span ng-show="entryArray.length === 0"><i> There are currently no entries for this type, be the first!</i></span>
-  <i class="material-icons right" ng-class="iconCSS" ng-click="loadOneMore()">queue</i>
-  <i class="material-icons right" ng-class="iconCSS" ng-click="loadOneLess()">present_to_all</i>   
-  <i class="material-icons right" ng-class="iconCSS" ng-click="showModal($event)">settings</i>
-  <div ng-repeat='entry in entryArray | limitTo: displayedEntries'>
+
+  <!-- LIST CONFIGURATION ICON -->
+  <div class="entry-icons right">
+    <i class="fa fa-plus fa-lg" ng-class="iconCSS" ng-click="toggleTextArea()"></i>
+    <i class="fa fa-chevron-down fa-lg" ng-class="iconCSS" ng-click="loadOneMore()"></i>
+    <i class="fa fa-chevron-up fa-lg" ng-class="iconCSS" ng-click="loadOneLess()"></i>
+    <i class="fa fa-gear fa-lg" ng-class="iconCSS" ng-click="showModal($event)"></i>
+  </div>
+
+  <div ng-repeat='entry in entryArray | limitTo: displayedEntries | orderBy: "-upvotes"'>
     <div sodocan-entry>
     </div>
   </div>
@@ -15,9 +20,13 @@
   </div>
   <form>
     <div class="input-field" ng-hide="hideTextArea">
-      <textarea id="textArea{{$id}}" ng-model="entryText" class="materialize-textarea"></textarea>
-      <label for="textArea{{$id}}">Your entry for {{explanationType}}</label>
-      <a ng-click="submitEntry()" href="#" class="btn submit">Submit</a>
+      <div class="input-field col s10">
+        <input ng-model="entryText" placeholder="Your entry for {{explanationType}}" id="first_name" type="text" class="validate">
+      </div>
+      <div class="col s1" style="padding-top: 25px">
+        <button ng-click="submitEntry()" class="btn waves-effect waves-light" type="submit" name="action" style="left: 44%; margin-bottom: 20px;">Submit
+        </button>
+      </div>
     </div>
   </form>
 

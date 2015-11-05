@@ -3,7 +3,7 @@ angular.module('sodocan')
   return{
     restrict: 'A',
     replace: true,
-    templateUrl: 'angular-sodone/explanation/explanationTpl.html'
+    templateUrl: '../angular-sodone/explanation/explanationTpl.html'
   };
 })
 .controller('sodocanExplanationCtrl',
@@ -21,7 +21,7 @@ angular.module('sodocan')
     var entry = {
       text: $scope.entryText,
       upvotes: 0,
-      additions: []
+      comments: []
     };
     $scope.localEntries.push(entry); 
   };
@@ -30,7 +30,7 @@ angular.module('sodocan')
   $scope.submitEntry = function(){ 
     if($scope.entryText){
       //the actual server request
-      submitType[$scope.explanationType]($scope.methodName, $scope.entryText);
+      submitType[$scope.explanationType]($scope.methodName, $scope.entryText, function(){console.log('posted');});
       //display it locally
       pushLocalEntry(); 
       //clear and close
@@ -59,15 +59,22 @@ angular.module('sodocan')
     var width = 450; 
     var modalSettings = {
       windowStyle: {
-        left: event.x - (width/2) + 'px',
-        top: event.y + 'px',
-        width: width +'px',
-        height: 100 + 'px'
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        margin: 'auto',
+        width: '600px',
+        height: '130px'
+        // left: event.x - (width/2) + 'px',
+        // top: event.y + 'px',
+        // width: width +'px',
+        // height: 100 + 'px'
       },
       bgStyle: {
         opacity: 0.2
       },
-      templateUrl: 'angular-sodone/expLocalModal/expLocalModalTpl.html'
+      templateUrl: '../angular-sodone/expLocalModal/expLocalModalTpl.html'
     };
     $scope.$emit('clickedShowModal', modalSettings); 
   };

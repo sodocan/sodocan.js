@@ -130,11 +130,59 @@ angular.module('sodocan')
     }
   };
 
+  // Edits! confusing, but you get the idea, right??
+  $scope.editEntry = function(item,comment) {
+    if (comment) {
+      sodocanAPI.editComment(sodocanAPI.docs[item].explanations[$scope.EntryType][0].entryID,
+                             item,
+                             $scope.EntryType,
+                             $scope.NewEntry[item],
+                             comment.commentID,
+                             function(err,data) {
+                               if (!err) {
+                                 comment.text = $scope.NewEntry[item];
+                               }
+                               postResp(err,data);
+                             });
+    } else {
+      sodocanAPI.editDescription(item,
+                                 $scope.NewEntry[item],
+                                 sodocanAPI.docs[item].explanations[$scope.EntryType][0].entryID,
+                                 function(err,data) {
+                                   if (!err) {
+                                     sodocanAPI.docs[item].explanations[$scope.EntryType][0].text = $scope.NewEntry[item];
+                                   }
+                                   postResp(err,data);
+                                 });
+    }
+  };
+
   // we only work with top entries, so only need the functionName
-  $scope.upvote = function(item) {
-    sodocanAPI.upvote(sodocanAPI.docs[item].explanations[$scope.EntryType][0].entryID,item,$scope.EntryType,postResp);
-    // cheat to update number
-    sodocanAPI.docs[item].explanations[$scope.EntryType][0].upvotes++;
+  $scope.upvote = function(item,comment) {
+    if (!comment) {
+      sodocanAPI.upvote(sodocanAPI.docs[item].explanations[$scope.EntryType][0].entryID,
+                        item,
+                        $scope.EntryType,
+                        function(err,data) {
+                          if (!err) {
+                            // err doesn't trigger for dup/self-vote atm <-- FYI
+                            sodocanAPI.docs[item].explanations[$scope.EntryType][0].upvotes++;
+                          }
+                          postResp(err,data);
+                        });
+    } else {
+      sodocanAPI.upvote(sodocanAPI.docs[item].explanations[$scope.EntryType][0].entryID,
+                        item,
+                        $scope.EntryType,
+                        comment.commentID,
+                        function(err,data) {
+                          if (!err) {
+                            // err doesn't trigger for dup/self-vote atm <-- FYI
+                            comment.upvotes++;
+                          }
+                          postResp(err,data);
+                        });
+    }
   };
 
 }]);

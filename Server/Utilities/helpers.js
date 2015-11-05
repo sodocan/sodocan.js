@@ -15,6 +15,7 @@ var send404 = exports.send404 = function(res, errorMessageOrObj) {
     console.error(errorMessageOrObj);
   }
   console.error(new Error('404').stack);
+  res.setHeader('Access-Control-Allow-Origin','*');
   res.status(404).end();
 };
 
@@ -29,10 +30,10 @@ var mongoFind = function(res, searchObj, sortObj, successC, notFoundC, errorC) {
   errorC = errorC || function(err) {send404(res, err);};
 
   var finder = sortObj
-    ? methodsDB.find(searchObj).sort(sortObj)
+    ? methodsDB.find(searchObj).sort(sortObj).lean()
     : methodsDB.findOne(searchObj);
 
-  finder.lean().exec(function(error, references) {
+  finder.exec(function(error, references) {
     if (error) {
       errorC(error);
     } else if (sortObj ? !references.length : !references) {
@@ -77,13 +78,13 @@ var parseApiPath = exports.parseApiPath = function(path) {
     if (!nextPath
       || nextPath === 'all'
       || nextPath.slice(0,7) === 'entryID'
-      || nextPath.slice(0,10) === 'additionID'
+      || nextPath.slice(0,9) === 'commentID'
       || !isNaN(+nextPath)) {
       //the first time through, this will put an empty array into context
       //ex (contexts[description] = [])
       contexts[context] = contexts[context] || [];
       if (nextPath) { // not necessary, since will just push undefined to array
-        //pushes the depth, addition, all, or entry ID into context
+        //pushes the depth, comment, all, or entry ID into context
         //{example:[1,all]}
         contexts[context].push(nextPath);
       }
@@ -94,41 +95,30 @@ var parseApiPath = exports.parseApiPath = function(path) {
     }
     nextPath = next();
   } while (nextPath);
-  console.log(searchObject);
+
   return {
     searchObject: searchObject,
     contexts: contexts
   };
 };
 
-var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj){
-  var explanations = {};
-  for(var context in skeleObj.explanations){
-    explanations[context] = [];
-    if(skeleObj.explanations[context]){
-      explanations[context].push({
-        text: skeleObj.explanations[context],
-        upvotes: 0,
-        additions: [],
-        entryID: hashCode(skeleObj.explanations[context])
-      });
-    }
-  }
-
+var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj, username) {
   var dbForm = {
     project: projectName,
     functionName: skeleObj.functionName,
     group: skeleObj.group,
+    username: username,
+    timestamp: new Date(),
     reference: {
       params: skeleObj.params,
       returns: skeleObj.returns
     },
-    explanations: explanations
+    explanations: {descriptions: [], examples: [], tips:[]}
   };
   return dbForm;
 };
 
-var runAfterAsync = exports.runAfterAsync = function(res, numOfCallbacks){
+var runAfterAsync = exports.runAfterAsync = function(res, numOfCallbacks) {
   var finished = 0;
   var failed = false;
   return function(err){
@@ -165,7 +155,6 @@ sodocan.com/api/*:projectName/ref/:functionName/:explanationType/:numEntriesOrEn
 api/:projectName/1/all
 */
 var getReferences = exports.getReferences = function(path, res) {
-  console.log('getReferences got run');
 
   var parsedPath = parseApiPath(path);
   if (!parsedPath) {
@@ -211,26 +200,26 @@ var getReferences = exports.getReferences = function(path, res) {
             //so we get the n (depth) amount of entries
             contextArray = entriesObj[context] = entriesObj[context].slice(0, +entryDepth);
           }
-          //checking to see if we want a specific addition
+          //checking to see if we want a specific comment
           //very similar to what we did for entries
           for (var i = 0; i < contextArray.length; i++) {
-            if (addDepth.slice(0,10) === 'additionID') {
-              id = +addDepth.slice(11);
-              var additionsArray = contextArray[i].additions;
+            if (addDepth.slice(0,9) === 'commentID') {
+              id = +addDepth.slice(10);
+              var commentsArray = contextArray[i].comments;
               var foundAdd = false;
-              for (var j = 0; i < additionsArray.length; j++) {
-                if (additionsArray[j].additionID === id) {
-                  contextArray[i].additions = [additionsArray[j]];
+              for (var j = 0; i < commentsArray.length; j++) {
+                if (commentsArray[j].commentID === id) {
+                  contextArray[i].comments = [commentsArray[j]];
                   foundAdd = true;
                   break;
                 }
               }
               if (!foundAdd) {
-                contextArray[i].additions = [];
+                contextArray[i].comments = [];
               }
 
             } else if(addDepth !== 'all'){
-              contextArray[i].additions = contextArray[i].additions.slice(0, +addDepth);
+              contextArray[i].comments = contextArray[i].comments.slice(0, +addDepth);
             }
           }
         } else {//if there was no depth, that means we don't want it. delete.
@@ -249,12 +238,12 @@ var getReferences = exports.getReferences = function(path, res) {
 var upvote = exports.upvote = function(upvoteInfo, res) {
   /*
   {
+    username:
     project:
     functionName:
     context:
     entryID:
-    [additionID:]
-    [username/ip:]
+    [commentID:]
   }
   */
   var searchObject = {
@@ -267,20 +256,18 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
     return;
   }
 
+  var username = upvoteInfo.username;
+
   // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
   mongoFind(res, searchObject, null, function(reference) {
     var context = upvoteInfo.context;
     var entryID = upvoteInfo.entryID;
 
-    var addition = false;
-
-    var additionID = upvoteInfo.additionID;
-    if (additionID) {
-      addition = true;
-    }
+    var commentID = upvoteInfo.commentID;
 
     var entryFound = false;
-    var contextArray = reference.explanations[context];
+    var explanations = JSON.parse(JSON.stringify(reference.explanations));
+    var contextArray = explanations[context];
     if (!contextArray) {
       send404(res, 'context not found');
       return;
@@ -288,33 +275,45 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
     for (var i = 0; i < contextArray.length; i++) {
       if (contextArray[i].entryID === entryID) {
         entryFound = true;
-        if(!additionID){
-          contextArray[i].upvotes++;
+        if (!commentID) {
+          var entry = contextArray[i];
+          if (!entry.upvoters.hasOwnProperty(username) && username !== entry.username) {
+            entry.upvotes++;
+            entry.upvoters[username] = 1;
 
-          while (i > 0 && contextArray[i].upvotes > contextArray[i-1].upvotes) {
-            var temp = contextArray[i];
-            contextArray[i] = contextArray[i-1];
-            contextArray[i-1] = temp;
-            i--;
+            while (i > 0 && entry.upvotes > contextArray[i-1].upvotes) {
+              contextArray[i] = contextArray[i-1];
+              contextArray[i-1] = entry;
+              i--;
+            }
+          } else {
+            send404(res, 'cannot vote more than once or for your own entry');
+            return;
           }
         } else {
-          var additionFound = false;
-          var additions = contextArray[i].additions;
-          for (var j = 0; j < additions.length; j++) {
-            if (additions[j].additionID === additionID) {
-              additionFound = true;
-              additions[j].upvotes++;
-              while (j > 0 && additions[j].upvotes > additions[j-1].upvotes) {
-                var temp = additions[j];
-                additions[j] = additions[j-1];
-                additions[j-1] = temp;
-                j--;
+          var commentFound = false;
+          var comments = contextArray[i].comments;
+          for (var j = 0; j < comments.length; j++) {
+            var comment = comments[j];
+            if (comment.commentID === commentID) {
+              commentFound = true;
+              if (!comment.upvoters.hasOwnProperty(username) && username !== comment.username) {
+                comment.upvotes++;
+                comment.upvoters[username] = 1;
+                while (j > 0 && comment.upvotes > comments[j-1].upvotes) {
+                  comments[j] = comments[j-1];
+                  comments[j-1] = comment;
+                  j--;
+                }
+              } else {
+                send404(res, 'cannot vote more than once or for your own entry');
+                return;
               }
               break;
             }
           }
-          if (!additionFound) {
-            send404(res, 'additionID not found');
+          if (!commentFound) {
+            send404(res, 'commentID not found');
             return;
           }
         }
@@ -326,9 +325,13 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
       return;
     }
 
-    methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
-      if (error) {
-        send404(res, error);
+    // Mongoose will not save the modifications to the explanations object
+    // unless you reassign its value to a different object
+    reference.explanations = explanations;
+
+    reference.save(function(err) {
+      if (err) {
+        send404(res, err);
       } else {
         res.setHeader('Access-Control-Allow-Origin','*');
         res.sendStatus(202);
@@ -340,28 +343,35 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
 var addEntry = exports.addEntry = function(addEntryInfo, res) {
   /*
   {
+    username:
     project:
     functionName:
     context:
     text:
     [entryID:]
-    [username/ip:]
   }
   */
+
+  if (!addEntryInfo.text || !addEntryInfo.text.trim()) {
+    send404(res, 'no content in text');
+    return;
+  }
+
+  if (!addEntryInfo.project || !addEntryInfo.functionName) {
+    send404(res, 'project or functionName not provided');
+    return;
+  }
+
   var searchObject = {
     project: addEntryInfo.project,
     functionName: addEntryInfo.functionName
   };
 
-  if (!searchObject.project || !searchObject.functionName) {
-    send404(res, 'project or functionName not provided');
-    return;
-  }
-
   // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
   mongoFind(res, searchObject, null, function(reference) {
     var context = addEntryInfo.context;
-    var contextArray = reference.explanations[context];
+    var explanations = JSON.parse(JSON.stringify(reference.explanations));
+    var contextArray = explanations[context];
     if (!contextArray) {
       send404(res, 'context not found');
       return;
@@ -372,21 +382,30 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
     if (entryID) {
       var entryFound = false;
       for (var i = 0; i < contextArray.length; i++) {
-        if (contextArray[i].entryID === entryID) {
+        var entry = contextArray[i];
+        if (entry.entryID === entryID) {
           entryFound = true;
-          for (var j = 0; j < contextArray[i].additions.length; j++) {
-            if (contextArray[i].additions[j].additionID === id) {
+          var comments = entry.comments;
+          var ids = [];
+          for (var j = 0; j < comments.length; j++) {
+            if (comments[j].text === addEntryInfo.text) {
               send404(res, 'duplicate entry');
               return;
             }
+            ids.push(comments[j].commentID);
           }
-          var addition = {
-            additionID: id,
+          while (ids.indexOf(id) !== -1) {
+            id++;
+          }
+          var comment = {
+            username: addEntryInfo.username,
+            commentID: id,
             timestamp: new Date(),
             text: addEntryInfo.text,
             upvotes: 0,
+            upvoters: {}
           };
-          contextArray[i].additions.push(addition);
+          comments.push(comment);
           break;
         }
       }
@@ -395,25 +414,37 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
         return;
       }
     } else {
+      var ids = [];
       for (var i = 0; i < contextArray.length; i++) {
-        if (contextArray[i].entryID === id) {
+        var currEntry = contextArray[i];
+        if (currEntry.text === addEntryInfo.text) {
           send404(res, 'duplicate entry');
           return;
         }
+        ids.push(currEntry.entryID);
+      }
+      while (ids.indexOf(id) !== -1) {
+        id++;
       }
       var entry = {
+        username: addEntryInfo.username,
         entryID: id,
         timestamp: new Date(),
         text: addEntryInfo.text,
         upvotes: 0,
-        additions: []
+        upvoters: {},
+        comments: []
       };
       contextArray.push(entry);
     }
 
-    methodsDB.update(searchObject, {explanations: reference.explanations}, function(error, response) {
-      if (error) {
-        send404(res, error);
+    // Mongoose will not save the modifications to the explanations object
+    // unless you reassign its value to a different object
+    reference.explanations = explanations;
+
+    reference.save(function(err) {
+      if (err) {
+        send404(res, err);
       } else {
         res.setHeader('Access-Control-Allow-Origin','*');
         res.sendStatus(202);
@@ -422,9 +453,131 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
   });
 };
 
+var editEntry = exports.editEntry = function(editEntryInfo, res) {
+  /*
+  {
+    username:
+    project:
+    functionName:
+    context:
+    entryID:
+    text:
+    delete:
+    [commentID:]
+  }
+  */
+  var text = editEntryInfo.text;
+  if (!editEntryInfo.delete && (!text || !text.trim())) {
+    send404(res, 'no content in text');
+    return;
+  }
+
+  if (!editEntryInfo.project || !editEntryInfo.functionName) {
+    send404(res, 'project or functionName not provided');
+    return;
+  }
+
+  var searchObject = {
+    project: editEntryInfo.project,
+    functionName: editEntryInfo.functionName
+  };
+
+  // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
+  mongoFind(res, searchObject, null, function(reference) {
+    // var validUpdate;
+    var context = editEntryInfo.context;
+    var entryID = editEntryInfo.entryID;
+
+    var commentID = editEntryInfo.commentID;
+
+    var entryFound = false;
+    var explanations = JSON.parse(JSON.stringify(reference.explanations));
+    var contextArray = explanations[context];
+    if (!contextArray) {
+      send404(res, 'context not found');
+      return;
+    }
+    for (var i = 0; i < contextArray.length; i++) {
+      if (contextArray[i].entryID === entryID) {
+        entryFound = true;
+        if (!commentID) {
+          var entry = contextArray[i];
+          if (editEntryInfo.username === entry.username) {
+            if (editEntryInfo.delete) {
+              contextArray.splice(i, 1);
+              // validUpdate = true;
+            } else if (entry.text !== text) {
+              entry.text = text;
+              // validUpdate = true;
+            } else {
+              send404(res, 'no change in content found');
+              return;
+            }
+          } else {
+            send404(res, 'not authorized to edit this entry');
+            return;
+          }
+        } else {
+          var commentFound = false;
+          var comments = contextArray[i].comments;
+          for (var j = 0; j < comments.length; j++) {
+            var comment = comments[j];
+            if (comment.commentID === commentID) {
+              commentFound = true;
+              if (editEntryInfo.username === comment.username) {
+                if (editEntryInfo.delete) {
+                  comments.splice(j, 1);
+                  // validUpdate = true;
+                } else if (comment.text !== text) {
+                  comment.text = text;
+                  // validUpdate = true;
+                } else {
+                  send404(res, 'no change in content found');
+                  return;
+                }
+              } else {
+                send404(res, 'not authorized to edit this entry');
+                return;
+              }
+              break;
+            }
+          }
+          if (!commentFound) {
+            send404(res, 'commentID not found');
+            return;
+          }
+        }
+        break;
+      }
+    }
+    if (!entryFound) {
+      send404(res, 'entryID not found');
+      return;
+    }
+    // if (!validUpdate) {
+    //   send404(res, 'not a valid edit');
+    //   return;
+    // }
+
+    // Mongoose will not save the modifications to the explanations object
+    // unless you reassign its value to a different object
+    reference.explanations = explanations;
+
+    reference.save(function(err) {
+      if (err) {
+        send404(res, err);
+      } else {
+        res.setHeader('Access-Control-Allow-Origin','*');
+        res.sendStatus(202);
+      }
+    });
+  });
+
+};
 
 
-var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, completedMethodEntry, skull) {
+
+var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, completedMethodEntry, skull, username) {
   var searchObj = {
     project: skull.project,
     functionName: method.functionName
@@ -434,7 +587,6 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
   var cb = {
 
     success: function(foundMethod) {
-      log('postSkeleton mongoFindOne success');
       var explanations = method.explanations;
       for (var context in explanations) { //should be changed to explanations
         var newEntryText = explanations[context]; // this is a string
@@ -450,10 +602,13 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
           }
           if (!match) {
             var newEntry = {
+              username: username,
               text: newEntryText,
               upvotes: 0,
-              additions: [],
-              entryID: hashCode(newEntryText)
+              upvoters: {},
+              comments: [],
+              entryID: hashCode(newEntryText),
+              timestamp: new Date()
             };
             existingEntries.push(newEntry);
           }
@@ -477,20 +632,18 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
     },
 
     notFound: function() {
-      log('postSkeleton mongoFindOne notFound');
       // convertToDBForm and then insert
       // res.statusCode(202).end() inside callback of database upsert
-      (new methodsDB(convertToDBForm(skull.project, method))).save(function(err){
+      (new methodsDB(convertToDBForm(skull.project, method, username))).save(function(err, newMethod){
         if(err){
           completedMethodEntry(err);
         } else {
-          completedMethodEntry();
+          cb.success(newMethod);
         }
       });
     },
 
     error: function(err) {
-      log('postSkeleton mongoFindOne error');
       console.error(err);
       completedMethodEntry(err);
     }
@@ -504,17 +657,16 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
 
 var createToken = exports.createToken = function(req, res, next, authenticateType) {
   passport.authenticate(authenticateType, {session: false}, function(err, user) {
-    log('callback in passport authenticate got run');
     if (err) { console.log('error loggin'); }
     if (!user) {
-      return res.json(401, { error: 'message'} );
+      return res.status(401).json({ error: 'Unauthorized'});
     }
-    log('user', user);
     var token = jwt.encode({
       username: user.username,
       expiration: calculateTokenExpiration(),
       session: user.session
     }, process.env.TOKEN_SECRET || authConfig.tokenSecret);
+    res.setHeader('Access-Control-Allow-Origin','*');
     res.json({access_token: token});
   })(req, res, next);
 };

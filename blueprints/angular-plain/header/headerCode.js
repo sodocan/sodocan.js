@@ -14,6 +14,40 @@ angular.module('sodocan')
   $scope.display = sodocanAPI.projectName;
 
   $scope.test = function() {
+    
+    /* also H4rold for testing
+    sodocanAPI.register('Harold','lept0n',function(err,resp) {
+      if (!err) console.log('registered');
+    });
+    */
+
+    if (window.localStorage.getItem('sodocanToken')) {
+      sodocanAPI.logout(function(err,resp) {
+        if (err) console.log('__ERR');
+        console.log(err);
+        console.log(resp);
+      });
+    } else {
+      sodocanAPI.login('Harold','lept0n',function(err,resp) {
+        if (err) {
+          console.log('___ERROR:');
+          console.log(err);
+          return;
+        }
+
+        console.log('___LOGGED IN:');
+        console.log(resp);
+      });
+    }
+    /*
+     * register example:
+     *
+     * sodocanAPI.register('Harold','lept0n',function(err,resp) {});
+     */
+
+    /* upvoting test
+     *
+
     var upvoter,addID;
     var refObj = {
       //ref: 'Ctor',
@@ -39,5 +73,6 @@ angular.module('sodocan')
         });
       });
     });
+    */
   };
 }]);

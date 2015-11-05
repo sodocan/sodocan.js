@@ -13,13 +13,14 @@ exports.postSkeleton = function(req, res) {
   var skeleton = req.body;
   var skull = skeleton.header; // :D
   var methodsArray = skeleton.body;
+  var username = skeleton.username;
   var completedMethodEntry = helpers.runAfterAsync(res, methodsArray.length);
   for(var i = 0; i < methodsArray.length; i++){
     var method = methodsArray[i];
     //check and see if this method exists already (match proj and method)
       //if it doesn't, convert it to proper mongoForm, then insert
 
-    helpers.findAndUpdateMethod(method, completedMethodEntry, skull);
+    helpers.findAndUpdateMethod(method, completedMethodEntry, skull, username);
 
     //else, check and see if content matches any existing method content
       //if it doesn't match, insert
@@ -34,6 +35,10 @@ exports.addEntry = function(req, res) {
   helpers.addEntry(req.body, res);
 };
 
+exports.editEntry = function(req, res) {
+  helpers.editEntry(req.body, res);
+}
+
 
 exports.registerPostHandler = function(req, res, next) {
   if (req.body.username.substring(req.body.username.length - 4) === '.git') {
@@ -46,7 +51,6 @@ exports.registerPostHandler = function(req, res, next) {
       res.end();
       return;
     }
-    log('user', user);
     helpers.createToken(req, res, next, 'local');
   });
 };
@@ -68,6 +72,7 @@ exports.logoutHandler = function(req, res, next) {
         console.error(err);
         return;
       }
+      res.setHeader('Access-Control-Allow-Origin','*');
       res.sendStatus(200);
     });
   })(req, res, next);
@@ -79,6 +84,22 @@ exports.loginPostHandler = function(req, res, next) {
 
 exports.githubLoginPostHandler = function(req, res, next) {
   helpers.createToken(req, res, next, 'github');
+};
+
+exports.checkTokenHandler = function(req, res, next) {
+  passport.authenticate('bearer', {session: false}, function(err, user) {
+    if (user) {
+      req.body.username = user.username;
+      next();
+    } else {
+      res.sendStatus(401);
+    }
+  })(req, res, next);
+};
+
+exports.setCorsHeader = function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin','*');
+  next();
 };
 
 /* Used for our testing pages only

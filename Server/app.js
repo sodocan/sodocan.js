@@ -16,6 +16,15 @@ var strategyUtil = require('./Utilities/strategyUtil');
 
 var app = express();
 
+// TODO: fit this in better, CORS for POSTing
+app.options('/*', function(req,res) {
+  res.set({
+    'Access-Control-Allow-Headers':'Content-Type',
+    'Access-Control-Allow-Origin':'*',
+  });
+  res.end();
+});
+
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
@@ -59,28 +68,20 @@ passport.use(new BearerStrategy(strategyUtil.bearerStrategyCallback));
 app.use('/auth', usersRouter);
 
 app.use(function(err, req, res, next) {
-  // console.log(err);
   console.error(err);
   console.error(new Error('404').stack);
   console.log('next: ', next);
   next();
 });
 
-app.get('/api/*', handlers.getApi);
-app.post('/create', handlers.postSkeleton);
-app.post('/upvote', passport.authenticate('bearer', {session: false}), handlers.upvote);
-app.post('/addEntry', passport.authenticate('bearer', {session: false}), handlers.addEntry);
+app.get('/api/*', handlers.setCorsHeader, handlers.getApi);
+app.post('/create', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.postSkeleton);
+app.post('/upvote', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.upvote);
+app.post('/addEntry', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.addEntry);
+app.post('/editEntry', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.editEntry);
 
 //NOTE: figure out best practices for above route
 
-// TODO: fit this in better, CORS for POSTing
-app.options('/*', function(req,res) {
-  res.set({
-    'Access-Control-Allow-Headers':'Content-Type',
-    'Access-Control-Allow-Origin':'*',
-  });
-  res.end();
-});
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

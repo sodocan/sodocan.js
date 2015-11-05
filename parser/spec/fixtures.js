@@ -1,4 +1,4 @@
-/* @header
+/** @header
 @project: 'underscore'
 @author: 'superman'
 @version: '~0.0.3'
@@ -48,7 +48,6 @@ var rice = function(stuff, things) {
 @functionName: 'spicyTuna'
 @descriptions: 'top quality fish'
 @group: 'happySaturday'
-
 */
 
 function spicyTuna() {
