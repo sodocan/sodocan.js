@@ -128,7 +128,7 @@ var cliAskQuestion = function(message, callback) {
     } else if (noValues.indexOf(answer) > - 1) {
       callback(false);
     } else {
-      process.stdout.write('invalid response.');
+      process.stdout.write('invalid response.\n');
       cliAskQuestion(message, callback);
     }
   });
