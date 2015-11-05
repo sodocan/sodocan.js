@@ -95,7 +95,12 @@ exports.checkTokenHandler = function(req, res, next) {
       res.sendStatus(401);
     }
   })(req, res, next);
-}
+};
+
+exports.setCorsHeader = function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin','*');
+  next();
+};
 
 /* Used for our testing pages only
 

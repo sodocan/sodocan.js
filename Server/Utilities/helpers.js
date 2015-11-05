@@ -15,6 +15,7 @@ var send404 = exports.send404 = function(res, errorMessageOrObj) {
     console.error(errorMessageOrObj);
   }
   console.error(new Error('404').stack);
+  res.setHeader('Access-Control-Allow-Origin','*');
   res.status(404).end();
 };
 
@@ -658,7 +659,7 @@ var createToken = exports.createToken = function(req, res, next, authenticateTyp
   passport.authenticate(authenticateType, {session: false}, function(err, user) {
     if (err) { console.log('error loggin'); }
     if (!user) {
-      return res.json(401, { error: 'message'} );
+      return res.status(401).json({ error: 'Unauthorized'});
     }
     var token = jwt.encode({
       username: user.username,

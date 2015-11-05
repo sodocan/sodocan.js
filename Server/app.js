@@ -74,11 +74,11 @@ app.use(function(err, req, res, next) {
   next();
 });
 
-app.get('/api/*', handlers.getApi);
-app.post('/create', handlers.checkTokenHandler, handlers.postSkeleton);
-app.post('/upvote', handlers.checkTokenHandler, handlers.upvote);
-app.post('/addEntry', handlers.checkTokenHandler, handlers.addEntry);
-app.post('/editEntry', handlers.checkTokenHandler, handlers.editEntry);
+app.get('/api/*', handlers.setCorsHeader, handlers.getApi);
+app.post('/create', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.postSkeleton);
+app.post('/upvote', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.upvote);
+app.post('/addEntry', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.addEntry);
+app.post('/editEntry', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.editEntry);
 
 //NOTE: figure out best practices for above route
 
