@@ -114,6 +114,7 @@ describe("Server", function() {
     it("should convert parser output objects to the DB form", function(done) {
       var convertFormCase = testCases.convertFormCase;
       var actualForm = helpers.convertToDBForm.apply(null, convertFormCase.inputs);
+      delete actualForm.timestamp;
       log('expectNum', ++expectNum);
       expect(actualForm).to.deep.equal(convertFormCase.expectedOutput);
       done();
@@ -135,6 +136,8 @@ describe("Server", function() {
           'json': parserPostCases[i]
         };
 
+        options.json.access_token = access_token;
+
         request(options, function(error, res, body) {
           log('expectNum', ++expectNum);
           expect(res.statusCode).to.equal(202);
@@ -144,7 +147,15 @@ describe("Server", function() {
               console.error(err);
             } else {
               for (var j = 0; j < references.length; j++) {
-                delete references[j]['_id'];
+                var reference = references[j];
+                delete reference._id;
+                delete reference.timestamp;
+                for (var context in reference.explanations) {
+                  var entries = reference.explanations[context];
+                  for (var k = 0; k < entries.length; k++) {
+                    delete entries[k].timestamp;
+                  }
+                }
               }
 
               log('expectNum', ++expectNum);
@@ -182,7 +193,15 @@ describe("Server", function() {
           log('expectNum', ++expectNum);
           expect(Array.isArray(body)).to.be.true;
           for (var j = 0; j < body.length; j++) {
-            delete body[j]['_id'];
+            var reference = body[j];
+            delete reference._id;
+            delete reference.timestamp;
+            for (var context in reference.explanations) {
+              var entries = reference.explanations[context];
+              for (var k = 0; k < entries.length; k++) {
+                delete entries[k].timestamp;
+              }
+            }
           }
           log('expectNum', ++expectNum);
           expect(body).to.deep.equal(getValidCases[path]);
@@ -265,7 +284,8 @@ describe("Server", function() {
           .then(function(body) {
             body = JSON.parse(body);
             var ref = body[0];
-            delete ref['_id'];
+            delete ref._id;
+            delete ref.timestamp;
             var tips = ref.explanations.tips;
             var comments;
             for (var i = 0; i < tips.length; i++) {
@@ -316,7 +336,8 @@ describe("Server", function() {
           .then(function(body) {
             body = JSON.parse(body);
             var ref = body[0];
-            delete ref['_id'];
+            delete ref._id;
+            delete ref.timestamp;
             var tips = ref.explanations.tips;
             var comments;
             for (var i = 0; i < tips.length; i++) {
@@ -383,7 +404,8 @@ describe("Server", function() {
           .then(function(body) {
             body = JSON.parse(body);
             var ref = body[0];
-            delete ref['_id'];
+            delete ref._id;
+            delete ref.timestamp;
             var tips = ref.explanations.tips;
             var comments;
             for (var i = 0; i < tips.length; i++) {

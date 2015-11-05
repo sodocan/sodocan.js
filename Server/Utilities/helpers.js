@@ -15,6 +15,7 @@ var send404 = exports.send404 = function(res, errorMessageOrObj) {
     console.error(errorMessageOrObj);
   }
   console.error(new Error('404').stack);
+  res.setHeader('Access-Control-Allow-Origin','*');
   res.status(404).end();
 };
 
@@ -101,11 +102,13 @@ var parseApiPath = exports.parseApiPath = function(path) {
   };
 };
 
-var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj) {
+var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj, username) {
   var dbForm = {
     project: projectName,
     functionName: skeleObj.functionName,
     group: skeleObj.group,
+    username: username,
+    timestamp: new Date(),
     reference: {
       params: skeleObj.params,
       returns: skeleObj.returns
@@ -283,6 +286,9 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
               contextArray[i-1] = entry;
               i--;
             }
+          } else {
+            send404(res, 'cannot vote more than once or for your own entry');
+            return;
           }
         } else {
           var commentFound = false;
@@ -299,6 +305,9 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
                   comments[j-1] = comment;
                   j--;
                 }
+              } else {
+                send404(res, 'cannot vote more than once or for your own entry');
+                return;
               }
               break;
             }
@@ -342,15 +351,21 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
     [entryID:]
   }
   */
+
+  if (!addEntryInfo.text || !addEntryInfo.text.trim()) {
+    send404(res, 'no content in text');
+    return;
+  }
+
+  if (!addEntryInfo.project || !addEntryInfo.functionName) {
+    send404(res, 'project or functionName not provided');
+    return;
+  }
+
   var searchObject = {
     project: addEntryInfo.project,
     functionName: addEntryInfo.functionName
   };
-
-  if (!searchObject.project || !searchObject.functionName) {
-    send404(res, 'project or functionName not provided');
-    return;
-  }
 
   // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
   mongoFind(res, searchObject, null, function(reference) {
@@ -446,23 +461,30 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
     functionName:
     context:
     entryID:
+    text:
     delete:
     [commentID:]
   }
   */
+  var text = editEntryInfo.text;
+  if (!editEntryInfo.delete && (!text || !text.trim())) {
+    send404(res, 'no content in text');
+    return;
+  }
+
+  if (!editEntryInfo.project || !editEntryInfo.functionName) {
+    send404(res, 'project or functionName not provided');
+    return;
+  }
+
   var searchObject = {
     project: editEntryInfo.project,
     functionName: editEntryInfo.functionName
   };
 
-  if (!searchObject.project || !searchObject.functionName) {
-    send404(res, 'project or functionName not provided');
-    return;
-  }
-
   // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
   mongoFind(res, searchObject, null, function(reference) {
-    var validUpdate;
+    // var validUpdate;
     var context = editEntryInfo.context;
     var entryID = editEntryInfo.entryID;
 
@@ -483,11 +505,17 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
           if (editEntryInfo.username === entry.username) {
             if (editEntryInfo.delete) {
               contextArray.splice(i, 1);
-              validUpdate = true;
-            } else if (['', entry.text].indexOf(editEntryInfo.text) === -1) {
-              entry.text = editEntryInfo.text;
-              validUpdate = true;
+              // validUpdate = true;
+            } else if (entry.text !== text) {
+              entry.text = text;
+              // validUpdate = true;
+            } else {
+              send404(res, 'no change in content found');
+              return;
             }
+          } else {
+            send404(res, 'not authorized to edit this entry');
+            return;
           }
         } else {
           var commentFound = false;
@@ -499,11 +527,17 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
               if (editEntryInfo.username === comment.username) {
                 if (editEntryInfo.delete) {
                   comments.splice(j, 1);
-                  validUpdate = true;
-                } else if (['', comment.text].indexOf(editEntryInfo.text) === -1) {
-                  comment.text = editEntryInfo.text;
-                  validUpdate = true;
+                  // validUpdate = true;
+                } else if (comment.text !== text) {
+                  comment.text = text;
+                  // validUpdate = true;
+                } else {
+                  send404(res, 'no change in content found');
+                  return;
                 }
+              } else {
+                send404(res, 'not authorized to edit this entry');
+                return;
               }
               break;
             }
@@ -520,10 +554,10 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
       send404(res, 'entryID not found');
       return;
     }
-    if (!validUpdate) {
-      send404(res, 'not a valid edit');
-      return;
-    }
+    // if (!validUpdate) {
+    //   send404(res, 'not a valid edit');
+    //   return;
+    // }
 
     // Mongoose will not save the modifications to the explanations object
     // unless you reassign its value to a different object
@@ -543,7 +577,7 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
 
 
 
-var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, completedMethodEntry, skull) {
+var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, completedMethodEntry, skull, username) {
   var searchObj = {
     project: skull.project,
     functionName: method.functionName
@@ -568,11 +602,13 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
           }
           if (!match) {
             var newEntry = {
+              username: username,
               text: newEntryText,
               upvotes: 0,
               upvoters: {},
               comments: [],
-              entryID: hashCode(newEntryText)
+              entryID: hashCode(newEntryText),
+              timestamp: new Date()
             };
             existingEntries.push(newEntry);
           }
@@ -598,7 +634,7 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
     notFound: function() {
       // convertToDBForm and then insert
       // res.statusCode(202).end() inside callback of database upsert
-      (new methodsDB(convertToDBForm(skull.project, method))).save(function(err, newMethod){
+      (new methodsDB(convertToDBForm(skull.project, method, username))).save(function(err, newMethod){
         if(err){
           completedMethodEntry(err);
         } else {
@@ -623,7 +659,7 @@ var createToken = exports.createToken = function(req, res, next, authenticateTyp
   passport.authenticate(authenticateType, {session: false}, function(err, user) {
     if (err) { console.log('error loggin'); }
     if (!user) {
-      return res.json(401, { error: 'message'} );
+      return res.status(401).json({ error: 'Unauthorized'});
     }
     var token = jwt.encode({
       username: user.username,

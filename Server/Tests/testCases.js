@@ -54,11 +54,12 @@ exports.convertFormCase = {
       "examples":"",
       "tips":""
     }
-  }],
+  }, "aUser"],
   expectedOutput: {
     "project":"fishProj",
     "functionName":"goldfish",
     "group":"happySaturday",
+    "username":"aUser",
     "reference": {
       "params": [{"name":"stuff","type":"Boolean"}],
       "returns":[{"type":"stuff"},{"type":"num"},{"type":"bool"}]
@@ -151,6 +152,7 @@ exports.parserPostExpectedReturns = [
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -158,6 +160,7 @@ exports.parserPostExpectedReturns = [
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -167,6 +170,7 @@ exports.parserPostExpectedReturns = [
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -176,6 +180,7 @@ exports.parserPostExpectedReturns = [
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -191,6 +196,7 @@ exports.parserPostExpectedReturns = [
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -198,6 +204,7 @@ exports.parserPostExpectedReturns = [
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -207,6 +214,7 @@ exports.parserPostExpectedReturns = [
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -216,6 +224,7 @@ exports.parserPostExpectedReturns = [
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -233,6 +242,7 @@ exports.parserPostExpectedReturns = [
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -240,6 +250,7 @@ exports.parserPostExpectedReturns = [
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -249,6 +260,7 @@ exports.parserPostExpectedReturns = [
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -258,6 +270,7 @@ exports.parserPostExpectedReturns = [
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -273,6 +286,7 @@ exports.parserPostExpectedReturns = [
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -280,6 +294,7 @@ exports.parserPostExpectedReturns = [
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -289,6 +304,7 @@ exports.parserPostExpectedReturns = [
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -296,6 +312,7 @@ exports.parserPostExpectedReturns = [
             "entryID": 837883623
           },
           {
+            "username":"testUser",
             "entryID": 199356705,
             "comments": [],
             "upvotes": 0,
@@ -305,6 +322,7 @@ exports.parserPostExpectedReturns = [
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -322,6 +340,7 @@ exports.parserPostExpectedReturns = [
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -329,6 +348,7 @@ exports.parserPostExpectedReturns = [
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -338,6 +358,7 @@ exports.parserPostExpectedReturns = [
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -347,6 +368,7 @@ exports.parserPostExpectedReturns = [
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -362,6 +384,7 @@ exports.parserPostExpectedReturns = [
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -369,6 +392,7 @@ exports.parserPostExpectedReturns = [
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -378,6 +402,7 @@ exports.parserPostExpectedReturns = [
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -385,6 +410,7 @@ exports.parserPostExpectedReturns = [
             "entryID": 837883623
           },
           {
+            "username":"testUser",
             "entryID": 199356705,
             "comments": [],
             "upvotes": 0,
@@ -394,6 +420,7 @@ exports.parserPostExpectedReturns = [
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -409,6 +436,7 @@ exports.parserPostExpectedReturns = [
       "project": "testProj",
       "functionName": "method3",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -433,6 +461,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -440,6 +469,7 @@ exports.getValidCases = {
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -449,6 +479,7 @@ exports.getValidCases = {
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -458,6 +489,7 @@ exports.getValidCases = {
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -473,6 +505,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -480,6 +513,7 @@ exports.getValidCases = {
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -489,6 +523,7 @@ exports.getValidCases = {
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -496,6 +531,7 @@ exports.getValidCases = {
             "entryID": 837883623
           },
           {
+            "username":"testUser",
             "entryID": 199356705,
             "comments": [],
             "upvotes": 0,
@@ -505,6 +541,7 @@ exports.getValidCases = {
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -520,6 +557,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method3",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -539,6 +577,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -546,6 +585,7 @@ exports.getValidCases = {
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -555,6 +595,7 @@ exports.getValidCases = {
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -564,6 +605,7 @@ exports.getValidCases = {
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -579,6 +621,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -586,6 +629,7 @@ exports.getValidCases = {
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -595,6 +639,7 @@ exports.getValidCases = {
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -604,6 +649,7 @@ exports.getValidCases = {
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -619,6 +665,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method3",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -638,6 +685,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -645,6 +693,7 @@ exports.getValidCases = {
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -654,6 +703,7 @@ exports.getValidCases = {
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -663,6 +713,7 @@ exports.getValidCases = {
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -681,6 +732,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -688,6 +740,7 @@ exports.getValidCases = {
       "explanations": {
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -703,6 +756,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -710,6 +764,7 @@ exports.getValidCases = {
       "explanations": {
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -725,6 +780,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method3",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -742,6 +798,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -749,6 +806,7 @@ exports.getValidCases = {
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -758,6 +816,7 @@ exports.getValidCases = {
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -773,6 +832,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -780,6 +840,7 @@ exports.getValidCases = {
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -789,6 +850,7 @@ exports.getValidCases = {
         ],
         "tips": [
           {
+            "username":"testUser",
             "text": "tipsblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -804,6 +866,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method3",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -822,6 +885,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method1",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -829,6 +893,7 @@ exports.getValidCases = {
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -838,6 +903,7 @@ exports.getValidCases = {
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah",
             "upvotes": 0,
             "upvoters": {},
@@ -854,6 +920,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -861,6 +928,7 @@ exports.getValidCases = {
       "explanations": {
         "descriptions": [
           {
+            "username":"testUser",
             "text": "descriptionblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -870,6 +938,7 @@ exports.getValidCases = {
         ],
         "examples": [
           {
+            "username":"testUser",
             "text": "examplesblahblah2",
             "upvotes": 0,
             "upvoters": {},
@@ -877,6 +946,7 @@ exports.getValidCases = {
             "entryID": 837883623
           },
           {
+            "username":"testUser",
             "entryID": 199356705,
             "comments": [],
             "upvotes": 0,
@@ -893,6 +963,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method3",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -912,6 +983,7 @@ exports.getValidCases = {
       "project": "testProj",
       "functionName": "method2",
       "group": "testGroup",
+      "username":"testUser",
       "reference": {
         "params": [],
         "returns": []
@@ -919,6 +991,7 @@ exports.getValidCases = {
       "explanations": {
         "examples": [
           {
+            "username":"testUser",
             "entryID": 199356705,
             "comments": [],
             "upvotes": 0,
@@ -952,6 +1025,7 @@ exports.addEntryCases = [
       project: 'testProj',
       functionName: 'method1',
       group: 'testGroup',
+      username: 'testUser',
       reference: {returns:[], params: []},
       explanations: {tips: [{
         username: 'testUser',
@@ -978,6 +1052,7 @@ exports.addEntryCases = [
       project: 'testProj',
       functionName: 'method1',
       group: 'testGroup',
+      username: 'testUser',
       reference: {returns:[], params: []},
       explanations: {tips: [{
         username: 'testUser',
@@ -1018,6 +1093,7 @@ exports.upvoteCases = [
       project: 'testProj',
       functionName: 'method1',
       group: 'testGroup',
+      username: 'testUser',
       reference: {returns:[], params: []},
       explanations: {tips: [
         {
@@ -1029,6 +1105,7 @@ exports.upvoteCases = [
           comments: []
         },
         {
+          username: 'testUser',
           entryID: 907176294,
           comments: [],
           upvotes: 0,
@@ -1068,6 +1145,7 @@ exports.upvoteCases = [
       project: 'testProj',
       functionName: 'method1',
       group: 'testGroup',
+      username: 'testUser',
       reference: {returns:[], params: []},
       explanations: {tips: [{
         username: 'testUser',
@@ -1125,6 +1203,7 @@ exports.editEntryCases = [
       project: 'testProj',
       functionName: 'method1',
       group: 'testGroup',
+      username: 'testUser',
       reference: {returns:[], params: []},
       explanations: {tips: [
         {
@@ -1136,6 +1215,7 @@ exports.editEntryCases = [
           comments: []
         },
         {
+          username: 'testUser',
           entryID: 907176294,
           comments: [],
           upvotes: 0,
@@ -1161,6 +1241,7 @@ exports.editEntryCases = [
       project: 'testProj',
       functionName: 'method1',
       group: 'testGroup',
+      username: 'testUser',
       reference: {returns:[], params: []},
       explanations: {tips: [
         {
@@ -1203,6 +1284,7 @@ exports.editEntryCases = [
       project: 'testProj',
       functionName: 'method1',
       group: 'testGroup',
+      username: 'testUser',
       reference: {returns:[], params: []},
       explanations: {tips: [{
         username: 'testUser',
@@ -1235,8 +1317,10 @@ exports.editEntryCases = [
       project: 'testProj',
       functionName: 'method1',
       group: 'testGroup',
+      username: 'testUser',
       reference: {returns:[], params: []},
       explanations: {tips: [{
+        username: 'testUser',
         entryID: 907176294,
         comments: [],
         upvotes: 0,
