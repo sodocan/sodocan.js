@@ -223,9 +223,11 @@ CARD STYLES
   padding: 10px;
   margin-top: 5px;
   margin-bottom: 5px;
-  -webkit-transition: top 0.5s ease-in-out !important;
-  -moz-transition: top 0.5s ease-in-out !important;
-  transition: top 0.5s ease-in-out !important;
+}
+.item {
+  -webkit-transition:  top 1s ease-out !important;
+  -moz-transition:  top 1s ease-out !important;
+  transition:  top 1s ease-out !important;
 }
 .post{
   width: 80%;

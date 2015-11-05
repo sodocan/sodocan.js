@@ -13,6 +13,10 @@ angular.module('sodocan')
       $scope.sendUpvote(); 
     };
     $scope.sendUpvote = function(commentID){
+      var project = projectName;
+      var functionName = $scope.method.functionName;
+      var context = $scope.explanationType;
+      var entryID = $scope.entry.entryID;
       var upvoteJSON = {
         project: projectName,
         functionName:$scope.method.functionName,
@@ -22,7 +26,7 @@ angular.module('sodocan')
       if(commentID){
         upvoteJSON.commentID = commentID; 
       }
-      sodocanAPI.upvote('upvote', upvoteJSON, function(){});
+      sodocanAPI.upvote(entryID, functionName, context, commentID, function(){});
     };
 
     //When a new entry is added, we fake it on the front end, while also sending 
