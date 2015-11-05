@@ -75,7 +75,8 @@ app.use(function(err, req, res, next) {
 });
 
 app.get('/api/*', handlers.getApi);
-app.post('/create', handlers.checkTokenHandler, handlers.postSkeleton);
+// app.post('/create', handlers.checkTokenHandler, handlers.postSkeleton);
+app.post('/create', handlers.postSkeleton); // delete and comment back in line above
 app.post('/upvote', handlers.checkTokenHandler, handlers.upvote);
 app.post('/addEntry', handlers.checkTokenHandler, handlers.addEntry);
 app.post('/editEntry', handlers.checkTokenHandler, handlers.editEntry);
