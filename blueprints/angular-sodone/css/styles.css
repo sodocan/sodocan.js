@@ -70,7 +70,7 @@ NAV BAR STYLES
 }
 
 .nav-thin-top {
-  background: #063F84;
+  background: #10DAC2;
   height: 5px;
 }
 
@@ -217,10 +217,9 @@ CARD STYLES
   cursor: pointer;
 }
 .comments{
-  padding-left: 10px;
-  padding-right: 5px;
-  margin-left: 20px;
-  margin-right: 50px;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 .post{
   width: 80%;

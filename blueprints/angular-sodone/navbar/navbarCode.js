@@ -57,7 +57,7 @@ angular.module('sodocan')
         height: '440px'
       },
       bgStyle: {
-        opacity: 0.9
+        opacity: 0.2
       },
       templateUrl: '../angular-sodone/expGlobalModal/expGlobalModalTpl.html'
     };
