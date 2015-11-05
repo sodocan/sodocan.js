@@ -75,41 +75,41 @@ var fileOperations = function(paths) {
   writeIntoLocalFiles(outputObj, outputPath);
 
 
-  //networkRequest.sendParsedToServer(JSON.stringify(outputObj));
+  networkRequest.sendParsedToServer(JSON.stringify(outputObj));
 
 
 
-  cliAskQuestion('do you want to upload this doc to the server?', function(userInput) {
-    if (userInput) {
-    //handle registration/auth, then do sendParsedToServer
-    cliAskQuestion('do you have a sodocan.js account?', function(userInput) {
-      var usernameSentence = userInput ? 'Enter username:' : 'Registering now. Enter desired username:';
-      var passwordSentence = userInput ? 'Enter password:' : 'Enter desired password:';
-      process.stdout.write(usernameSentence);
-      process.stdin.once('data', function(username) {
-        username = username.trim();
-        process.stdout.write(passwordSentence);
-        process.stdin.once('data', function(password) {
-          password = password.trim();
-          networkRequest.makeAuthRequest(userInput, username, password, function(requestBody) {
-            var token = JSON.parse(requestBody).access_token;
-            var tokenQueryString = '?access_token=' + token;
+  // cliAskQuestion('do you want to upload this doc to the server?', function(userInput) {
+  //   if (userInput) {
+  //   //handle registration/auth, then do sendParsedToServer
+  //   cliAskQuestion('do you have a sodocan.js account?', function(userInput) {
+  //     var usernameSentence = userInput ? 'Enter username:' : 'Registering now. Enter desired username:';
+  //     var passwordSentence = userInput ? 'Enter password:' : 'Enter desired password:';
+  //     process.stdout.write(usernameSentence);
+  //     process.stdin.once('data', function(username) {
+  //       username = username.trim();
+  //       process.stdout.write(passwordSentence);
+  //       process.stdin.once('data', function(password) {
+  //         password = password.trim();
+  //         networkRequest.makeAuthRequest(userInput, username, password, function(requestBody) {
+  //           var token = JSON.parse(requestBody).access_token;
+  //           var tokenQueryString = '?access_token=' + token;
             
             
             
-            console.log('successfully ' + (userInput ? 'logged in' : 'registered'));
-            console.log('about to send parsed to server');
-            //DON"T KNOW IF THIS WORKS YET!
-            networkRequest.sendParsedToServer(JSON.stringify(outputObj), tokenQueryString);
-          });
-        });
-      });
-    }); 
-    } else {
-      process.stdout.write('Doc has not been sent.  Enjoy your local copy!');
-    }
-  });
-  make POST request to our server to send over the processed json file
+  //           console.log('successfully ' + (userInput ? 'logged in' : 'registered'));
+  //           console.log('about to send parsed to server');
+  //           //DON"T KNOW IF THIS WORKS YET!
+  //           networkRequest.sendParsedToServer(JSON.stringify(outputObj), tokenQueryString);
+  //         });
+  //       });
+  //     });
+  //   }); 
+  //   } else {
+  //     process.stdout.write('Doc has not been sent.  Enjoy your local copy!');
+  //   }
+  // });
+  //make POST request to our server to send over the processed json file
   
 };
 

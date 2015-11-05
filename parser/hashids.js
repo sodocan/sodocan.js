@@ -13,13 +13,23 @@
 /*jslint plusplus: true, nomen: true, browser: true */
 /*global define */
 
+/**
+@header
+@project: 'Hashids.js'
+@author: 'ivanakimov'
+*/
 
 
 var Hashids = (function () {
 
   "use strict";
 
-
+/**
+@class
+@params: [{name: "salt", type:"String"},{name: "minHashLength", type: "Number"}, {name: "alphabet", type: "String"}]
+@descriptions: 'The hashids class contains all the methods for encoding. All parameters are optional'
+@tips:'For encoding you can pass a unique salt value so your hashids differ from everyone else's. I use "this is my salt" as an example.'
+*/
   function Hashids(salt, minHashLength, alphabet) {
 
     var uniqueAlphabet, i, j, len, sepsLength, diff, guardCount;
@@ -114,7 +124,12 @@ var Hashids = (function () {
     }
 
   }
-
+/**
+@params: {name:"ID", type: 'Number || Numbers || Array[Numbers...]'}
+@descriptions: 'Encodes the numbers passed in to look like youtube-style hashes'
+@tips: 'Make sure your salt is the same for both encoding and decoding'
+@returns{name: 'hash', type: 'String'}
+*/
   Hashids.prototype.encode = function () {
 
     var ret = "", i, len,
@@ -138,7 +153,11 @@ var Hashids = (function () {
 
   };
 
-
+  /**
+  @params: {name: 'hash', type:'String'}
+  @returns: {name: 'id', type:'Number'}
+  @descriptions: 'Decodes a hash created by the encode method'
+  */
   Hashids.prototype.decode = function (hash) {
 
     var ret = [];
@@ -150,7 +169,12 @@ var Hashids = (function () {
     return this._decode(hash, this.alphabet);
 
   };
-
+  /**
+  @params: {name:"hex", type: "String"}
+  @returns: {name: "encodedHex", type: "String"}
+  @descriptions: 'Encodes a hexcode into a hashed string'
+  @tips: 'The regular encode function doesn't handle strings. encodeHx doesn't work for all strings, however, only hex values'
+  */
   Hashids.prototype.encodeHex = function (str) {
 
     var i, len, numbers;
@@ -169,7 +193,12 @@ var Hashids = (function () {
     return this.encode.apply(this, numbers);
 
   };
-  
+  /**
+  @params: {name:"hash", type: "String"}
+  @returns: {name: "hex", type: "String"}
+  @descriptions: 'Decodes hashes of hexes'
+  @tips: 'Make sure that this is used in conjuction with encode hex'
+  */
   Hashids.prototype.decodeHex = function (hash) {
 
     var ret = [], i, len,

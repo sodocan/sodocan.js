@@ -53,14 +53,14 @@ var parseUrl = function(url) {
 
 var sendParsedToServer = function(string, tokenQueryString) {
   var options = {
-     host:'localhost',
-     port: '3000',
-    //host: 'http://sodocan.herokuapp.com',
+     // host:'localhost',
+     // port: '3000',
+    host: 'http://sodocan.herokuapp.com',
     headers: {
       "content-type": "application/json",
     },
-    path: '/create/' + tokenQueryString,
-    //path: '/api/create',
+    //path: '/create/' + tokenQueryString,
+    path: '/create',
     method: 'POST'
   };
   var request = http.request(options, function(res) {
