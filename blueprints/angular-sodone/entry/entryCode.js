@@ -22,7 +22,7 @@ angular.module('sodocan')
       if(commentID){
         upvoteJSON.commentID = commentID; 
       }
-      sodocanAPI.sendToAPI('upvote', upvoteJSON, function(){});
+      sodocanAPI.upvote('upvote', upvoteJSON, function(){});
     };
 
     //When a new entry is added, we fake it on the front end, while also sending 
