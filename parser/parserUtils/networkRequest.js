@@ -3,8 +3,8 @@ var http = require('http');
 var fs = require('fs');
 var URL = require('url');
 //var host = 'localhost';
-//var host = 'sodocan.herokuapp.com';
-var host = 'sodocan-staging.herokuapp.com';
+var host = 'sodocan.herokuapp.com';
+//var host = 'sodocan-staging.herokuapp.com';
 
 var githubAPICallForFile = function(fileInfo, cb) {
   //       github.com/username/repo/(always)/branch/folders.../filename
