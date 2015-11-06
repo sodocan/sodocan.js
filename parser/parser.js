@@ -208,7 +208,6 @@ var executingProgram = process.argv[1];
 var userArgs = process.argv.slice(2);
 console.log(process.argv);
 console.log(userArgs);
-console.log(executingProgram.substring(executingProgram.length - 10)); 
 var validRoutes = {
   '/parse' : true,
   '/parser.js' : true,
