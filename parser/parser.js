@@ -208,8 +208,15 @@ var executingProgram = process.argv[1];
 var userArgs = process.argv.slice(2);
 console.log(process.argv);
 console.log(userArgs);
-if (executingProgram.substring(executingProgram.length - 6) === '/parse' ||
-  executingProgram.substring(executingProgram.length - 10) === '/parser.js') {
+console.log(executingProgram.substring(executingProgram.length - 10)); 
+var validRoutes = {
+  '/parse' : true,
+  '/parser.js' : true,
+  '\\parse' : true,
+  '\\parser.js' : true
+};
+if (validRoutes[executingProgram.substring(executingProgram.length - 6)]||
+  validRoutes[executingProgram.substring(executingProgram.length - 10)]) {
   fileOperations(userArgs);
 } 
 // console.log('arg: ', userArgs);
