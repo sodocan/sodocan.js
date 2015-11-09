@@ -18,6 +18,11 @@ exports.postSkeleton = function(req, res) {
     var methodsArray = unfilteredMethodsArray.filter(function(method) {
       return ((typeof method.functionName === 'string') && !!method.functionName.trim());
     });
+    if (methodsArray.length === 0) {
+      res.sendStatus(400);
+      res.end('no function names for any of the functions');
+      return;
+    }
     var completedMethodEntry = helpers.runAfterAsync(res, methodsArray.length);
     for(var i = 0; i < methodsArray.length; i++){
       var method = methodsArray[i];
