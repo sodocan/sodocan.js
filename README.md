@@ -14,10 +14,7 @@ Sodocan.js is a tool to create well laid out, and easy to read, crowd sourced do
 ##Getting Started
 Setting up your docs with sodocan is straightforward - follow these steps to get up and running.
 
-1.  Install our parser module from npm.
-```
-npm install -g sodocan-parser
-```
+1.  Install our parser module from npm.  ```npm install -g sodocan-parser```
 2.  Run the ```parse``` command on your source code.  The arguments for ```parse``` are a space delimited
 list of .js files or folders containing files you wish to parse, followed by the path to an output folder 
 (the output folder you name wil be created if it does not exist).  All files you parse with a single command
