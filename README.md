@@ -18,15 +18,11 @@ Setting up your docs with sodocan is straightforward - follow these steps to get
 ```
 npm install -g sodocan-parser
 ```
-
 2.  Run the ```parse``` command on your source code.  The arguments for ```parse``` are a space delimited
 list of .js files or folders containing files you wish to parse, followed by the path to an output folder 
 (the output folder you name wil be created if it does not exist).  All files you parse with a single command
 will be assumed to be part of the same project. 
-Example:
-```
-parse projectFolder additionalFile.js outputFolder
-```
+Example:  ```parse projectFolder additionalFile.js outputFolder```
 
 3.  The files will be parsed for data to be used in our documentation - function names and parameter names by default, and additional info if you create comments in the files according to our JSDoc-like syntax (check out the 
 [parser README](./parser/README.md) for more details on this).  
