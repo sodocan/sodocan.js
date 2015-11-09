@@ -5,7 +5,6 @@
 
 > Crowdsourced docs, generated from source code.
 
-
 ##Overview
 Sodocan.js is a tool to create well laid out, and easy to read, crowd sourced documentation. It has 3 main components. 
   * [The Parser:](./parser/README.md) This creates the skeleton for the docs. Function names, and their inputs are automatically parsed. You can also mark them up with the javadoc notation that you are already familiar with to add more info easily. 
@@ -46,13 +45,11 @@ This template works well, but you're looking for more flexibility with your fron
 7.  That's it! The template will be populated with your docs, and other users can upvote entries and add new ones.
 Watch your docs improve, and enjoy.      
 
-
 ## Team
 
   - __Product Owner__: Corey Wolff
   - __Scrum Master__: Lai 'Lain' Jiang
   - __Development Team Members__: Joyce Liu, James Yokobosky, Leo Thorp
-
 
 
 ### Currently hosted docs:
