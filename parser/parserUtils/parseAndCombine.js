@@ -112,17 +112,6 @@ var combineInfo = function(functionArray, commentArray) {
   //take functionName and params info from the following function if not provided in a comment
   for (var i = 0; i < combinedArray.length; i++) {
     var current = combinedArray[i];
-
-    // try a match against pattern of method declaration
-    // if match, then store classContext in current object
-    var classContext = current.functionName.match(/^([a-zA-Z0-9_]+)\./);
-
-    if (classContext) {
-      classContext = classContext[1];
-    }
-    if (classContext && classStore[classContext]) {
-      current.classContext = current.classContext || classContext;
-    }
     
     //add to results and break if we're on the last element
     if (i === combinedArray.length - 1) {
@@ -133,6 +122,10 @@ var combineInfo = function(functionArray, commentArray) {
     var next = combinedArray[i + 1];
     //we're only interested in taking info from the next entry if we're on a comment
     //and the next one is a JS entry
+    console.log('current function name: ', current.functionName);
+
+    var classContext;
+
     if (current.fromComment && !next.fromComment) { 
       if (current.functionName === '') {
         current.functionName = next.functionName;
@@ -152,16 +145,41 @@ var combineInfo = function(functionArray, commentArray) {
         }
         classStore[current.class] = current.class;
       }
+
+      classContext = current.functionName.match(/^([a-zA-Z0-9_]+)\./) || next.functionName.match(/^([a-zA-Z0-9_]+)\./);
+      //skip next element because it is the JS corresponding to the current comment
+      i++;
+
+    } else {
+      classContext = current.functionName.match(/^([a-zA-Z0-9_]+)\./);
     }
+    
+    //// try a match against pattern of method declaration
+    // if match, then store classContext in current object
+    //create classContext if it hasn't been manually specified
+
+    if (classContext) {
+      classContext = classContext[1];
+
+    }
+    if (classContext && classStore[classContext]) {
+      current.classContext = current.classContext || classContext;
+    }
+
+    //shorten the entry's function name (e.g., 'hashids.prototype.encode' becomes 'encode')
+    var matchForNameAfterDot = current.functionName.match(/\.([a-zA-Z0-9_]+)$/);
+    if (matchForNameAfterDot) {
+      current.functionName = matchForNameAfterDot[1];
+    }
+
+    //remove the fromComment property, and push our entry to results
     delete current.fromComment;
     results.push(current);
-    //skip next element, if it is the JS corresponding to the current comment 
-    if (next.functionName === current.functionName) {
-      i++;
-    }
   }
   return results;
 };
+
+
 
 module.exports = {
   parseMain: parseMain,
