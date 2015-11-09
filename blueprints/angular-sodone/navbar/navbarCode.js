@@ -11,7 +11,11 @@ angular.module('sodocan')
     $scope.projectName = sodocanAPI.projectName;
     $scope.authToken = sodocanAPI.authToken;
     $scope.signOut = function(){
-      sodocanAPI.logout(function(){
+      sodocanAPI.logout(function(err){
+        if (err) {
+          sodocanAPI.authToken = '';
+          window.localStorage.setItem('sodocanToken','');
+        }
         $window.location.reload();
       });
     };
