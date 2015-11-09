@@ -21,7 +21,7 @@ And sodocan-parser will be installed in to your bin path. Note that you must exp
 
 # Usage
 
-sodocan-parser takes either the directory of your files or you can specify an arbitrary number of individual file paths. The last argument should always be the output directory path.
+sodocan-parser takes either the directory of your files or  an arbitrary number of individual file paths. The last argument should always be the output directory path.
 
     parse [your dir or your file path(s)] [output dir]
 
@@ -62,7 +62,7 @@ The following keywords can be used in a header.  Use as many or as few as you li
 
 **@header**: indicate a header block.
 
-**@project** : the name of the project.
+**@project** : the name of the project.  If you do not include this, the name of the first file input into ```parse``` will be used as the project's name.
 
 **@author**: The author(s) of the project.
 
