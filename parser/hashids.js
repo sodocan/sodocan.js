@@ -15,7 +15,7 @@
 
 /**
 @header
-@project: 'Hashids.js'
+@project: 'hashids'
 @author: 'ivanakimov'
 */
 
