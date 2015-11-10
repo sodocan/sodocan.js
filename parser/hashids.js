@@ -125,10 +125,11 @@ var Hashids = (function () {
 
   }
 /**
+@functionName: encode
 @params: {name:"ID", type: 'Number || Numbers || Array[Numbers...]'}
 @descriptions: 'Encodes the numbers passed in to look like youtube-style hashes'
 @tips: 'Make sure your salt is the same for both encoding and decoding'
-@returns{name: 'hash', type: 'String'}
+@returns: {name: 'hash', type: 'String'}
 */
   Hashids.prototype.encode = function () {
 
