@@ -5,6 +5,12 @@
 
 > Crowdsourced docs, generated from source code.
 
+##What is Sodocan.js?
+http://www.sodocanjs.com
+Every developer has read terrible documentation for libraries and frameworks that are supposed to make a project easier, but instead cause fruitless hours spent figuring out how to use the API. On the other hand, writing documentation is a terrible experience for developers who build and maintain libraries and frameworks. You aren't a writer, and it's time taken away that you could spend creating other projects. Too many great libraries then fall to the wayside as developers abandon them in favor of better-documented ones.
+
+Sodocan.js mitigates both of these frustrating (and all too common) experiences by auto-generating a beautiful and well laid out page from your source code and comments. The true power of Sodocan.js comes with the crowd-sourced approach we take, which allows the developer community to add helpful explanations and vote on entries, so your documentation natuarally reflects the needs of your users over time.
+
 ##Overview
 Sodocan.js is a tool to create well laid out, and easy to read, crowd sourced documentation. It has 3 main components. 
   * [The Parser:](./parser/README.md) This creates the skeleton for the docs. Function names, and their inputs are automatically parsed. You can also mark them up with the javadoc notation that you are already familiar with to add more info easily. 
