@@ -101,10 +101,21 @@ exports.githubLoginPostHandler = function(req, res, next) {
 
 exports.checkTokenHandler = function(req, res, next) {
   passport.authenticate('bearer', {session: false}, function(err, user) {
+    if (err) {
+      console.error(err);
+      if (err === 'Invalid Token') {
+        res.send(err);
+      } else {
+        res.send('Unknown error. Please try again');
+      }
+      res.sendStatus(401);
+      return;
+    }
     if (user) {
       req.body.username = user.username;
       next();
     } else {
+      res.send('Not logged in');
       res.sendStatus(401);
     }
   })(req, res, next);
