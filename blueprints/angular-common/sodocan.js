@@ -160,9 +160,9 @@ angular.module( 'sodocan', [])
   };
 
   obj.logout = function(cb) {
+    window.localStorage.setItem('sodocanToken','');
     var success = function(data) {
       obj.authToken = '';
-      window.localStorage.setItem('sodocanToken','');
       cb(null,data.data);
     };
     $http.post(API_HOME.slice(0,-4)+'auth/logout',
