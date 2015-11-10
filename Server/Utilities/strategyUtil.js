@@ -43,22 +43,23 @@ exports.githubStrategyCallback = function(accessToken, refreshToken, profile, do
 exports.bearerStrategyCallback = function(token, done) {
   try {
     var decoded = jwt.decode(token, env.TOKEN_SECRET || authConfig.tokenSecret);
-    if (decoded.expiration < Date.now()) {
-      return done(null, false);
-    }
-    User.findOne({username: decoded.username, session: decoded.session}, function(err, user) {
-      if (err) {
-        console.error(err);
-        return done(err);
-      }
-      if (!user) {
-        return done(null, false);
-      } else {
-        return done(null, user);
-      }
-    });
   }
   catch(err) {
+    return done('Invalid Token');
+  }
+
+  if (decoded.expiration < Date.now()) {
     return done(null, false);
   }
+  User.findOne({username: decoded.username, session: decoded.session}, function(err, user) {
+    if (err) {
+      console.error(err);
+      return done(err);
+    }
+    if (!user) {
+      return done(null, false);
+    } else {
+      return done(null, user);
+    }
+  });
 };
