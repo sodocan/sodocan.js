@@ -5,32 +5,35 @@ GLOBAL STYLES
 -----------------------------------------*/
 
 html {
-    font-size: 100%;        
+    font-size: 100%;
 }
 
 body {
-  font-family: 'Raleway', sans-serif !important;
-  font-size: 14px;  
-  color: #808080;
-  font-weight: normal;
-  overflow-x: hidden !important;
-  line-height: 25px;
-  background-color: white;
+    font-family: 'Raleway', sans-serif !important;
+    font-size: 14px;
+    color: #080808;
+    font-weight: normal;
+    overflow-x: hidden !important;
+    line-height: 25px;
+    background-color: white;
 }
 
-::-moz-selection { /* Code for Firefox */
-  color: white;
-  background: red;
+::-moz-selection {
+    /* Code for Firefox */
+    color: white;
+    background: red;
 }
 
 ::selection {
-  color: white; 
-  background: red;
+    color: white;
+    background: red;
 }
+
 
 /*li a:hover {
   background: #26A69A;
 }*/
+
 
 /* --------------------------------------
 =========================================
@@ -39,70 +42,74 @@ SIDE BAR STYLES
 -----------------------------------------*/
 
 .side-nav {
-  padding-top: 110px;
-  z-index: 0;
-}
-.side-nav li{
-  position: relative;
-  height: 50px;
-  border-color: white;
-  border-bottom: 1px dotted rgb(60, 60, 60);
-}
-.side-nav a{
-  position: relative;
-  line-height: 50px;
-  height: 50px;
+    padding-top: 110px;
+    z-index: 0;
 }
 
-.side-nav a:hover{
-  color: black !important;
+.side-nav li {
+    position: relative;
+    height: 50px;
+    border-color: white;
+    border-bottom: 1px dotted rgb(60, 60, 60);
 }
+
+.side-nav a {
+    position: relative;
+    line-height: 50px;
+    height: 50px;
+}
+
+.side-nav a:hover {
+    color: black !important;
+}
+
 
 /* --------------------------------------
 =========================================
 NAV BAR STYLES
 =========================================
 -----------------------------------------*/
+
 .logo-img img {
-  height: 45%;
-  vertical-align: middle;
-  margin-left: 30px;
+    height: 45%;
+    vertical-align: middle;
+    margin-left: 30px;
 }
 
 .nav-thin-top {
-  background: #10DAC2;
-  height: 5px;
+    background: #10DAC2;
+    height: 5px;
 }
+
 
 /*.navbar-fixed form {
   background: pink;
 }*/
+
 .navbar-fixed form:hover {
-  background: #022E49;
+    background: #022E49;
 }
 
-.input-field {
-}
+.input-field {}
 
-.input-field:hover {
-
-}
+.input-field:hover {}
 
 .right li {
-  height: ;
-  margin: 0px;
-  padding-left: 20px;
-  padding-right: 20px;
-  cursor: pointer;
+    height: ;
+    margin: 0px;
+    padding-left: 20px;
+    padding-right: 20px;
+    cursor: pointer;
 }
 
 #search {
-  cursor: default;
+    cursor: default;
 }
 
 .right a i {
-  font-size: 20px;
+    font-size: 20px;
 }
+
 
 /* --------------------------------------
 =========================================
@@ -110,161 +117,175 @@ MAIN BODY STYLES
 =========================================
 -----------------------------------------*/
 
-.main{
-  padding-left: 260px;
-  padding-right: 20px;
-  padding-top: 30px;
+.main {
+    padding-left: 260px;
+    padding-right: 20px;
+    padding-top: 30px;
 }
 
-.main .s12 {
-}
+.main .s12 {}
 
-.contextBtn{
-  padding: 2px;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin-left: 1px;
-  font-size: 15px;
-  background: #26A69A;
-  color: white;
-  border-radius: 2px;
-  vertical-align: middle;
+.contextBtn {
+    padding: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 1px;
+    font-size: 15px;
+    background: #26A69A;
+    color: white;
+    border-radius: 2px;
+    vertical-align: middle;
 }
 
 .contextBtn div {
-  display:inline-block; 
-  vertical-align: middle;
+    display: inline-block;
+    vertical-align: middle;
 }
+
 
 /*=========================================
 CARD STYLES
 =========================================*/
 
 .card {
-  margin-bottom: 20px;
-  padding: 5px;
-  padding-left: 10px;
-  box-shadow: 2px red;
+    margin-bottom: 20px;
+    padding: 5px;
+    padding-left: 10px;
+    box-shadow: 2px red;
 }
 
 .card-inner {
-  padding: 5px;
-  padding-left: 20px;
-  padding-right: 20px;
-  box-shadow: 2px #ff0000 !important;
-/*  border: 1px solid black;*/
-  width: 100%;
+    padding: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-shadow: 2px #ff0000 !important;
+    /*  border: 1px solid black;*/
+    width: 100%;
 }
 
 .entry {
-  margin-top: 5px;
-  padding: 10px !important;
-  padding-left: 25px !important;
-  font-size: 18px;
-  -webkit-transition: top 0.5s ease-in-out !important;
-  -moz-transition: top 0.5s ease-in-out !important;
-  transition: top 0.5s ease-in-out !important;
+    margin-top: 5px;
+    padding: 10px !important;
+    padding-left: 25px !important;
+    font-size: 18px;
+    -webkit-transition: top 0.5s ease-in-out !important;
+    -moz-transition: top 0.5s ease-in-out !important;
+    transition: top 0.5s ease-in-out !important;
 }
 
 .vote-count {
-  font-size: 20px;
+    font-size: 20px;
 }
 
 .card-header {
-  padding-left: 10px;
-  padding-right: 30px;
+    padding-left: 10px;
+    padding-right: 30px;
 }
 
-.card h3{
-  margin-top: 0;
-  font-size: 25px;
-  margin-right: 10px;
+.card h3 {
+    margin-top: 0;
+    font-size: 25px;
+    margin-right: 10px;
 }
 
-.card span {
+.card span {}
 
-}
-
-.card .params{
-  font-size: 20px;
+.card .params {
+    font-size: 20px;
 }
 
 .entry-icons {
-  margin-top: 5px;
-  margin-right: 10px;
+    margin-top: 5px;
+    margin-right: 10px;
 }
 
 .entry-icons i {
-  margin: 5px;
+    margin: 5px;
 }
 
-.tint{
-  opacity: 0.3;
-  cursor: pointer;
-  transition: opacity 0.5s;
+.tint {
+    opacity: 0.3;
+    cursor: pointer;
+    transition: opacity 0.5s;
 }
-.tint:hover{
-  opacity: 1;
-  transition: opacity 0.5s;
+
+.tint:hover {
+    opacity: 1;
+    transition: opacity 0.5s;
 }
-.card h6{
-  font-size: 1.3rem;
-  font-weight: 500;
-  display: inline-block;
+
+.card h6 {
+    font-size: 1.3rem;
+    font-weight: 500;
+    display: inline-block;
 }
-.upvote{
-  font-size: 1.2rem;
-  font-weight: 400;
+
+.upvote {
+    font-size: 1.2rem;
+    font-weight: 400;
 }
-.upvote i, .upvoteComments i{
-  cursor: pointer;
+
+.upvote i, .upvoteComments i {
+    cursor: pointer;
 }
-.comments{
-  padding: 10px;
-  margin-top: 5px;
-  margin-bottom: 5px;
+
+.comments {
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
+
 .item {
-  -webkit-transition:  top 1s ease-out !important;
-  -moz-transition:  top 1s ease-out !important;
-  transition:  top 1s ease-out !important;
+    -webkit-transition: top 1s ease-out !important;
+    -moz-transition: top 1s ease-out !important;
+    transition: top 1s ease-out !important;
 }
-.post{
-  width: 80%;
-  display: inline-block;
+
+.post {
+    width: 80%;
+    display: inline-block;
 }
-.upvoteComments{
-  width: 20%;
-  float: right;
-  text-align: right;
+
+.upvoteComments {
+    width: 20%;
+    float: right;
+    text-align: right;
 }
-.inline{
-  display: inline-block;
+
+.inline {
+    display: inline-block;
 }
-.suggest{
-  font-weight: 300;
-  font-size: .9rem;
+
+.suggest {
+    font-weight: 300;
+    font-size: .9rem;
 }
-.off{
-  background-color: gray;
+
+.off {
+    background-color: gray;
 }
-.submit{
-  position: relative;
-  left: 50%;
+
+.submit {
+    position: relative;
+    left: 50%;
 }
-.icon{
-  opacity: 0.5;
-  transition: opacity 0.5s;
-  cursor: pointer;
+
+.icon {
+    opacity: 0.5;
+    transition: opacity 0.5s;
+    cursor: pointer;
 }
-.icon:hover{
-  opacity: 1;
+
+.icon:hover {
+    opacity: 1;
 }
-.hide-icon{
-  opacity: 0;
-  transition: opacity 0.5s;
-  cursor: pointer;
+
+.hide-icon {
+    opacity: 0;
+    transition: opacity 0.5s;
+    cursor: pointer;
 }
+
 
 /* --------------------------------------
 =========================================
@@ -272,51 +293,53 @@ MODAL STYLES
 =========================================
 -----------------------------------------*/
 
-.modal-bg{
-  position: fixed;
-  width: 100%;
-  height: 100%; 
-  background-color: black;
-  opacity: 0.7;
-  z-index: 999;
+.modal-bg {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    opacity: 0.7;
+    z-index: 999;
 }
-.modal-window{
-  width: 50%;
-  height: 50%;
-  position: fixed;
-  opacity: 1;
-  z-index: 1000;
-  background-color: white; 
+
+.modal-window {
+    width: 50%;
+    height: 50%;
+    position: fixed;
+    opacity: 1;
+    z-index: 1000;
+    background-color: white;
 }
 
 .auth {
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: 60%;
-  text-align: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    width: 60%;
+    text-align: center;
 }
 
 .modal-container {
-  padding: 20px;
-  height: 300px;
+    padding: 20px;
+    height: 300px;
 }
 
 .modal-setting {
-  vertical-align: middle;
-  padding: 0px;
+    vertical-align: middle;
+    padding: 0px;
 }
 
 .setting-entry {
-  margin: 5px;
+    margin: 5px;
 }
 
 .setting-entry-title {
-  width: 20%;
-  font-size: 20px;
+    width: 20%;
+    font-size: 20px;
 }
+
 
 /* --------------------------------------
 =========================================
@@ -325,12 +348,13 @@ TEXT COLOR
 -----------------------------------------*/
 
 .white-text {
-  color: #FFFFFF !important;
+    color: #FFFFFF !important;
 }
 
 .lightgrey-text {
-  color: #DDDDDD !important;
+    color: #DDDDDD !important;
 }
+
 
 /* --------------------------------------
 =========================================
@@ -339,13 +363,13 @@ BACKGROUND COLOR
 -----------------------------------------*/
 
 .darkgrey-bg {
-  background-color: rgba(40, 40, 40, 1) !important;
+    background-color: rgba(40, 40, 40, 1) !important;
 }
 
 .lightgrey-bg {
-  background-color: rgba();
+    background-color: rgba();
 }
 
 .blue-bg {
-  background-color: rgba(20, 100, 150, 1) !important;
+    background-color: rgba(20, 100, 150, 1) !important;
 }
