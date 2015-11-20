@@ -1,3 +1,4 @@
+// This file is used for testing on the local server. Do not delete.
 exports.methodsData = [
   {
     project: 'sodocan',
@@ -5,7 +6,7 @@ exports.methodsData = [
     reference:
       [
         {
-          params: '(collection, iteratee, callback)', //'(collection,iterattee,callback)'
+          params: '(collection, iteratee, callback)',
           output: 'String'
         }
       ],
