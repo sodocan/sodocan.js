@@ -4,14 +4,14 @@ var handlers = require('../Utilities/requestHandlers');
 var passport = require('passport');
 
 
-router.post('/login', handlers.setCorsHeader, handlers.loginPostHandler);
+router.post('/login', handlers.loginPostHandler);
 
-router.post('/register', handlers.setCorsHeader, handlers.registerPostHandler);
+router.post('/register', handlers.registerPostHandler);
 
-router.post('/logout', handlers.setCorsHeader, handlers.logoutHandler);
+router.post('/logout', handlers.logoutHandler);
 
-router.get('/github', handlers.setCorsHeader, passport.authenticate('github'));
+router.get('/github', passport.authenticate('github'));
 
-router.get('/github/callback', handlers.setCorsHeader, handlers.githubLoginPostHandler);
+router.get('/github/callback', handlers.githubLoginPostHandler);
 
 module.exports = router;

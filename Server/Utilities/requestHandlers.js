@@ -76,7 +76,12 @@ exports.logoutHandler = function(req, res, next) {
       return;
     }
     if (!user) {
-      res.sendStatus(401);
+      if (info === 'expired') {
+        res.setHeader('Access-Control-Allow-Origin','*');
+        res.sendStatus(200);
+      } else {
+        res.sendStatus(401);
+      }
       return;
     }
     user.session++;
@@ -124,4 +129,13 @@ exports.checkTokenHandler = function(req, res, next) {
 exports.setCorsHeader = function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin','*');
   next();
+};
+
+exports.sendOptionsHeader = function(req, res) {
+  res.set({
+    'Access-Control-Allow-Headers':'Content-Type',
+    'Access-Control-Allow-Origin':'*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+  });
+  res.end();
 };

@@ -18,26 +18,21 @@ var strategyUtil = require('./Utilities/strategyUtil');
 
 var app = express();
 
-app.options('/*', function(req,res) {
-  res.set({
-    'Access-Control-Allow-Headers':'Content-Type',
-    'Access-Control-Allow-Origin':'*',
-  });
-  res.end();
-});
-
-app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));
 app.use(logger('dev'));
+app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.options('/*', handlers.sendOptionsHeader);
+
+app.all('/*', handlers.setCorsHeader);
 
 app.use(expressSession({
   secret: 'secret',
   resave: false,
   saveUninitialized: false
 }));
-
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -70,11 +65,11 @@ app.use(function(err, req, res, next) {
   next();
 });
 
-app.get('/api/*', handlers.setCorsHeader, handlers.getApi);
-app.post('/create', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.postSkeleton);
-app.post('/upvote', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.upvote);
-app.post('/addEntry', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.addEntry);
-app.post('/editEntry', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.editEntry);
+app.get('/api/*', handlers.getApi);
+app.post('/create', handlers.checkTokenHandler, handlers.postSkeleton);
+app.post('/upvote', handlers.checkTokenHandler, handlers.upvote);
+app.post('/addEntry', handlers.checkTokenHandler, handlers.addEntry);
+app.post('/editEntry', handlers.checkTokenHandler, handlers.editEntry);
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
