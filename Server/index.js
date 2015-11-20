@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// I added this. This is not part of the express generator
+// Used for easier debugging
 global.log = function() {
   var start;
   if (arguments.length > 1 && typeof arguments[0] === 'string') {
