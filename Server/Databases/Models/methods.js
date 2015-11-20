@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var testObjs = require('./dummyData').methodsData;
 
 // Define the schema for each method object in the methods database.
 // project and functionName are required to be defined when a new

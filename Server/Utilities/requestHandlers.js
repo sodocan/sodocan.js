@@ -125,31 +125,3 @@ exports.setCorsHeader = function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin','*');
   next();
 };
-
-/* Used for our testing pages only
-
-exports.loginGetHandler = function(req, res, next) {
-  console.log('login get received');
-  log('__dirname', __dirname);
-  var path = __dirname + '/../StaticPages/login.html';
-  fs.readFile(path, 'utf8', function(err, html) {
-    if (err) {
-      console.error(err);
-    }
-    res.end(html);
-  });
-};
-
-exports.registerGetHandler = function(req, res, next) {
-  console.log('login get received');
-  log('__dirname', __dirname);
-  var path = __dirname + '/../StaticPages/register.html';
-  fs.readFile(path, 'utf8', function(err, html) {
-    if (err) {
-      console.error(err);
-    }
-    res.end(html);
-  });
-};
-
-*/
