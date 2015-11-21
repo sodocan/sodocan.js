@@ -15,7 +15,7 @@ var send404 = exports.send404 = function(res, errorMessageOrObj) {
     console.error(errorMessageOrObj);
   }
   console.error(new Error('404').stack);
-  res.sendStatus(404);
+  res.status(404).send(errorMessageOrObj);
 };
 
 /* Database Actions */
