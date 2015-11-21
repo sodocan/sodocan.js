@@ -1,7 +1,11 @@
 var mongoose = require('mongoose');
-var testObjs = require('./dummyData').methodsData;
 
+// Define the schema for each method object in the methods database.
+// project and functionName are required to be defined when a new
+// object is inserted, or will throw error
 var MethodSchema = new mongoose.Schema({
+  // project is indexed, so lookups for a particular project
+  // are in constant time, rather than linear time
   project: {type: String, required: true, index: true},
   functionName: {type: String, required: true},
   group: {type: String},
@@ -10,33 +14,10 @@ var MethodSchema = new mongoose.Schema({
   reference: mongoose.Schema.Types.Mixed,
   explanations: mongoose.Schema.Types.Mixed,
 });
+// Defines complex index, so lookups for any combination of
+// project and functionName is constant time
 MethodSchema.index({project: 1, functionName: 1});
+
 var methodsModel =  mongoose.model('Method', MethodSchema);
-
-
-// var insertObjs = function(objs){ //inserts dummy data
-//   for(var i = 0; i < objs.length; i++){
-//     methodsModel.findOneAndUpdate({
-//       project: objs[i].project,
-//       functionName: objs[i].functionName
-//     }, objs[i], {upsert: true},
-//     function(){
-//     });
-//   }
-// };
-// insertObjs(testObjs);
-
-/*
-Test cases:
-1. api/sodocan
-2. api/sodocan/ref/makeSkele
-3. api/sodocan/examples
-4. api/sodocan/descriptions/all
-5. api/sodocan/descriptions/1/10
-6. api/sodocan/all/all
-7. api/sodocan/tips/descriptions
-8. api/sodocan/all/tips/0
-9. api/sodocan/ref/makeItPretty/descriptions/entryID-128/all
-*/
 
 module.exports = methodsModel;

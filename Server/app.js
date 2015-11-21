@@ -1,13 +1,15 @@
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon'); // currently not used
+var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
+
+// Require modules for authentication
 var LocalStrategy = require('passport-local').Strategy;
 var GitHubStrategy = require('passport-github').Strategy;
-var expressSession = require('express-session'); // still needed?
+var expressSession = require('express-session');
 var BearerStrategy = require('passport-http-bearer').Strategy;
 
 var usersRouter = require('./Routes/users');
@@ -16,26 +18,16 @@ var strategyUtil = require('./Utilities/strategyUtil');
 
 var app = express();
 
-// TODO: fit this in better, CORS for POSTing
-app.options('/*', function(req,res) {
-  res.set({
-    'Access-Control-Allow-Headers':'Content-Type',
-    'Access-Control-Allow-Origin':'*',
-  });
-  res.end();
-});
-
-// view engine setup
-//app.set('views', path.join(__dirname, 'views'));
-//app.set('view engine', 'jade');
-
-app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));
 app.use(logger('dev'));
+app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// not needed anymore?
+app.options('/*', handlers.sendOptionsHeader);
+
+app.all('/*', handlers.setCorsHeader);
+
 app.use(expressSession({
   secret: 'secret',
   resave: false,
@@ -44,7 +36,6 @@ app.use(expressSession({
 
 app.use(passport.initialize());
 app.use(passport.session());
-// app.use(express.static(path.join(__dirname, 'StaticPages'))); // will this be used?
 app.use(express.static(path.join(__dirname, '../public')));
 
 var User = require('./Databases/Models/users.js');
@@ -74,14 +65,11 @@ app.use(function(err, req, res, next) {
   next();
 });
 
-app.get('/api/*', handlers.setCorsHeader, handlers.getApi);
-app.post('/create', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.postSkeleton);
-app.post('/upvote', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.upvote);
-app.post('/addEntry', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.addEntry);
-app.post('/editEntry', handlers.setCorsHeader, handlers.checkTokenHandler, handlers.editEntry);
-
-//NOTE: figure out best practices for above route
-
+app.get('/api/*', handlers.getApi);
+app.post('/create', handlers.checkTokenHandler, handlers.postSkeleton);
+app.post('/upvote', handlers.checkTokenHandler, handlers.upvote);
+app.post('/addEntry', handlers.checkTokenHandler, handlers.addEntry);
+app.post('/editEntry', handlers.checkTokenHandler, handlers.editEntry);
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
@@ -96,10 +84,6 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    // res.render('error', {
-    //   message: err.message,
-    //   error: err
-    // });
     res.end();
   });
 }
@@ -108,10 +92,6 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  // res.render('error', {
-  //   message: err.message,
-  //   error: {}
-  // });
   res.end();
 });
 

@@ -76,7 +76,12 @@ exports.logoutHandler = function(req, res, next) {
       return;
     }
     if (!user) {
-      res.sendStatus(401);
+      if (info === 'expired') {
+        res.setHeader('Access-Control-Allow-Origin','*');
+        res.sendStatus(200);
+      } else {
+        res.sendStatus(401);
+      }
       return;
     }
     user.session++;
@@ -126,30 +131,11 @@ exports.setCorsHeader = function(req, res, next) {
   next();
 };
 
-/* Used for our testing pages only
-
-exports.loginGetHandler = function(req, res, next) {
-  console.log('login get received');
-  log('__dirname', __dirname);
-  var path = __dirname + '/../StaticPages/login.html';
-  fs.readFile(path, 'utf8', function(err, html) {
-    if (err) {
-      console.error(err);
-    }
-    res.end(html);
+exports.sendOptionsHeader = function(req, res) {
+  res.set({
+    'Access-Control-Allow-Headers':'Content-Type',
+    'Access-Control-Allow-Origin':'*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
   });
+  res.end();
 };
-
-exports.registerGetHandler = function(req, res, next) {
-  console.log('login get received');
-  log('__dirname', __dirname);
-  var path = __dirname + '/../StaticPages/register.html';
-  fs.readFile(path, 'utf8', function(err, html) {
-    if (err) {
-      console.error(err);
-    }
-    res.end(html);
-  });
-};
-
-*/
