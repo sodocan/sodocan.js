@@ -19,8 +19,7 @@ exports.postSkeleton = function(req, res) {
       return ((typeof method.functionName === 'string') && !!method.functionName.trim());
     });
     if (methodsArray.length === 0) {
-      res.sendStatus(400);
-      res.end('no function names for any of the functions');
+      res.status(400).send('no function names for any of the functions');
       return;
     }
     var completedMethodEntry = helpers.runAfterAsync(res, methodsArray.length);
@@ -35,8 +34,7 @@ exports.postSkeleton = function(req, res) {
         //if it doesn't match, insert
     }
   } else {
-    res.sendStatus(400);
-    res.end('project name is not provided');
+    res.status(400).send('project name is not provided');
   }
 };
 
@@ -55,13 +53,11 @@ exports.editEntry = function(req, res) {
 
 exports.registerPostHandler = function(req, res, next) {
   if (req.body.username.substring(req.body.username.length - 4) === '.git') {
-    res.sendStatus(400);
-    res.end('illegal username (cannot end in .git)');
+    res.status(400).send('illegal username (cannot end in .git)');
   }
   User.register(new User({username: req.body.username}), req.body.password, function(err, user) {
     if (err) {
       res.sendStatus(400);
-      res.end();
       return;
     }
     helpers.createToken(req, res, next, 'local');

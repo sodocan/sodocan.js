@@ -15,8 +15,7 @@ var send404 = exports.send404 = function(res, errorMessageOrObj) {
     console.error(errorMessageOrObj);
   }
   console.error(new Error('404').stack);
-  res.setHeader('Access-Control-Allow-Origin','*');
-  res.status(404).end();
+  res.sendStatus(404);
 };
 
 /* Database Actions */
@@ -130,7 +129,6 @@ var runAfterAsync = exports.runAfterAsync = function(res, numOfCallbacks) {
     }
     if(err && !failed){
       failed = true;
-      // error(res, err);
       send404(res, err);
     }
   };
@@ -230,7 +228,6 @@ var getReferences = exports.getReferences = function(path, res) {
       return reference;
     });
 
-    res.setHeader('Access-Control-Allow-Origin','*');
     res.send(newReferences);
   });
 };
@@ -333,7 +330,6 @@ var upvote = exports.upvote = function(upvoteInfo, res) {
       if (err) {
         send404(res, err);
       } else {
-        res.setHeader('Access-Control-Allow-Origin','*');
         res.sendStatus(202);
       }
     });
@@ -446,7 +442,6 @@ var addEntry = exports.addEntry = function(addEntryInfo, res) {
       if (err) {
         send404(res, err);
       } else {
-        res.setHeader('Access-Control-Allow-Origin','*');
         res.sendStatus(202);
       }
     });
@@ -567,7 +562,6 @@ var editEntry = exports.editEntry = function(editEntryInfo, res) {
       if (err) {
         send404(res, err);
       } else {
-        res.setHeader('Access-Control-Allow-Origin','*');
         res.sendStatus(202);
       }
     });
@@ -632,8 +626,6 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
     },
 
     notFound: function() {
-      // convertToDBForm and then insert
-      // res.statusCode(202).end() inside callback of database upsert
       (new methodsDB(convertToDBForm(skull.project, method, username))).save(function(err, newMethod){
         if(err){
           completedMethodEntry(err);
@@ -659,15 +651,14 @@ var createToken = exports.createToken = function(req, res, next, authenticateTyp
   passport.authenticate(authenticateType, {session: false}, function(err, user) {
     if (err) { console.log('error loggin'); }
     if (!user) {
-      return res.status(401).json({ error: 'Unauthorized'});
+      return res.sendStatus(401);
     }
     var token = jwt.encode({
       username: user.username,
       expiration: calculateTokenExpiration(),
       session: user.session
     }, process.env.TOKEN_SECRET || authConfig.tokenSecret);
-    res.setHeader('Access-Control-Allow-Origin','*');
-    res.json({access_token: token});
+    res.send({access_token: token});
   })(req, res, next);
 };
 
