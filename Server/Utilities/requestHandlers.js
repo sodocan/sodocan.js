@@ -71,17 +71,16 @@ exports.registerPostHandler = function(req, res, next) {
 exports.logoutHandler = function(req, res, next) {
   passport.authenticate('bearer', {session: false}, function(err, user, info) {
     if (err) {
-      console.error(err);
-      res.end('authentication error');
+      if (err === 'Token Expired') {
+        res.sendStatus(200);
+      } else {
+        console.error(err);
+        res.send('authentication error');
+      }
       return;
     }
     if (!user) {
-      if (info === 'expired') {
-        res.setHeader('Access-Control-Allow-Origin','*');
-        res.sendStatus(200);
-      } else {
-        res.sendStatus(401);
-      }
+      res.send('Not logged in');
       return;
     }
     user.session++;
@@ -90,7 +89,6 @@ exports.logoutHandler = function(req, res, next) {
         console.error(err);
         return;
       }
-      res.setHeader('Access-Control-Allow-Origin','*');
       res.sendStatus(200);
     });
   })(req, res, next);
@@ -108,20 +106,18 @@ exports.checkTokenHandler = function(req, res, next) {
   passport.authenticate('bearer', {session: false}, function(err, user) {
     if (err) {
       console.error(err);
-      if (err === 'Invalid Token') {
-        res.send(err);
+      if (err === 'Invalid Token' || err === 'Token Expired') {
+        res.status(401).send(err);
       } else {
-        res.send('Unknown error. Please try again');
+        res.status(401).send('Unknown error. Please try again');
       }
-      res.sendStatus(401);
       return;
     }
     if (user) {
       req.body.username = user.username;
       next();
     } else {
-      res.send('Not logged in');
-      res.sendStatus(401);
+      res.status(401).send('Not logged in');
     }
   })(req, res, next);
 };
