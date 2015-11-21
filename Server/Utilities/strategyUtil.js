@@ -49,7 +49,7 @@ exports.bearerStrategyCallback = function(token, done) {
   }
 
   if (decoded.expiration < Date.now()) {
-    return done(null, false, 'expired');
+    return done('Token Expired',false);
   }
   User.findOne({username: decoded.username, session: decoded.session}, function(err, user) {
     if (err) {
