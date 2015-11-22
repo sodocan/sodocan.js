@@ -39,15 +39,15 @@ exports.postSkeleton = function(req, res) {
 };
 
 exports.upvote = function(req, res) {
-  helpers.upvote(req.body, res);
+  helpers.postToEntry(req.body, 'upvote', res);
 };
 
 exports.addEntry = function(req, res) {
-  helpers.addEntry(req.body, res);
+  helpers.postToEntry(req.body, 'add', res);
 };
 
 exports.editEntry = function(req, res) {
-  helpers.editEntry(req.body, res);
+  helpers.postToEntry(req.body, req.body.delete ? 'delete' : 'edit', res);
 }
 
 

@@ -232,345 +232,6 @@ var getReferences = exports.getReferences = function(path, res) {
   });
 };
 
-var upvote = exports.upvote = function(upvoteInfo, res) {
-  /*
-  {
-    username:
-    project:
-    functionName:
-    context:
-    entryID:
-    [commentID:]
-  }
-  */
-  var searchObject = {
-    project: upvoteInfo.project,
-    functionName: upvoteInfo.functionName
-  };
-
-  if (!searchObject.project || !searchObject.functionName) {
-    send404(res, 'project or functionName not provided');
-    return;
-  }
-
-  var username = upvoteInfo.username;
-
-  // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
-  mongoFind(res, searchObject, null, function(reference) {
-    var context = upvoteInfo.context;
-    var entryID = upvoteInfo.entryID;
-
-    var commentID = upvoteInfo.commentID;
-
-    var entryFound = false;
-    var explanations = JSON.parse(JSON.stringify(reference.explanations));
-    var contextArray = explanations[context];
-    if (!contextArray) {
-      send404(res, 'context not found');
-      return;
-    }
-    for (var i = 0; i < contextArray.length; i++) {
-      if (contextArray[i].entryID === entryID) {
-        entryFound = true;
-        if (!commentID) {
-          var entry = contextArray[i];
-          if (!entry.upvoters.hasOwnProperty(username) && username !== entry.username) {
-            entry.upvotes++;
-            entry.upvoters[username] = 1;
-
-            while (i > 0 && entry.upvotes > contextArray[i-1].upvotes) {
-              contextArray[i] = contextArray[i-1];
-              contextArray[i-1] = entry;
-              i--;
-            }
-          } else {
-            send404(res, 'cannot vote more than once or for your own entry');
-            return;
-          }
-        } else {
-          var commentFound = false;
-          var comments = contextArray[i].comments;
-          for (var j = 0; j < comments.length; j++) {
-            var comment = comments[j];
-            if (comment.commentID === commentID) {
-              commentFound = true;
-              if (!comment.upvoters.hasOwnProperty(username) && username !== comment.username) {
-                comment.upvotes++;
-                comment.upvoters[username] = 1;
-                while (j > 0 && comment.upvotes > comments[j-1].upvotes) {
-                  comments[j] = comments[j-1];
-                  comments[j-1] = comment;
-                  j--;
-                }
-              } else {
-                send404(res, 'cannot vote more than once or for your own entry');
-                return;
-              }
-              break;
-            }
-          }
-          if (!commentFound) {
-            send404(res, 'commentID not found');
-            return;
-          }
-        }
-        break;
-      }
-    }
-    if (!entryFound) {
-      send404(res, 'entryID not found');
-      return;
-    }
-
-    // Mongoose will not save the modifications to the explanations object
-    // unless you reassign its value to a different object
-    reference.explanations = explanations;
-
-    reference.save(function(err) {
-      if (err) {
-        send404(res, err);
-      } else {
-        res.sendStatus(202);
-      }
-    });
-  });
-};
-
-var addEntry = exports.addEntry = function(addEntryInfo, res) {
-  /*
-  {
-    username:
-    project:
-    functionName:
-    context:
-    text:
-    [entryID:]
-  }
-  */
-
-  if (!addEntryInfo.text || !addEntryInfo.text.trim()) {
-    send404(res, 'no content in text');
-    return;
-  }
-
-  if (!addEntryInfo.project || !addEntryInfo.functionName) {
-    send404(res, 'project or functionName not provided');
-    return;
-  }
-
-  var searchObject = {
-    project: addEntryInfo.project,
-    functionName: addEntryInfo.functionName
-  };
-
-  // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
-  mongoFind(res, searchObject, null, function(reference) {
-    var context = addEntryInfo.context;
-    var explanations = JSON.parse(JSON.stringify(reference.explanations));
-    var contextArray = explanations[context];
-    if (!contextArray) {
-      send404(res, 'context not found');
-      return;
-    }
-    var id = hashCode(addEntryInfo.text);
-
-    var entryID = addEntryInfo.entryID;
-    if (entryID) {
-      var entryFound = false;
-      for (var i = 0; i < contextArray.length; i++) {
-        var entry = contextArray[i];
-        if (entry.entryID === entryID) {
-          entryFound = true;
-          var comments = entry.comments;
-          var ids = [];
-          for (var j = 0; j < comments.length; j++) {
-            if (comments[j].text === addEntryInfo.text) {
-              send404(res, 'duplicate entry');
-              return;
-            }
-            ids.push(comments[j].commentID);
-          }
-          while (ids.indexOf(id) !== -1) {
-            id++;
-          }
-          var comment = {
-            username: addEntryInfo.username,
-            commentID: id,
-            timestamp: new Date(),
-            text: addEntryInfo.text,
-            upvotes: 0,
-            upvoters: {}
-          };
-          comments.push(comment);
-          break;
-        }
-      }
-      if (!entryFound) {
-        send404(res, 'entryID not found');
-        return;
-      }
-    } else {
-      var ids = [];
-      for (var i = 0; i < contextArray.length; i++) {
-        var currEntry = contextArray[i];
-        if (currEntry.text === addEntryInfo.text) {
-          send404(res, 'duplicate entry');
-          return;
-        }
-        ids.push(currEntry.entryID);
-      }
-      while (ids.indexOf(id) !== -1) {
-        id++;
-      }
-      var entry = {
-        username: addEntryInfo.username,
-        entryID: id,
-        timestamp: new Date(),
-        text: addEntryInfo.text,
-        upvotes: 0,
-        upvoters: {},
-        comments: []
-      };
-      contextArray.push(entry);
-    }
-
-    // Mongoose will not save the modifications to the explanations object
-    // unless you reassign its value to a different object
-    reference.explanations = explanations;
-
-    reference.save(function(err) {
-      if (err) {
-        send404(res, err);
-      } else {
-        res.sendStatus(202);
-      }
-    });
-  });
-};
-
-var editEntry = exports.editEntry = function(editEntryInfo, res) {
-  /*
-  {
-    username:
-    project:
-    functionName:
-    context:
-    entryID:
-    text:
-    delete:
-    [commentID:]
-  }
-  */
-  var text = editEntryInfo.text;
-  if (!editEntryInfo.delete && (!text || !text.trim())) {
-    send404(res, 'no content in text');
-    return;
-  }
-
-  if (!editEntryInfo.project || !editEntryInfo.functionName) {
-    send404(res, 'project or functionName not provided');
-    return;
-  }
-
-  var searchObject = {
-    project: editEntryInfo.project,
-    functionName: editEntryInfo.functionName
-  };
-
-  // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
-  mongoFind(res, searchObject, null, function(reference) {
-    // var validUpdate;
-    var context = editEntryInfo.context;
-    var entryID = editEntryInfo.entryID;
-
-    var commentID = editEntryInfo.commentID;
-
-    var entryFound = false;
-    var explanations = JSON.parse(JSON.stringify(reference.explanations));
-    var contextArray = explanations[context];
-    if (!contextArray) {
-      send404(res, 'context not found');
-      return;
-    }
-    for (var i = 0; i < contextArray.length; i++) {
-      if (contextArray[i].entryID === entryID) {
-        entryFound = true;
-        if (!commentID) {
-          var entry = contextArray[i];
-          if (editEntryInfo.username === entry.username) {
-            if (editEntryInfo.delete) {
-              contextArray.splice(i, 1);
-              // validUpdate = true;
-            } else if (entry.text !== text) {
-              entry.text = text;
-              // validUpdate = true;
-            } else {
-              send404(res, 'no change in content found');
-              return;
-            }
-          } else {
-            send404(res, 'not authorized to edit this entry');
-            return;
-          }
-        } else {
-          var commentFound = false;
-          var comments = contextArray[i].comments;
-          for (var j = 0; j < comments.length; j++) {
-            var comment = comments[j];
-            if (comment.commentID === commentID) {
-              commentFound = true;
-              if (editEntryInfo.username === comment.username) {
-                if (editEntryInfo.delete) {
-                  comments.splice(j, 1);
-                  // validUpdate = true;
-                } else if (comment.text !== text) {
-                  comment.text = text;
-                  // validUpdate = true;
-                } else {
-                  send404(res, 'no change in content found');
-                  return;
-                }
-              } else {
-                send404(res, 'not authorized to edit this entry');
-                return;
-              }
-              break;
-            }
-          }
-          if (!commentFound) {
-            send404(res, 'commentID not found');
-            return;
-          }
-        }
-        break;
-      }
-    }
-    if (!entryFound) {
-      send404(res, 'entryID not found');
-      return;
-    }
-    // if (!validUpdate) {
-    //   send404(res, 'not a valid edit');
-    //   return;
-    // }
-
-    // Mongoose will not save the modifications to the explanations object
-    // unless you reassign its value to a different object
-    reference.explanations = explanations;
-
-    reference.save(function(err) {
-      if (err) {
-        send404(res, err);
-      } else {
-        res.sendStatus(202);
-      }
-    });
-  });
-
-};
-
-
-
 var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, completedMethodEntry, skull, username) {
   var searchObj = {
     project: skull.project,
@@ -666,4 +327,215 @@ var calculateTokenExpiration = exports.calculateTokenExpiration = function() {
   var timeInHours = 24;
   var timeInMilliseconds = timeInHours * 3600000;
   return Date.now() + timeInMilliseconds;
+};
+
+
+
+
+
+
+
+var fieldsCheck = {
+
+  commonFields: ['username', 'project', 'functionName', 'context'],
+
+  additional: {
+    upvote: ['entryID'],
+    add: ['text'],
+    edit: ['text', 'entryID'],
+    delete: ['entryID']
+  },
+
+  fieldIsInvalid: function(field, value) {
+    if (field === 'entryID' || field === 'commentID') {
+      if (typeof value === 'number' && value > 0 && Number.isInteger(value)) {
+        return false;
+      }
+    } else {
+      if (typeof value === 'string' && value.trim()) {
+        return false;
+      }
+    }
+    return true;
+  },
+
+  findInvalidFields: function(reqBody, action) {
+    var requiredFields = this.commonFields.concat(this.additional[action]);
+    var invalidFields = requiredFields.filter(function(field) {
+      return this.fieldIsInvalid(field, reqBody[field]);
+    }.bind(this));
+    if (invalidFields.length) {
+      return 'Required fields missing or invalid: ' + invalidFields.join(', ');
+    } else {
+      return null;
+    }
+  }
+};
+
+var addNewPost = function(entries, username, newText, isComment) {
+  var idType = isComment ? 'commentID' : 'entryID';
+  var newPostID = hashCode(newText);
+  var existingIDs = {};
+  for (var i = 0; i < entries.length; i++) {
+    if (entries[i].text === newText) {
+      return 'duplicate entry';
+    }
+    existingIDs[entries[i][idType]] = true;
+  }
+  while (existingIDs[newPostID]) {
+    newPostID++;
+  }
+  var newEntry = {
+    username: username,
+    timestamp: new Date(),
+    text: newText,
+    upvotes: 0,
+    upvoters: {},
+  };
+  newEntry[idType] = newPostID;
+  if (!isComment) {
+    newEntry.comments = [];
+  }
+  entries.push(newEntry);
+  return null;
+};
+
+var postToExistng = {
+
+  upvote: function(entries, ind, username) {
+    var entry = entries[ind];
+    if (!entry.upvoters.hasOwnProperty(username) && username !== entry.username) {
+      entry.upvotes++;
+      // 1 is arbitrarily selected to indicate that a
+      // user has upvoted this entry
+      entry.upvoters[username] = 1;
+      while (ind > 0 && entry.upvotes > entries[ind -1].upvotes) {
+        entries[ind] = entries[ind - 1];
+        entries[ind - 1] = entry;
+        ind--;
+      }
+      return null;
+    }
+    return 'cannot vote more than once or for your own entry';
+  },
+
+  edit: function(entries, ind, username, text) {
+    var entry = entries[ind];
+    if (username === entry.username) {
+      if (entry.text === text) {
+        return 'no change in content found';
+      }
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].text === text) {
+          return 'duplicate entry';
+        }
+      }
+      entry.text = text;
+      return null;
+    }
+    return 'not authorized to edit this entry';
+  },
+
+  delete: function(entries, ind, username) {
+    if (username === entries[ind].username) {
+      entries.splice(ind, 1);
+      return null;
+    }
+    return 'not authorized to delete this entry';
+  }
+};
+
+var indexOfID = function(entries, ID, isComment) {
+  var idType = isComment ? 'commentID' : 'entryID';
+  for (var ind = 0; ind < entries.length; ind++) {
+    if (entries[ind][idType] === ID) {
+      return ind;
+    }
+  }
+  return -1;
+};
+
+var postToEntry = exports.postToEntry = function(reqBody, action, res) {
+
+  var fieldsError = fieldsCheck.findInvalidFields(reqBody, action);
+  if (fieldsError) {
+    send404(res, fieldsError);
+    return;
+  }
+
+  var searchObject = {
+    project: reqBody.project,
+    functionName: reqBody.functionName
+  };
+
+  // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
+  mongoFind(res, searchObject, null, function(reference) {
+    var explanations = JSON.parse(JSON.stringify(reference.explanations));
+    var entries = explanations[reqBody.context];
+    if (!entries) {
+      send404(res, 'context not found for this function');
+      return;
+    }
+
+    var username = reqBody.username;
+    var text = reqBody.text; // may be undefined for upvote, delete
+    var entryID = reqBody.entryID; // may be undefined for add
+    var commentID = reqBody.commentID; // may be undefined
+
+    var newPost = (action === 'add');
+
+    if (newPost) {
+      if (fieldsCheck.fieldIsInvalid('entryID', entryID)) {
+        entryID = null;
+      }
+      commentID = null;
+    } else { // if !newPost
+      if (fieldsCheck.fieldIsInvalid('commentID', commentID)) {
+        commentID = null;
+      }
+    }
+
+    var postErr;
+
+    if (entryID) { // always true when !newPost
+      var entInd = indexOfID(entries, entryID);
+      if (entInd === -1) {
+        send404(res, 'entry not found');
+        return;
+      }
+      var entry = entries[entInd];
+      var comments = entry.comments;
+      if (newPost) {
+        postErr = addNewPost(comments, username, text, true);
+      } else if (commentID) { // && !newPost
+        var comInd = indexOfID(comments, commentID, true);
+        if (comInd === -1) {
+          send404(res, 'comment not found');
+          return;
+        }
+        postErr = postToExistng[action](comments, comInd, username, text);
+      } else { // if !newPost && !commentID
+        postErr = postToExistng[action](entries, entInd, username, text);
+      }
+    } else { // if !entryID
+      postErr = addNewPost(entries, username, text);
+    }
+
+    if (postErr) {
+      send404(res, postErr);
+      return;
+    }
+
+    // Mongoose will not save the modifications to the explanations object
+    // unless you reassign its value to a different object
+    reference.explanations = explanations;
+
+    reference.save(function(err) {
+      if (err) {
+        send404(res, err);
+      } else {
+        res.sendStatus(202);
+      }
+    });
+  });
 };
