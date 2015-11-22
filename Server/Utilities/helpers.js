@@ -1,70 +1,4 @@
-var methodsDB = require('../Databases/Models/methods.js');
-var passport = require('passport');
-var jwt = require('jwt-simple');
-
-if (!process.env.TOKEN_SECRET) {
-  var authConfig = require('../authenticationConfig');
-}
-
-/* Server Response Actions */
-
-// var send404 = exports.send404 = function(res, errorMessageOrObj) {
-//   if (typeof errorMessageOrObj === 'string') {
-//     log('Error', errorMessageOrObj);
-//   } else {
-//     console.error(errorMessageOrObj);
-//   }
-//   console.error(new Error('404').stack);
-//   res.status(404).send(errorMessageOrObj);
-// };
-
-var sendErr = function(res, statusCode, errorMessageOrObj) {
-  if (statusCode === null) {
-    statusCode = 400;
-  }
-  if (isNaN(+statusCode)) {
-    // if 2nd arg is the error, then reassign variable
-    errorMessageOrObj = statusCode || errorMessageOrObj;
-    statusCode = 400;
-  }
-  if (!errorMessageOrObj) {
-    errorMessageOrObj = 'Unknown Error';
-  }
-  if (typeof errorMessageOrObj === 'string') {
-    log('Error', errorMessageOrObj);
-  } else {
-    console.error(errorMessageOrObj);
-  }
-  console.error(new Error(errorMessageOrObj).stack);
-  res.status(statusCode).send(errorMessageOrObj);
-};
-
-/* Database Actions */
-
-// successC (required), notFoundC, and errorC are all callback functions
-// successC takes the found reference as a parameter
-// errorC takes the error as a parameter
-// if sortObj is null, then findOne is used instead of find
-var mongoFind = function(res, searchObj, sortObj, successC, notFoundC, errorC) {
-  notFoundC = notFoundC || function() {sendErr(res, 404, 'reference not found');};
-  errorC = errorC || function(err) {sendErr(res, 500, err);};
-
-  var finder = sortObj
-    ? methodsDB.find(searchObj).sort(sortObj).lean()
-    : methodsDB.findOne(searchObj);
-
-  finder.exec(function(error, references) {
-    if (error) {
-      errorC(error);
-    } else if (sortObj ? !references.length : !references) {
-      notFoundC();
-    } else {
-      successC(references);
-    }
-  });
-};
-
-/* Other Helpers */
+var dbHelpers = require('./methodsDatabaseHelpers');
 
 var parseApiPath = exports.parseApiPath = function(path) {
   var pathArray = path.split('/');
@@ -168,7 +102,6 @@ var hashCode = function(string) {
   return Math.abs(hash);
 };
 
-/* Uncategorized so far */
 /*
 sodocan.com/api/*:projectName/ref/:functionName/:explanationType/:numEntriesOrEntryID/:numCommentsOrCommentID
 api/:projectName/1/all
@@ -181,8 +114,8 @@ var getReferences = exports.getReferences = function(path, res) {
     return;
   }
 
-  // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
-  mongoFind(res, parsedPath.searchObject, {functionName: 1}, function(references) {
+  // Parameters: res, searchObj, sortObj, successC, notFoundC, errorC
+  dbHelpers.methodsFind(res, parsedPath.searchObject, {functionName: 1}, function(references) {
     var contexts = parsedPath.contexts;
 
     var newReferences = references.map(function(reference) {
@@ -291,30 +224,14 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
         }
       }
 
-      methodsDB.update({
-        project: foundMethod.project,
-        functionName: foundMethod.functionName
-      },
-      {
-        explanations: foundMethod.explanations
-      }, function(err){
-        if(err){
-          completedMethodEntry(err);
+      var updateObj = {explanations: foundMethod.explanations};
 
-        } else {
-          completedMethodEntry();
-        }
-      });
+      dbHelpers.methodsUpdate(searchObj, updateObj, completedMethodEntry);
     },
 
     notFound: function() {
-      (new methodsDB(convertToDBForm(skull.project, method, username))).save(function(err, newMethod){
-        if(err){
-          completedMethodEntry(err);
-        } else {
-          cb.success(newMethod);
-        }
-      });
+      var dbForm = convertToDBForm(skull.project, method, username);
+      dbHelpers.methodsCreate(dbForm, completedMethodEntry, cb.success);
     },
 
     error: function(err) {
@@ -325,33 +242,9 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, complet
   };
 
   // Since the third argument is null, this will use mongo's findOne
-  // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
-  mongoFind(null, searchObj, null, cb.success, cb.notFound, cb.error);
+  // Parameters: res, searchObj, sortObj, successC, notFoundC, errorC
+  dbHelpers.methodsFind(null, searchObj, null, cb.success, cb.notFound, cb.error);
 };
-
-var createToken = exports.createToken = function(req, res, next, authenticateType) {
-  passport.authenticate(authenticateType, {session: false}, function(err, user) {
-    if (err) { console.log('error loggin'); }
-    if (!user) {
-      return res.sendStatus(401);
-    }
-    var token = jwt.encode({
-      username: user.username,
-      expiration: calculateTokenExpiration(),
-      session: user.session
-    }, process.env.TOKEN_SECRET || authConfig.tokenSecret);
-    res.send({access_token: token});
-  })(req, res, next);
-};
-
-var calculateTokenExpiration = exports.calculateTokenExpiration = function() {
-  var timeInHours = 24;
-  var timeInMilliseconds = timeInHours * 3600000;
-  return Date.now() + timeInMilliseconds;
-};
-
-
-
 
 
 
@@ -489,8 +382,8 @@ var postToEntry = exports.postToEntry = function(reqBody, action, res) {
     functionName: reqBody.functionName
   };
 
-  // mongoFind(res, searchObj, sortObj, successC, notFoundC, errorC)
-  mongoFind(res, searchObject, null, function(reference) {
+  // Parameters res, searchObj, sortObj, successC, notFoundC, errorC
+  dbHelpers.methodsFind(res, searchObject, null, function(reference) {
     var explanations = JSON.parse(JSON.stringify(reference.explanations));
     var entries = explanations[reqBody.context];
     if (!entries) {

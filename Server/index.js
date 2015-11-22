@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Used for easier debugging
+// Custom log function used for easier debugging
 global.log = function() {
   var start;
   if (arguments.length > 1 && typeof arguments[0] === 'string') {
@@ -24,6 +24,29 @@ global.log = function() {
     console.log(arguments[i]);
   }
   console.log('*************************');
+};
+
+// Custon error sending function that provides more information
+// in the development testing server
+global.sendErr = function(res, statusCode, errorMessageOrObj) {
+  if (statusCode === null) {
+    statusCode = 400;
+  }
+  if (isNaN(+statusCode)) {
+    // if 2nd arg is the error, then reassign variable
+    errorMessageOrObj = statusCode || errorMessageOrObj;
+    statusCode = 400;
+  }
+  if (!errorMessageOrObj) {
+    errorMessageOrObj = 'Unknown Error';
+  }
+  if (typeof errorMessageOrObj === 'string') {
+    log('Error', errorMessageOrObj);
+  } else {
+    console.error(errorMessageOrObj);
+  }
+  console.error(new Error(errorMessageOrObj).stack);
+  res.status(statusCode).send(errorMessageOrObj);
 };
 
 /**

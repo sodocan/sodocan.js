@@ -1,6 +1,7 @@
 var User = require('../Databases/Models/users.js');
 var passport = require('passport');
-var helpers = require('./helpers');
+var authTokenHelpers = require('./authTokenHelpers');
+
 
 exports.registerPostHandler = function(req, res, next) {
   if (req.body.username.substring(req.body.username.length - 4) === '.git') {
@@ -11,7 +12,7 @@ exports.registerPostHandler = function(req, res, next) {
       res.status(400).send(err);
       return;
     }
-    helpers.createToken(req, res, next, 'local');
+    authTokenHelpers.createToken(req, res, next, 'local');
   });
 };
 
@@ -42,11 +43,11 @@ exports.logoutHandler = function(req, res, next) {
 };
 
 exports.loginPostHandler = function(req, res, next) {
-  helpers.createToken(req, res, next, 'local');
+  authTokenHelpers.createToken(req, res, next, 'local');
 };
 
 exports.githubLoginPostHandler = function(req, res, next) {
-  helpers.createToken(req, res, next, 'github');
+  authTokenHelpers.createToken(req, res, next, 'github');
 };
 
 exports.checkTokenHandler = function(req, res, next) {

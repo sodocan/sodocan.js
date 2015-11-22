@@ -35,6 +35,27 @@ global.log = function() {
   console.log('*************************');
 };
 
+global.sendErr = function(res, statusCode, errorMessageOrObj) {
+  if (statusCode === null) {
+    statusCode = 400;
+  }
+  if (isNaN(+statusCode)) {
+    // if 2nd arg is the error, then reassign variable
+    errorMessageOrObj = statusCode || errorMessageOrObj;
+    statusCode = 400;
+  }
+  if (!errorMessageOrObj) {
+    errorMessageOrObj = 'Unknown Error';
+  }
+  if (typeof errorMessageOrObj === 'string') {
+    log('Error', errorMessageOrObj);
+  } else {
+    console.error(errorMessageOrObj);
+  }
+  console.error(new Error(errorMessageOrObj).stack);
+  res.status(statusCode).send(errorMessageOrObj);
+};
+
 var access_token, access_token2;
 
 // Begin tests
