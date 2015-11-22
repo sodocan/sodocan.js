@@ -359,7 +359,7 @@ describe("Server", function() {
             log('Test Fail', 'Did not send 404 for duplicate ' + duplicateEntryCase.type);
           })
           .catch(function(res) {
-            expect(res.statusCode).to.equal(404);
+            expect(res.statusCode).to.equal(401);
             done();
           })
       });

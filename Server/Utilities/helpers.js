@@ -8,14 +8,35 @@ if (!process.env.TOKEN_SECRET) {
 
 /* Server Response Actions */
 
-var send404 = exports.send404 = function(res, errorMessageOrObj) {
+// var send404 = exports.send404 = function(res, errorMessageOrObj) {
+//   if (typeof errorMessageOrObj === 'string') {
+//     log('Error', errorMessageOrObj);
+//   } else {
+//     console.error(errorMessageOrObj);
+//   }
+//   console.error(new Error('404').stack);
+//   res.status(404).send(errorMessageOrObj);
+// };
+
+var sendErr = function(res, statusCode, errorMessageOrObj) {
+  if (statusCode === null) {
+    statusCode = 400;
+  }
+  if (isNaN(+statusCode)) {
+    // if 2nd arg is the error, then reassign variable
+    errorMessageOrObj = statusCode || errorMessageOrObj;
+    statusCode = 400;
+  }
+  if (!errorMessageOrObj) {
+    errorMessageOrObj = 'Unknown Error';
+  }
   if (typeof errorMessageOrObj === 'string') {
     log('Error', errorMessageOrObj);
   } else {
     console.error(errorMessageOrObj);
   }
-  console.error(new Error('404').stack);
-  res.status(404).send(errorMessageOrObj);
+  console.error(new Error(errorMessageOrObj).stack);
+  res.status(statusCode).send(errorMessageOrObj);
 };
 
 /* Database Actions */
@@ -25,8 +46,8 @@ var send404 = exports.send404 = function(res, errorMessageOrObj) {
 // errorC takes the error as a parameter
 // if sortObj is null, then findOne is used instead of find
 var mongoFind = function(res, searchObj, sortObj, successC, notFoundC, errorC) {
-  notFoundC = notFoundC || function() {send404(res, 'reference not found');};
-  errorC = errorC || function(err) {send404(res, err);};
+  notFoundC = notFoundC || function() {sendErr(res, 404, 'reference not found');};
+  errorC = errorC || function(err) {sendErr(res, 500, err);};
 
   var finder = sortObj
     ? methodsDB.find(searchObj).sort(sortObj).lean()
@@ -129,7 +150,7 @@ var runAfterAsync = exports.runAfterAsync = function(res, numOfCallbacks) {
     }
     if(err && !failed){
       failed = true;
-      send404(res, err);
+      sendErr(res, 500, err);
     }
   };
 };
@@ -156,7 +177,7 @@ var getReferences = exports.getReferences = function(path, res) {
 
   var parsedPath = parseApiPath(path);
   if (!parsedPath) {
-    send404(res, 'Path parsing failed');
+    sendErr(res, 400, 'Invalid path');
     return;
   }
 
@@ -378,7 +399,7 @@ var addNewPost = function(entries, username, newText, isComment) {
   var existingIDs = {};
   for (var i = 0; i < entries.length; i++) {
     if (entries[i].text === newText) {
-      return 'duplicate entry';
+      return 'cannot submit duplicate entry';
     }
     existingIDs[entries[i][idType]] = true;
   }
@@ -427,7 +448,7 @@ var postToExistng = {
       }
       for (var i = 0; i < entries.length; i++) {
         if (entries[i].text === text) {
-          return 'duplicate entry';
+          return 'cannot submit duplicate entry';
         }
       }
       entry.text = text;
@@ -459,7 +480,7 @@ var postToEntry = exports.postToEntry = function(reqBody, action, res) {
 
   var fieldsError = fieldsCheck.findInvalidFields(reqBody, action);
   if (fieldsError) {
-    send404(res, fieldsError);
+    sendErr(res, 400, fieldsError);
     return;
   }
 
@@ -473,7 +494,7 @@ var postToEntry = exports.postToEntry = function(reqBody, action, res) {
     var explanations = JSON.parse(JSON.stringify(reference.explanations));
     var entries = explanations[reqBody.context];
     if (!entries) {
-      send404(res, 'context not found for this function');
+      sendErr(res, 404, 'context not found for this function');
       return;
     }
 
@@ -500,7 +521,7 @@ var postToEntry = exports.postToEntry = function(reqBody, action, res) {
     if (entryID) { // always true when !newPost
       var entInd = indexOfID(entries, entryID);
       if (entInd === -1) {
-        send404(res, 'entry not found');
+        sendErr(res, 404, 'entry not found');
         return;
       }
       var entry = entries[entInd];
@@ -510,7 +531,7 @@ var postToEntry = exports.postToEntry = function(reqBody, action, res) {
       } else if (commentID) { // && !newPost
         var comInd = indexOfID(comments, commentID, true);
         if (comInd === -1) {
-          send404(res, 'comment not found');
+          sendErr(res, 404, 'comment not found');
           return;
         }
         postErr = postToExistng[action](comments, comInd, username, text);
@@ -522,7 +543,7 @@ var postToEntry = exports.postToEntry = function(reqBody, action, res) {
     }
 
     if (postErr) {
-      send404(res, postErr);
+      sendErr(res, 401, postErr);
       return;
     }
 
@@ -532,7 +553,7 @@ var postToEntry = exports.postToEntry = function(reqBody, action, res) {
 
     reference.save(function(err) {
       if (err) {
-        send404(res, err);
+        sendErr(res, 500, err);
       } else {
         res.sendStatus(202);
       }
