@@ -1,17 +1,16 @@
 var express = require('express');
 var router = express.Router();
-var handlers = require('../Utilities/requestHandlers');
+var authHandlers = require('../Utilities/authHandlers');
 var passport = require('passport');
 
+router.post('/login', authHandlers.loginPostHandler);
 
-router.post('/login', handlers.loginPostHandler);
+router.post('/register', authHandlers.registerPostHandler);
 
-router.post('/register', handlers.registerPostHandler);
-
-router.post('/logout', handlers.logoutHandler);
+router.post('/logout', authHandlers.logoutHandler);
 
 router.get('/github', passport.authenticate('github'));
 
-router.get('/github/callback', handlers.githubLoginPostHandler);
+router.get('/github/callback', authHandlers.githubLoginPostHandler);
 
 module.exports = router;

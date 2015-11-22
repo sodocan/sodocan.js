@@ -1,7 +1,7 @@
 var helpers = require('./helpers');
 var fs = require('fs');
-var User = require('../Databases/Models/users.js');
-var passport = require('passport');
+// var User = require('../Databases/Models/users.js');
+// var passport = require('passport');
 
 exports.getApi = function(req, res){
   var apiPath = req.url;
@@ -51,72 +51,72 @@ exports.editEntry = function(req, res) {
 }
 
 
-exports.registerPostHandler = function(req, res, next) {
-  if (req.body.username.substring(req.body.username.length - 4) === '.git') {
-    res.status(400).send('illegal username (cannot end in .git)');
-  }
-  User.register(new User({username: req.body.username}), req.body.password, function(err, user) {
-    if (err) {
-      res.sendStatus(400);
-      return;
-    }
-    helpers.createToken(req, res, next, 'local');
-  });
-};
+// exports.registerPostHandler = function(req, res, next) {
+//   if (req.body.username.substring(req.body.username.length - 4) === '.git') {
+//     res.status(400).send('illegal username (cannot end in .git)');
+//   }
+//   User.register(new User({username: req.body.username}), req.body.password, function(err, user) {
+//     if (err) {
+//       res.sendStatus(400);
+//       return;
+//     }
+//     helpers.createToken(req, res, next, 'local');
+//   });
+// };
 
-exports.logoutHandler = function(req, res, next) {
-  passport.authenticate('bearer', {session: false}, function(err, user, info) {
-    if (err) {
-      if (err === 'Token Expired') {
-        res.sendStatus(200);
-      } else {
-        console.error(err);
-        res.send('authentication error');
-      }
-      return;
-    }
-    if (!user) {
-      res.send('Not logged in');
-      return;
-    }
-    user.session++;
-    user.save(function(err) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      res.sendStatus(200);
-    });
-  })(req, res, next);
-};
+// exports.logoutHandler = function(req, res, next) {
+//   passport.authenticate('bearer', {session: false}, function(err, user, info) {
+//     if (err) {
+//       if (err === 'Token Expired') {
+//         res.sendStatus(200);
+//       } else {
+//         console.error(err);
+//         res.send('authentication error');
+//       }
+//       return;
+//     }
+//     if (!user) {
+//       res.send('Not logged in');
+//       return;
+//     }
+//     user.session++;
+//     user.save(function(err) {
+//       if (err) {
+//         console.error(err);
+//         return;
+//       }
+//       res.sendStatus(200);
+//     });
+//   })(req, res, next);
+// };
 
-exports.loginPostHandler = function(req, res, next) {
-  helpers.createToken(req, res, next, 'local');
-};
+// exports.loginPostHandler = function(req, res, next) {
+//   helpers.createToken(req, res, next, 'local');
+// };
 
-exports.githubLoginPostHandler = function(req, res, next) {
-  helpers.createToken(req, res, next, 'github');
-};
+// exports.githubLoginPostHandler = function(req, res, next) {
+//   helpers.createToken(req, res, next, 'github');
+// };
 
-exports.checkTokenHandler = function(req, res, next) {
-  passport.authenticate('bearer', {session: false}, function(err, user) {
-    if (err) {
-      console.error(err);
-      if (err === 'Invalid Token' || err === 'Token Expired') {
-        res.status(401).send(err);
-      } else {
-        res.status(401).send('Unknown error. Please try again');
-      }
-      return;
-    }
-    if (user) {
-      req.body.username = user.username;
-      next();
-    } else {
-      res.status(401).send('Not logged in');
-    }
-  })(req, res, next);
-};
+// exports.checkTokenHandler = function(req, res, next) {
+//   passport.authenticate('bearer', {session: false}, function(err, user) {
+//     if (err) {
+//       console.error(err);
+//       if (err === 'Invalid Token' || err === 'Token Expired') {
+//         res.status(401).send(err);
+//       } else {
+//         res.status(401).send('Unknown error. Please try again');
+//       }
+//       return;
+//     }
+//     if (user) {
+//       req.body.username = user.username;
+//       next();
+//     } else {
+//       res.status(401).send('Not logged in');
+//     }
+//   })(req, res, next);
+// };
 
 exports.setCorsHeader = function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin','*');
