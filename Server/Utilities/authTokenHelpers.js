@@ -6,9 +6,13 @@ if (!process.env.TOKEN_SECRET) {
 
 var createToken = exports.createToken = function(req, res, next, authenticateType) {
   passport.authenticate(authenticateType, {session: false}, function(err, user) {
-    if (err) { console.log('login error'); }
+    if (err) {
+      res.sendStatus(500);
+      return;
+    }
     if (!user) {
-      return res.sendStatus(401);
+      res.sendStatus(401);
+      return;
     }
     var token = jwt.encode({
       username: user.username,

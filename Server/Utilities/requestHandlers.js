@@ -1,9 +1,11 @@
-var helpers = require('./helpers');
+var postToEntryHelpers = require('./postToEntryHelpers');
+var getRefHelpers = require('./getRefHelpers');
+var postSkelHelpers = require('./postSkelHelpers');
 var fs = require('fs');
 
 exports.getApi = function(req, res){
   var apiPath = req.url;
-  helpers.getReferences(apiPath, res);
+  getRefHelpers.getReferences(apiPath, res);
 };
 
 exports.postSkeleton = function(req, res) {
@@ -19,13 +21,13 @@ exports.postSkeleton = function(req, res) {
       res.status(400).send('no function names for any of the functions');
       return;
     }
-    var completedMethodEntry = helpers.runAfterAsync(res, methodsArray.length);
+    var oneUpdateComplete = postSkelHelpers.trackUpdates(res, methodsArray.length);
     for(var i = 0; i < methodsArray.length; i++){
       var method = methodsArray[i];
       //check and see if this method exists already (match proj and method)
         //if it doesn't, convert it to proper mongoForm, then insert
 
-      helpers.findAndUpdateMethod(method, completedMethodEntry, skull, username);
+      postSkelHelpers.findAndUpdateMethod(method, oneUpdateComplete, skull, username);
 
       //else, check and see if content matches any existing method content
         //if it doesn't match, insert
@@ -36,15 +38,15 @@ exports.postSkeleton = function(req, res) {
 };
 
 exports.upvote = function(req, res) {
-  helpers.postToEntry(req.body, 'upvote', res);
+  postToEntryHelpers.postToEntry(req.body, 'upvote', res);
 };
 
 exports.addEntry = function(req, res) {
-  helpers.postToEntry(req.body, 'add', res);
+  postToEntryHelpers.postToEntry(req.body, 'add', res);
 };
 
 exports.editEntry = function(req, res) {
-  helpers.postToEntry(req.body, req.body.delete ? 'delete' : 'edit', res);
+  postToEntryHelpers.postToEntry(req.body, req.body.delete ? 'delete' : 'edit', res);
 }
 
 exports.setCorsHeader = function(req, res, next) {

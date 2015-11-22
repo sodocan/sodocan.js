@@ -57,7 +57,7 @@ exports.checkTokenHandler = function(req, res, next) {
       if (err === 'Invalid Token' || err === 'Token Expired') {
         res.status(401).send(err);
       } else {
-        res.status(401).send('Unknown error. Please try again');
+        res.status(500).send('Unknown error. Please try again');
       }
       return;
     }

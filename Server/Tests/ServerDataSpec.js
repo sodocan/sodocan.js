@@ -2,7 +2,8 @@ var mongoose = require('mongoose');
 var expect = require('chai').expect;
 var request = require('request');
 var reqprom = require('request-promise');
-var helpers = require('./../Utilities/helpers.js');
+var getRefHelpers = require('./../Utilities/getRefHelpers.js');
+var postSkelHelpers = require('./../Utilities/postSkelHelpers.js');
 var testCases = require('./testCases.js');
 var db = require('../Databases/dbconnection.js');
 var methodsDB = require('../Databases/Models/methods.js');
@@ -120,7 +121,7 @@ describe("Server", function() {
     var parseAPath = function(path) {
       it("should parse path " + path, function(done) {
         var expectedObj = parsePathCases[path];
-        var returnedObj = helpers.parseApiPath(path);
+        var returnedObj = getRefHelpers.parseApiPath(path);
         expect(returnedObj).to.deep.equal(expectedObj);
         done();
       });
@@ -132,7 +133,7 @@ describe("Server", function() {
 
     it("should convert parser output objects to the DB form", function(done) {
       var convertFormCase = testCases.convertFormCase;
-      var actualForm = helpers.convertToDBForm.apply(null, convertFormCase.inputs);
+      var actualForm = postSkelHelpers.convertToDBForm.apply(null, convertFormCase.inputs);
       delete actualForm.timestamp;
       expect(actualForm).to.deep.equal(convertFormCase.expectedOutput);
       done();
@@ -157,7 +158,7 @@ describe("Server", function() {
         options.json.access_token = access_token;
 
         request(options, function(error, res, body) {
-          expect(res.statusCode).to.equal(202);
+          expect(res.statusCode).to.equal(201);
 
           methodsDB.find({project: 'testProj'}).sort({functionName: 1}).lean().exec(function(err, references) {
             if (err) {
@@ -288,7 +289,7 @@ describe("Server", function() {
         getOptions.uri = addEntryCase.getUri;
         reqprom(postOptions)
           .then(function(res) {
-            expect(res.statusCode).to.equal(202);
+            expect(res.statusCode).to.equal(201);
             return reqprom(getOptions);
           })
           .then(function(body) {
@@ -330,14 +331,14 @@ describe("Server", function() {
         getOptions.uri = upvoteCase.getUri;
         reqprom(postOptions)
           .then(function(res) {
-            expect(res.statusCode).to.equal(202);
+            expect(res.statusCode).to.equal(201);
             postOptions.uri = 'http://localhost:3000/upvote'
             postOptions.json = upvoteCase.upvoteJson;
             postOptions.json.access_token = access_token2;
             return reqprom(postOptions);
           })
           .then(function(res) {
-            expect(res.statusCode).to.equal(202);
+            expect(res.statusCode).to.equal(201);
             return reqprom(getOptions);
           })
           .then(function(body) {
@@ -380,7 +381,7 @@ describe("Server", function() {
             log('Test Fail', 'Did not send 404 for duplicate ' + duplicateEntryCase.type);
           })
           .catch(function(res) {
-            expect(res.statusCode).to.equal(401);
+            expect(res.statusCode).to.equal(400);
             done();
           })
       });
@@ -402,7 +403,7 @@ describe("Server", function() {
         getOptions.uri = editEntryCase.getUri;
         reqprom(postOptions)
           .then(function(res) {
-            expect(res.statusCode).to.equal(202);
+            expect(res.statusCode).to.equal(201);
             return reqprom(getOptions);
           })
           .then(function(body) {
