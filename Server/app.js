@@ -14,6 +14,7 @@ var BearerStrategy = require('passport-http-bearer').Strategy;
 
 var usersRouter = require('./Routes/users');
 var handlers = require('./Utilities/requestHandlers');
+var authHandlers = require('./Utilities/authHandlers');
 var strategyUtil = require('./Utilities/strategyUtil');
 
 var app = express();
@@ -66,10 +67,10 @@ app.use(function(err, req, res, next) {
 });
 
 app.get('/api/*', handlers.getApi);
-app.post('/create', handlers.checkTokenHandler, handlers.postSkeleton);
-app.post('/upvote', handlers.checkTokenHandler, handlers.upvote);
-app.post('/addEntry', handlers.checkTokenHandler, handlers.addEntry);
-app.post('/editEntry', handlers.checkTokenHandler, handlers.editEntry);
+app.post('/create', authHandlers.checkTokenHandler, handlers.postSkeleton);
+app.post('/upvote', authHandlers.checkTokenHandler, handlers.upvote);
+app.post('/addEntry', authHandlers.checkTokenHandler, handlers.addEntry);
+app.post('/editEntry', authHandlers.checkTokenHandler, handlers.editEntry);
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
@@ -83,16 +84,14 @@ app.use(function(req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.end();
+    res.sendStatus(err.status || 500);
   });
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.end();
+  res.sendStatus(err.status || 500);
 });
 
 module.exports = app;
