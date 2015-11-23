@@ -1,9 +1,11 @@
 var passport = require('passport');
 var jwt = require('jwt-simple');
-if (!process.env.TOKEN_SECRET) {
+if (!process.env.TOKEN_SECRET) { // triggered when doing local testing
   var authConfig = require('../authenticationConfig');
 }
 
+// validates the username and password on the request body
+// then creates token to send to client
 var createToken = exports.createToken = function(req, res, next, authenticateType) {
   passport.authenticate(authenticateType, {session: false}, function(err, user) {
     if (err) {

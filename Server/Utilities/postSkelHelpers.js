@@ -1,5 +1,6 @@
 var dbHelpers = require('./methodsDatabaseHelpers');
 
+// converts object sent by parser into form that will be stored in database
 var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj, username) {
   var dbForm = {
     project: projectName,
@@ -16,6 +17,12 @@ var convertToDBForm = exports.convertToDBForm = function(projectName, skeleObj, 
   return dbForm;
 };
 
+// since the parser may send multiple functions from the same project
+// in one request, and because each function must be stored separately
+// in the database, the trackUpdates function will return a callback
+// for each successful database update, and will only send a response
+// back to the server when all updates have been successful, or when an
+// error occurs with any of the updates
 var trackUpdates = exports.trackUpdates = function(res, numOfCallbacks) {
   var finished = 0;
   var failed = false;
@@ -33,6 +40,11 @@ var trackUpdates = exports.trackUpdates = function(res, numOfCallbacks) {
   };
 };
 
+// when parser sends a new document, each function will be queried against
+// the database to see if they already exist. If a function exists, then any
+// entries that came with the function will be added to that function in the
+// database. If the function does not exist, then a new object will be created
+// for it and saved in the database.
 var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, oneUpdateComplete, skull, username) {
   var searchObj = {
     project: skull.project,

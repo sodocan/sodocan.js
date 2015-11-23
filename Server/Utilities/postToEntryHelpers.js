@@ -1,5 +1,7 @@
 var dbHelpers = require('./methodsDatabaseHelpers');
 
+// for each post request, checks if the request has all of the
+// necessary fields (and they are all valid)
 var fieldsCheck = {
 
   commonFields: ['username', 'project', 'functionName', 'context'],
@@ -120,6 +122,7 @@ var indexOfID = function(entries, ID, isComment) {
   return -1;
 };
 
+// allows adding, upvoting, editing, deleting of entries or comments
 var postToEntry = exports.postToEntry = function(reqBody, action, res) {
 
   var fieldsError = fieldsCheck.findInvalidFields(reqBody, action);

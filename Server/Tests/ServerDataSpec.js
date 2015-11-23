@@ -9,7 +9,7 @@ var db = require('../Databases/dbconnection.js');
 var methodsDB = require('../Databases/Models/methods.js');
 var User = require('../Databases/Models/users.js');
 
-// Need this log function because test environment has different
+// Need log and sendErr functions because test environment has different
 // global scope as the one the server is running on
 global.log = function() {
   var start;
@@ -57,15 +57,18 @@ global.sendErr = function(res, statusCode, errorMessageOrObj) {
   res.status(statusCode).send(errorMessageOrObj);
 };
 
+// to simulate login
 var access_token, access_token2;
 
 // Begin tests
 describe("Server", function() {
 
-  // removes test data
+  // runs this before running the tests
   before(function (done) {
     this.timeout(5000);
 
+    // removes data inserted by any previous runs of these tests
+    // and registers two test users
     var reinitiateTestData = function() {
       methodsDB.remove({project: 'testProj'}, function(err) {
         if (err) {

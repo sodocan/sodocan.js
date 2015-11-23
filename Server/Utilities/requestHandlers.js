@@ -1,7 +1,6 @@
 var postToEntryHelpers = require('./postToEntryHelpers');
 var getRefHelpers = require('./getRefHelpers');
 var postSkelHelpers = require('./postSkelHelpers');
-var fs = require('fs');
 
 exports.getApi = function(req, res){
   var apiPath = req.url;
@@ -24,13 +23,11 @@ exports.postSkeleton = function(req, res) {
     var oneUpdateComplete = postSkelHelpers.trackUpdates(res, methodsArray.length);
     for(var i = 0; i < methodsArray.length; i++){
       var method = methodsArray[i];
+
       //check and see if this method exists already (match proj and method)
-        //if it doesn't, convert it to proper mongoForm, then insert
-
+      //if it doesn't, convert it to proper mongoForm, then insert
+      //else, update existing method
       postSkelHelpers.findAndUpdateMethod(method, oneUpdateComplete, skull, username);
-
-      //else, check and see if content matches any existing method content
-        //if it doesn't match, insert
     }
   } else {
     res.status(400).send('project name is not provided');
@@ -49,6 +46,7 @@ exports.editEntry = function(req, res) {
   postToEntryHelpers.postToEntry(req.body, req.body.delete ? 'delete' : 'edit', res);
 }
 
+// to allow cross-origin requests, since clients are hotsted on another domain
 exports.setCorsHeader = function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin','*');
   next();
