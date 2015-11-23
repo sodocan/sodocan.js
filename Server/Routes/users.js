@@ -3,6 +3,8 @@ var router = express.Router();
 var authHandlers = require('../Utilities/authHandlers');
 var passport = require('passport');
 
+// url routes in auth/
+
 router.post('/login', authHandlers.loginPostHandler);
 
 router.post('/register', authHandlers.registerPostHandler);

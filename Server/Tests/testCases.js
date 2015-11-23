@@ -1,3 +1,5 @@
+// Used for tests
+
 exports.parsePathCases = {
   '/api/sodocan': {
     searchObject: {project: 'sodocan'},

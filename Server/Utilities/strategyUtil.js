@@ -3,11 +3,9 @@ var jwt = require('jwt-simple');
 
 var env = process.env;
 
-if (!env.TOKEN_SECRET) {
+if (!env.CLIENT_ID || !env.CLIENT_SECRET || !env.CALLBACK_URL) {
   var authConfig = require('../authenticationConfig');
 }
-
-exports.localStrategyCallback = User.authenticate();
 
 exports.githubStrategyConfig = {
   clientID: env.CLIENT_ID || authConfig.github.clientID,
@@ -15,31 +13,41 @@ exports.githubStrategyConfig = {
   callbackURL: env.CALLBACK_URL || authConfig.github.callbackURL
 };
 
+var saveNewGithubUser = function(githubName, done) {
+  var user = new User({
+    username: githubName + '.git',
+  });
+  user.save(function(err) {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log('saving new user...');
+      done(null, user);
+    }
+  });
+};
+
+// defines callback to be used when verifying username and password on login
+exports.localStrategyCallback = User.authenticate();
+
+// defines callback to be used when verifying that a github account is valid
 exports.githubStrategyCallback = function(accessToken, refreshToken, profile, done) {
-  User.findOne({username: profile.username + '.git'}, function(err, user) {
+  var githubName = profile.username;
+  User.findOne({username: githubName + '.git'}, function(err, user) {
     if (err) {
       console.error(err);
       return;
     }
     if (user) {
-        console.log('user already found in database');
+        console.log('user exists in database');
         done(null, user);
     } else {
-      var user = new User({
-        username: profile.username + '.git',
-      });
-      user.save(function(err) {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log('saving user...');
-          done(null, user);
-        }
-      });
+      saveNewGithubUser(githubName, done);
     }
   });
 };
 
+// defines callback to be used when verifying an authentication token
 exports.bearerStrategyCallback = function(token, done) {
   try {
     var decoded = jwt.decode(token, env.TOKEN_SECRET || authConfig.tokenSecret);
