@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+- 4.1.2
+services:
+- mongodb
+before_install:
+- npm install -g grunt-cli
+install:
+- npm install
+deploy:
+  provider: heroku
+  api_key:
+    secure: <YOUR API KEY>
+  app:
+    production: sodocan
+    master: sodocan-staging
+  on:
+    repo: sodocan/sodocan.js

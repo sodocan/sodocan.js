@@ -35,6 +35,7 @@ parser/results
 
 # auth secrets
 Server/authenticationConfig.js
+.travis.yml
 
 *.vim
 .*
