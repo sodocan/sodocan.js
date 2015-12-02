@@ -71,9 +71,9 @@ var pluckEntriesFromRef = function(reference, contexts) {
     //otherwise use the one specified in all
     var depthSpecs = contexts[context] || contexts.all;
     if (depthSpecs) {
-      //default depth is 1, default addtion is 0
+      //default entry depth is 1, default comment depth is 0
       var entryDepth = depthSpecs[0] || '1';
-      var addDepth = depthSpecs[1] || '0';
+      var commentDepth = depthSpecs[1] || '0';
       var contextArray;
       //the prefix entryID means we are looking for a specific ID
       if (entryDepth.slice(0,7) === 'entryID') {
@@ -103,26 +103,26 @@ var pluckEntriesFromRef = function(reference, contexts) {
       //checking to see if we want a specific comment
       //very similar to what we did for entries
       for (var i = 0; i < contextArray.length; i++) {
-        if (addDepth.slice(0,9) === 'commentID') {
-          id = +addDepth.slice(10);
+        if (commentDepth.slice(0,9) === 'commentID') {
+          id = +commentDepth.slice(10);
           var commentsArray = contextArray[i].comments;
-          var foundAdd = false;
+          var foundComment = false;
           for (var j = 0; i < commentsArray.length; j++) {
             if (commentsArray[j].commentID === id) {
               contextArray[i].comments = [commentsArray[j]];
-              foundAdd = true;
+              foundComment = true;
               break;
             }
           }
-          if (!foundAdd) {
+          if (!foundComment) {
             contextArray[i].comments = [];
           }
 
-        } else if(addDepth !== 'all'){
-          if (isNaN(+addDepth)) {
-            addDepth = 0;
+        } else if(commentDepth !== 'all'){
+          if (isNaN(+commentDepth)) {
+            commentDepth = 0;
           }
-          contextArray[i].comments = contextArray[i].comments.slice(0, +addDepth);
+          contextArray[i].comments = contextArray[i].comments.slice(0, +commentDepth);
         }
       }
     } else {//if there was no depth, that means we don't want it. delete.

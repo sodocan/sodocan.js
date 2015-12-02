@@ -40,6 +40,40 @@ var trackUpdates = exports.trackUpdates = function(res, numOfCallbacks) {
   };
 };
 
+var checkIfEntryIsNew = function(existingEntries, newEntryText) {
+  for (var j = 0; j < existingEntries.length; j++) {
+    var existingEntry = existingEntries[j];
+    if (newEntryText === existingEntry.text) {
+      return false;
+    }
+  }
+  return true;
+};
+
+var createNewEntry = function(newEntryText, username) {
+  return {
+    username: username,
+    text: newEntryText,
+    upvotes: 0,
+    upvoters: {},
+    comments: [],
+    entryID: dbHelpers.hashCode(newEntryText),
+    timestamp: new Date()
+  };
+};
+
+var updateFoundMethod = function(foundMethod, explanations, username) {
+  for (var context in explanations) { //should be changed to explanations
+    var newEntryText = explanations[context]; // this is a string
+    var existingEntries = foundMethod.explanations[context];
+    if (newEntryText && checkIfEntryIsNew(existingEntries, newEntryText)) {
+      var newEntry = createNewEntry(newEntryText, username);
+      existingEntries.push(newEntry);
+    }
+  }
+  return {explanations: foundMethod.explanations};
+};
+
 // when parser sends a new document, each function will be queried against
 // the database to see if they already exist. If a function exists, then any
 // entries that came with the function will be added to that function in the
@@ -56,35 +90,7 @@ var findAndUpdateMethod = exports.findAndUpdateMethod = function(method, oneUpda
 
     success: function(foundMethod) {
       var explanations = method.explanations;
-      for (var context in explanations) { //should be changed to explanations
-        var newEntryText = explanations[context]; // this is a string
-        if (newEntryText) { //only do work if there is text
-          var existingEntries = foundMethod.explanations[context]; // array
-          var match = false;
-          for (var j = 0; j < existingEntries.length; j++) {
-            var existingEntry = existingEntries[j]; // object
-            if (newEntryText === existingEntry.text) {
-              match = true;
-              break;
-            }
-          }
-          if (!match) {
-            var newEntry = {
-              username: username,
-              text: newEntryText,
-              upvotes: 0,
-              upvoters: {},
-              comments: [],
-              entryID: dbHelpers.hashCode(newEntryText),
-              timestamp: new Date()
-            };
-            existingEntries.push(newEntry);
-          }
-        }
-      }
-
-      var updateObj = {explanations: foundMethod.explanations};
-
+      var updateObj = updateFoundMethod(foundMethod, explanations, username);
       dbHelpers.methodsUpdate(searchObj, updateObj, oneUpdateComplete);
     },
 
